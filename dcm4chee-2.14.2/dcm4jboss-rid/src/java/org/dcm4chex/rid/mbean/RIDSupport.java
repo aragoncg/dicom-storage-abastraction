@@ -607,7 +607,8 @@ public class RIDSupport {
                 log.debug("Found Dataset:");log.debug(ds);
                 String cuid = ds.getString( Tags.SOPClassUID );
                 if ( getECGSopCuids().values().contains( cuid ) ) {
-                    response = getECGSupport().getECGDocument( reqObj, ds );
+//                  response = getECGSupport().getECGDocument( reqObj, ds );
+                	response = createECGSupport().getECGDocument( reqObj, ds );
                 } else if ( this.getEncapsulatedDocumentSopCuids().values().contains( cuid )) {
                     response = getEncapsulatedDocument( reqObj );
                     logExport(reqObj, ds, "XDS Document Retrieve");
@@ -758,11 +759,12 @@ public class RIDSupport {
                 if ( ! useOrigFile   ) {
                     FileDataSource ds = null;
                     try {
-                        ds = (FileDataSource) server.invoke(queryRetrieveScpName,
-                                "getDatasourceOfInstance",
-                                new Object[] { docUID },
-                                new String[] { String.class.getName() } );
-
+//                        ds = (FileDataSource) server.invoke(queryRetrieveScpName,
+//                                "getDatasourceOfInstance",
+//                                new Object[] { docUID },
+//                                new String[] { String.class.getName() } );
+    					ds = createDataSource(server, queryRetrieveScpName,
+				                "getDatasourceOfInstance", docUID);
                     } catch (Exception e) {
                         log.error("Failed to get updated DICOM file", e);
                         return new RIDStreamResponseObjectImpl( null, contentType, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error! Cant get updated dicom object");
@@ -777,7 +779,8 @@ public class RIDSupport {
                     renderSRFile( new FileInputStream(tmpFile), out );
                     tmpFile.delete();
                 } else {
-                    renderSRFile( new FileInputStream(inFile), out );
+//                  renderSRFile( new FileInputStream(inFile), out );
+                	renderSRFile( createInputStream(inFile), out );
                 }
                 out.close();
             }
@@ -904,7 +907,9 @@ public class RIDSupport {
                     new Object[] { reqObj.getParam("documentUID") },
                     new String[] { String.class.getName() } );
 
-            InputStream is = new BufferedInputStream( new FileInputStream(fds.getFile()) );
+//          InputStream is = new BufferedInputStream( new FileInputStream(fds.getFile()) );
+            InputStream is = new BufferedInputStream( createInputStream(fds.getFile()) );
+            
             Dataset ds = fds.getMergeAttrs();
             String mime = ds.getString(Tags.MIMETypeOfEncapsulatedDocument);
             if (mime == null) {
@@ -969,4 +974,19 @@ public class RIDSupport {
             storage= RIDStorageDelegate.getInstance();
         return storage;
     }
+    
+	//The following three methods are added by YangLin@cn-arg.com on 02.14.2009
+	protected InputStream createInputStream(File file) throws FileNotFoundException {
+	     return new FileInputStream(file);     
+	}
+	    
+	protected FileDataSource createDataSource(MBeanServer server, 
+	          ObjectName fileSystemMgtName, String methodName, String docUID) throws Exception {
+	     return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 
+	         new Object[] { docUID }, new String[] { String.class.getName() });
+	}
+	
+	protected ECGSupport createECGSupport() {
+	     return getECGSupport();
+	}
 }

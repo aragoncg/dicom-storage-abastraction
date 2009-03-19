@@ -84,6 +84,7 @@ import org.dcm4chex.archive.ejb.interfaces.FileSystemDTO;
 import org.dcm4chex.archive.ejb.interfaces.Storage;
 import org.dcm4chex.archive.ejb.interfaces.StorageHome;
 import org.dcm4chex.archive.exceptions.UnknownAETException;
+import org.dcm4chex.archive.factory.ScpFactoryUtil;
 import org.dcm4chex.archive.mbean.FileSystemMgt2Delegate;
 import org.dcm4chex.archive.mbean.SchedulerDelegate;
 import org.dcm4chex.archive.util.EJBHomeFactory;
@@ -181,7 +182,9 @@ public class StoreScpService extends AbstractScpService {
 
     private boolean md5sum = true;
 
-    private StoreScp scp = new StoreScp(this);
+    //Modified by YangLin@cn-arg.com on 03.02.2009
+//  private StoreScp scp = new StoreScp(this); 
+    private StoreScp scp = ScpFactoryUtil.getScpFactory().getStoreScp(this);
 
     protected StoreScp getScp() {
         return scp;
@@ -771,7 +774,12 @@ public class StoreScpService extends AbstractScpService {
         String fsPath = fileDTO.getDirectoryPath();
         String filePath = fileDTO.getFilePath();
         File f = FileUtils.toFile(fsPath, filePath);
-        scp.updateDB(store, ds, fileDTO.getFileSystemPk(), filePath, f.length(),
+        
+        //Modified by YangLin@cn-arg.com on 01.09.2009
+        //In case the file is not stored in file system but somewhere else 
+//      scp.updateDB(store, ds, fileDTO.getFileSystemPk(), filePath, f.length(),
+//              fileDTO.getFileMd5(), true);
+        scp.updateDB(store, ds, fileDTO.getFileSystemPk(), filePath, fileDTO.getFileSize(),
                 fileDTO.getFileMd5(), true);
         if (last) {
             SeriesStored seriesStored = store.makeSeriesStored(seriud);

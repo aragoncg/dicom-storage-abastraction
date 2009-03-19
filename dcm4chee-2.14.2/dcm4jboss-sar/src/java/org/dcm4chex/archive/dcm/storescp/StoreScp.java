@@ -458,8 +458,11 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
             Command rqCmd = rq.getCommand();
             Association assoc = activeAssoc.getAssociation();
             String callingAET = assoc.getCallingAET();
+            
             String iuid = checkSOPInstanceUID(rqCmd, ds, callingAET);
+            
             checkAppendPermission(assoc, ds);
+            
             List duplicates = new QueryFilesCmd(iuid).getFileDTOs();
             if (!(duplicates.isEmpty() || storeDuplicateIfDiffMD5 || storeDuplicateIfDiffHost
                     && !containsLocal(duplicates))) {
@@ -480,6 +483,7 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
                     ds);
 
             service.logDIMSE(assoc, STORE_XML, ds);
+            
             if (isCheckIncorrectWorklistEntry()
                     && checkIncorrectWorklistEntry(ds)) {
                 log
@@ -488,9 +492,13 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
                                 + "] ignored! Reason: Incorrect Worklist entry selected!");
                 return;
             }
+            
             FileSystemDTO fsDTO;
+            
             String filePath;
+            
             byte[] md5sum = null;
+            
             Dataset coerced = service.getCoercionAttributesFor(assoc,
                     STORE_XSL, ds);
             if ( coerceBeforeWrite ) {
@@ -499,6 +507,7 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
                 }
                 service.postCoercionProcessing(ds);
             }
+            
             if (dcm4cheeURIReferenced) {
                 String uri = ds.getString(Tags.RetrieveURI);
                 if (uri == null) {
@@ -526,8 +535,10 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
                         refFileSystemGroupID, referencedDirectoryPath);
                 if (file != null && readReferencedFile) {
                     log.info("M-READ " + file);
+                    
                     Dataset fileDS = objFact.newDataset();
                     FileInputStream fis = new FileInputStream(file);
+                    
                     try {
                         if (md5sumReferencedFile) {
                             MessageDigest digest = MessageDigest
@@ -563,11 +574,15 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
             } else {
                 String fsgrpid = service.selectFileSystemGroup(callingAET, ds);
                 fsDTO = service.selectStorageFileSystem(fsgrpid);
+                
                 File baseDir = FileUtils.toFile(fsDTO.getDirectoryPath());
+                
                 file = makeFile(baseDir, ds, callingAET);
+                
                 filePath = file.getPath().substring(
                         baseDir.getPath().length() + 1).replace(
                         File.separatorChar, '/');
+                
                 String compressTSUID = (parser.getReadTag() == Tags.PixelData && parser
                         .getReadLength() != -1) ? compressionRules
                         .getTransferSyntaxFor(assoc, ds) : null;
@@ -597,6 +612,7 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
             ds.putAE(PrivateTags.CallingAET, callingAET);
             ds.putAE(PrivateTags.CalledAET, assoc.getCalledAET());
             ds.putAE(Tags.RetrieveAET, fsDTO.getRetrieveAET());
+            
             if ( ! coerceBeforeWrite ) {
                 if (coerced != null) {
                     service.coerceAttributes(ds, coerced);
@@ -632,10 +648,12 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
             appendInstanceToSeriesStored(seriesStored, ds, fsDTO);
             perfMon.start(activeAssoc, rq,
                     PerfCounterEnum.C_STORE_SCP_OBJ_REGISTER_DB);
+            
             long fileLength = file != null ? file.length() : 0L;
             Dataset coercedElements = updateDB(store, ds, fsDTO.getPk(),
                     filePath, fileLength, md5sum,
                     newSeries);
+            
             ds.putAll(coercedElements, Dataset.MERGE_ITEMS);
             coerced = merge(coerced, coercedElements);
             perfMon.setProperty(activeAssoc, rq, PerfPropertyEnum.REQ_DATASET,
@@ -1167,6 +1185,16 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
         service.logInstancesStored(assoc == null ? null : assoc.getSocket(), seriesStored);
         service.sendJMXNotification(seriesStored);
         store.commitSeriesStored(seriesStored);
+    }
+    
+    //The two methods are added by YangLin@cn-arg.com on 01.20.2009
+    //For accessing private fields from sub-type
+    protected String getReferencedDirectoryURI() {
+        return referencedDirectoryURI;
+    }
+   
+    protected PerfMonDelegate getPerfMon() {
+        return perfMon;
     }
 
 }

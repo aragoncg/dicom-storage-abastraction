@@ -50,6 +50,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import javax.activation.DataHandler;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -184,10 +186,13 @@ public class ECGSupport {
         if (!ridSupport.isUseOrigFile()) {
             FileDataSource dsrc = null;
             try {
-                dsrc = (FileDataSource) ridSupport.getMBeanServer().invoke(
-                        ridSupport.getQueryRetrieveScpName(),
-                        "getDatasourceOfInstance", new Object[] { iuid },
-                        new String[] { String.class.getName() });
+//                dsrc = (FileDataSource) ridSupport.getMBeanServer().invoke(
+//                        ridSupport.getQueryRetrieveScpName(),
+//                        "getDatasourceOfInstance", new Object[] { iuid },
+//                        new String[] { String.class.getName() });
+                dsrc = createDataSource(ridSupport.getMBeanServer(), ridSupport.getQueryRetrieveScpName(),
+                        "getDatasourceOfInstance", iuid );
+                
             } catch (Exception e) {
                 log.error("Failed to get updated DICOM file", e);
             }
@@ -342,6 +347,13 @@ public class ECGSupport {
             }
         }
         return (WaveformGroup[]) l.toArray(new WaveformGroup[l.size()]);
+    }
+    
+    //Added by YangLin@cn-arg.com on 02.14.2009
+    protected FileDataSource createDataSource(MBeanServer server, 
+            ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
+        return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 
+            new Object[] { iuid }, new String[] { String.class.getName() });
     }
 
 }

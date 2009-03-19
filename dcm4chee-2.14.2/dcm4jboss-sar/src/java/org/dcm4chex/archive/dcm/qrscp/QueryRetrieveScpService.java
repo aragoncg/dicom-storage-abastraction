@@ -105,6 +105,7 @@ import org.dcm4chex.archive.ejb.jdbc.RetrieveCmd;
 import org.dcm4chex.archive.exceptions.ConfigurationException;
 import org.dcm4chex.archive.exceptions.NoPresContextException;
 import org.dcm4chex.archive.exceptions.UnknownAETException;
+import org.dcm4chex.archive.factory.ScpFactoryUtil;
 import org.dcm4chex.archive.mbean.DicomSecurityDelegate;
 import org.dcm4chex.archive.mbean.TLSConfigDelegate;
 import org.dcm4chex.archive.perf.PerfMonDelegate;
@@ -1465,7 +1466,12 @@ public class QueryRetrieveScpService extends AbstractScpService {
                                         info.seriesAttrs,
                                         DatasetUtils .fromByteArray(
                                                 info.instAttrs))));
-                return new FileDataSource(f, mergeAttrs, new byte[bufferSize]);
+                
+                //Modified by YangLin@cn-arg.com on 03.03.2009                
+//              return new FileDataSource(f, mergeAttrs, new byte[bufferSize]);
+                return ScpFactoryUtil.getScpFactory().getDataSource(
+                		                  f, mergeAttrs, bufferSize);
+                
             }
         }
         return null;

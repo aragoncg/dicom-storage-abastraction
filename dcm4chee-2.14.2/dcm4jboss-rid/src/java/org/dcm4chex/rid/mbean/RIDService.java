@@ -54,6 +54,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import org.dcm4che.dict.UIDs;
 import org.dcm4chex.rid.common.RIDRequestObject;
 import org.dcm4chex.rid.common.RIDResponseObject;
+import org.dcm4chex.rid.mbean.factory.RIDSupportFactoryUtil;
 import org.jboss.system.ServiceMBeanSupport;
 import org.xml.sax.SAXException;
 
@@ -67,7 +68,12 @@ import org.xml.sax.SAXException;
 public class RIDService extends ServiceMBeanSupport  {
 
     private static final String NONE = "NONE";
-    private RIDSupport support = new RIDSupport( this );
+    
+	//Modified by YangLin@cn-arg.com on 03.04.2009
+//	private RIDSupport support = new RIDSupport( this );
+	private RIDSupport support = RIDSupportFactoryUtil.getRIDSupportFactory().
+	                             getRIDSupport(this);
+    
     private float waveformCorrection = 1f;
 
     public RIDService() {
