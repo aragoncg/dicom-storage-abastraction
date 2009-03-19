@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[HL7 Server: Dispatch incoming HL7 messages to
+    registered HL7 services. When configuring, select the TCP listening port, 
+    the security protocol for communication, timeouts, and the maximum number of
+    connected HL7 senders.]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hl7.HL7ServerService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>HL7ServerService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCharsetName"
+      setMethod="setCharsetName">
+      <description><![CDATA[Specifies Charset of incoming and outgoing HL7
+      messages by its name as listed in the
+      <a href="http://www.iana.org/assignments/character-sets">
+      <i>IANA Charset Registry</i></a> (e.g. <code>ISO-8859-1</code>).]]>
+      </description>
+      <name>CharsetName</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ISO-8859-1" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPort"
+      setMethod="setPort">
+     <!-- Network -->
+      <description>TCP listening port. This is the most important value in
+      the service, and by default is set to 2575.
+      </description>
+      <name>Port</name>
+      <type>int</type>
+      <descriptors>
+         <value value="2575" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLocalAddress"
+      setMethod="setLocalAddress">
+      <description>Local interface IP address to listen for TCP communication.  0.0.0.0 indicates all active interfaces.
+      </description>
+      <name>LocalAddress</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="0.0.0.0" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getProtocolName"
+      setMethod="setProtocolName">
+     <!-- Security -->
+      <description><![CDATA[Enable Transport Security Layer (TLS) mode:<ul>
+      <li><tt>mllp</tt> - plain <i>Minimal Lower Level Protocol</i>; <b>no</b> TLS</li>
+      <li><tt>mllp-tls</tt> - accept TLS connections; offer AES or DES encryption</li>
+      <li><tt>mllp-tls.aes</tt> - accept TLS connections; force AES or DES encryption</li>
+      <li><tt>mllp-tls.3des</tt> - accept TLS connections; force DES encryption</li>
+      <li><tt>mllp-tls.nodes</tt> - accept TLS connections without encryption</li>
+      </ul>]]>
+      </description>
+      <name>ProtocolName</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="mllp" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSoTimeout"
+      setMethod="setSoTimeout">
+      <description>Socket timeout in ms. 0 = no timeout. 
+      This value determines how long the server is waiting for receiving
+      the next message on an open connection before it closes the idle connection.
+      HL7 senders (typical part of the RIS) typically keeps the connection
+      open between emitted messages, and some interprets a close of the idle
+      connection by the server as serious system failure. So the timeout value
+      may be configured quite large. Default: 600000 (=10min).
+      </description>
+      <name>SoTimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="600000" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getNoopMessageTypes"
+      setMethod="setNoopMessageTypes">
+      <description>Comma separated list of Message Types which are accepted
+       even if no HL7 Service is registered to actual process the message.
+       By setting this value, you avoid to reject messages, which are not
+       processed by the application.
+      </description>
+      <name>NoopMessageTypes</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ADT^A02,ADT^A03,ADT^A06,ADT^A07,ADT^A12,ADT^A13" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSuppressErrorResponse"
+      setMethod="setSuppressErrorResponse">
+      <description><![CDATA[Activates suppression of Application Reject or 
+      Application Error as acknowledgment code but always returns acknowledgment
+      code AA (=Application Accept), even if the processing of the message fails.]]>
+      </description>
+      <name>SuppressErrorResponse</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSendNotification"
+      setMethod="setSendNotification">
+      <description>Activates notification of registered listeners about received
+      HL7 messages. Required for message forwarding by HL7 Send service and
+      for prefetch of studies on receive of ORM^O01 messages by the Prefetch
+      Service.
+      </description>
+      <name>SendNotification</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isFileReceivedHL7"
+      setMethod="setFileReceivedHL7">
+      <description><![CDATA[Activates writing received HL7 messages into file 
+      (format: hl7-######.hl7, with ###### as the sequence number of the
+      received message since last application start) in log directory.
+      Useful to analyse HL7 encoding errors in incoming messages, which causes
+      the conversion of the message to XML for further processing to fail.]]>
+      </description>
+      <name>FileReceivedHL7</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isFileReceivedHL7OnError"
+      setMethod="setFileReceivedHL7OnError">
+      <description><![CDATA[Activates writing received HL7 messages, which
+      were rejected or which processing failed, into file (format: hl7-######.hl7,
+      with ###### as the sequence number of the received message since last
+      application start) in directory specified by <i>ErrorLogDirectory</i>]]>
+      </description>
+      <name>FileReceivedHL7OnError</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getErrorLogDirectory"
+      setMethod="setErrorLogDirectory">
+      <description><![CDATA[Directory to which HL7 messages which are rejected
+      or which processing fails are filed. Only effective if
+      <i>FileReceivedHL7OnError</i> = <code>true</code>.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>ErrorLogDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="log/hl7err" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isFileReceivedHL7AsXML"
+      setMethod="setFileReceivedHL7AsXML">
+      <description><![CDATA[Activates writing received and XMLized HL7 messages
+      into file (format: hl7-######.xml, with ###### as the sequence number of 
+      the received message since last application start) in log directory.
+      Useful to test customized XSL stylesheets used by individual HL7 Services.]]>
+      </description>
+      <name>FileReceivedHL7AsXML</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isTcpNoDelay"
+      setMethod="setTcpNoDelay">
+      <description>Send packets as quickly as possible (Disable Nagle's algorithmn).
+      </description>
+      <name>TcpNoDelay</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendBufferSize"
+      setMethod="setSendBufferSize">
+      <description>Buffer size used for socket output. 0 = use platform default.
+      </description>
+      <name>SendBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getReceiveBufferSize"
+      setMethod="setReceiveBufferSize">
+      <description>Buffer size used for socket input. 0 = use platform default.
+      </description>
+      <name>ReceiveBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>
+ 
+   <attribute access="read-write"
+      getMethod="getMaxClients"
+      setMethod="setMaxClients">
+      <description>Maximal number of simultaneously connected HL7 senders.
+      </description>
+      <name>MaxClients</name>
+      <type>int</type>
+      <descriptors>
+         <value value="50" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getNumClients">
+      <description>Current number of connected HL7 senders.
+      </description>
+      <name>NumClients</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxIdleThreads"
+      setMethod="setMaxIdleThreads">
+      <description>Maximal number of idle threads.
+      </description>
+      <name>MaxIdleThreads</name>
+      <type>int</type>
+      <descriptors>
+         <value value="5" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getNumIdleThreads">
+      <description>Current number of idle threads.
+      </description>
+      <name>NumIdleThread</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getNumberOfReceivedMessages">
+      <description><![CDATA[Number of received HL7 messages since last restart
+      of the application. Used for naming of log files, if logging of incoming
+      HL7 messages is activated by <b>FileReceivedHL7</b> or 
+      <b>FileReceivedHL7AsXML</b>.]]>
+      </description>
+      <name>NumberOfReceivedMessages</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAckStylesheet"
+      setMethod="setAckStylesheet">
+      <description><![CDATA[Stylesheet for generated ACK messages.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>AckStylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-hl7/msh2ack.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLogStylesheet"
+      setMethod="setLogStylesheet">
+      <description><![CDATA[Stylesheet for logging of received HL7 messages.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>LogStylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-hl7/logmsg.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Register HL7 Service</description>
+      <name>registerService</name>
+      <parameter>
+        <description>Message Type accepted by this service</description>
+        <name>messageType</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>HL7 Service</description>
+        <name>service</name>
+        <type>org.dcm4chex.archive.hl7.HL7Service</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Log Message</description>
+      <name>logMessage</name>
+      <parameter>
+        <description>Message</description>
+        <name>message</name>
+        <type>org.dom4j.Document</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+</mbean>
+    

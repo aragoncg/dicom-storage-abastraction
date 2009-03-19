@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This is the XML DTD for the dcm4chee attribute filter descriptor.
+
+Minimal descriptor for DICOM Standard Conformance of Query/Retrieve Service:
+  <dcm4chee-attribute-filter>
+    <patient>
+      <attr tag="00080005"/>
+      <attr tag="00100010"/>
+      <attr tag="00100020"/>
+    </patient>
+
+    <study>
+      <attr tag="00080005"/>
+      <attr tag="00080020"/>
+      <attr tag="00080030"/>
+      <attr tag="00080050"/>
+      <attr tag="0020000D"/>
+      <attr tag="00200010"/>
+    </study>
+
+    <series>
+      <attr tag="00080060"/>
+      <attr tag="0020000E"/>
+      <attr tag="00200011"/>
+    </series>
+
+    <instance>
+      <attr tag="00080018"/>
+      <attr tag="00200013"/>
+    </instance>
+  </dcm4chee-attribute-filter>
+-->
+
+<!ELEMENT dcm4chee-attribute-filter (patient+,study+,series+,instance+)>
+
+<!ELEMENT patient (attr)*>
+<!ATTLIST patient tsuid CDATA #IMPLIED>
+<!ATTLIST patient exclude (false) "false">
+<!ATTLIST patient exclude-private (false) "false">
+<!ATTLIST patient update-strategy (coerce-merge) "coerce-merge">
+
+<!ELEMENT study (attr)*>
+<!ATTLIST study tsuid CDATA #IMPLIED>
+<!ATTLIST study exclude (false) "false">
+<!ATTLIST study exclude-private (false) "false">
+<!ATTLIST study update-strategy (overwrite | overwrite-merge |
+                                 coerce | coerce-merge) "coerce-merge">
+
+<!ELEMENT series (attr)*>
+<!ATTLIST series tsuid CDATA #IMPLIED>
+<!ATTLIST series exclude ( false ) "false">
+<!ATTLIST series exclude-private ( false ) "false">
+<!ATTLIST series update-strategy (overwrite | overwrite-merge |
+                                  coerce | coerce-merge) "coerce-merge">
+
+<!ELEMENT instance (attr)*>
+<!ATTLIST instance cuid CDATA #IMPLIED>
+<!ATTLIST instance tsuid CDATA #IMPLIED>
+<!ATTLIST instance exclude (true | false ) "false">
+<!ATTLIST instance exclude-private (true | false ) "false">
+<!ATTLIST instance update-strategy (overwrite | overwrite-merge |
+                                    coerce | coerce-merge) "overwrite">
+
+<!ELEMENT attr EMPTY>
+<!ATTLIST attr tag CDATA #IMPLIED>
+<!ATTLIST attr vr (AE | AS | AT | CS | DA | DS | DT | FL |
+                   FD | IS | LO | LT | OB | OF | OW | PN |
+                   SH | SL | SQ | SS | ST | TM | UI | UL |
+                   UN | US | UT) #IMPLIED>
+<!ATTLIST attr coerce (true | false ) "true">

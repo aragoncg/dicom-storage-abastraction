@@ -1,0 +1,1226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>DICOM Query/Retrieve SCP. Provides the DICOM Query/Retrieve SCP.  Note that the value of the &lt;b&gt;MaxConcurrentCodec&lt;/b&gt; attribute in the Compression Service also effects the on-the-fly
+compression and decompression during the retrieve of images by the
+QueryRetrieveScp service.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.qrscp.QueryRetrieveScpService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>QueryRetrieveScpService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCalledAETs"
+      setMethod="setCalledAETs">
+      <description>Accepted called AE titles, separated by \(backslash).
+      </description>
+      <name>CalledAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCallingAETs"
+      setMethod="setCallingAETs">
+      <description><![CDATA[
+      	List of accepted calling AE titles, separated by \(backslash).<br/>
+      	ANY = accept any. <br/>
+      	CONFIGURED_AETS = accept any configured AE Title.
+      	]]>       
+      </description>
+      <name>CallingAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLocalStorageAET"
+      setMethod="setLocalStorageAET">
+      <description><![CDATA[AE title of local Storage SCP. Used as Move
+      Destination in forwarded C-Move RQs to external Retrieve AEs, for which
+      no direct forwarding to the Move Destination in the received C-MOVE RQ
+      is configured in <b>DirectForwardingList</b>.]]>
+      </description>
+      <name>LocalStorageAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSupplementIssuerOfPatientID"
+      setMethod="setSupplementIssuerOfPatientID">
+      <description><![CDATA[Supplement received C-FIND RQ identifier containing
+          a <i>Patient ID</i>, but no <i>Issuer Of Patient ID</i>, with a value
+          for <i>Issuer Of Patient ID</i>, if such is associated with the
+          C-FIND SCU AE by its AE Configuration entry.]]>
+      </description>
+      <name>SupplementIssuerOfPatientID</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendWithDefaultTransferSyntaxToAETs"
+      setMethod="setSendWithDefaultTransferSyntaxToAETs">
+      <description><![CDATA[Move Destination AE titles to which objects are
+      sent always with Default (=Implicit VR Little Endian) Transfer Syntax,
+      which implies, that compressed stored images are always decompressed by
+      this service for retrieval. Separate multiple values by \(backslash).
+      <br/>NONE = no AE titles match this criteria.
+      <br/>ANY = all AE titles match this criteria.]]>
+      </description>
+      <name>SendWithDefaultTransferSyntaxToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getOfferNoPixelDataToAETs"
+      setMethod="setOfferNoPixelDataToAETs">
+      <description><![CDATA[Move Destination AE titles to which images are sent 
+      without pixel data, if offered Transfer Syntax <i>No Pixel Data</i>
+      was accepted by the Move Destination AE.
+      Separate multiple values by \(backslash).
+      <br/>NONE = do not offer <i>No Pixel Data</i> Transfer Syntax to any
+      Move Destination AE.
+      <br/>ANY = offer <i>No Pixel Data</i> Transfer Syntax to all
+      Move Destination AEs.]]>
+      </description>
+      <name>OfferNoPixelDataTransferSyntaxToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getOfferNoPixelDataDeflateToAETs"
+      setMethod="setOfferNoPixelDataDeflateToAETs">
+      <description><![CDATA[Move Destination AE titles to which images are sent 
+      without pixel data, if offered Transfer Syntax <i>No Pixel Data Deflate</i>
+      or <i>No Pixel Data</i> was accepted by the Move Destination AE.
+      Separate multiple values by \(backslash).
+      <br/>NONE = do not offer <i>No Pixel Data Deflate</i> and
+      <i>No Pixel Data</i> Transfer Syntax to any Move Destination AE.
+      <br/>ANY = offer <i>No Pixel Data Deflate</i> and
+      <i>No Pixel Data</i> Transfer Syntax to all Move Destination AE.]]>
+      </description>
+      <name>OfferNoPixelDataDeflateTransferSyntaxToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendNoPixelDataToAETs"
+      setMethod="setSendNoPixelDataToAETs">
+      <description>Move Destination AE titles to which images are sent 
+      without pixel data. Separate multiple values by \(backslash).
+      NONE = no AE titles match this criteria.
+      </description>
+      <name>SendNoPixelDataToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getIgnoreUnsupportedSOPClassFailuresByAETs"
+      setMethod="setIgnoreUnsupportedSOPClassFailuresByAETs">
+      <description>Move Destination AE titles to which failures, 
+      caused by unsupported SOP Classes, in transmitting
+      objects shall NOT return a warning status "Sub-Operation fails" 
+      in the final Move Response to the Move SCU.
+      NONE =  no AE titles match this criteria.
+      </description>
+      <name>IgnoreUnsupportedSOPClassFailures</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPixQueryCallingAETs"
+      setMethod="setPixQueryCallingAETs">
+      <description><![CDATA[AE Titles of C-FIND SCUs, for which a
+      PIX Query of the data base or an external <i>Patient Cross-reference
+      (PIX) Manager</i> shall be executed, if the query request contains a
+      matching key for the Patient ID, to return also entities of linked
+      patients. Separate multiple values by \(backslash).
+      <br/>ANY = Enable PIX Queries for all C-FIND SCUs.
+      <br/>NONE = Disable PIX Queries for all C-FIND SCUs.]]>
+      </description>
+      <name>PIXQueryCallingAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPixQueryIssuers"
+      setMethod="setPixQueryIssuers">
+      <description><![CDATA[Comma separated list of values for Issuers of 
+      Patient IDs in C-FIND RQs, for which a PIX Query of the data base or an
+      external <i>Patient Cross-reference (PIX) Manager</i> shall be executed,
+      to return also entities of linked patients. 
+      ANY = Execute PIX Queries for any Issuer of Patient ID.]]>
+      </description>
+      <name>PIXQueryIssuersOfPatientID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="SSN" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPixQueryDefIssuer"
+      setMethod="setPixQueryDefIssuer">
+      <description><![CDATA[Value for Issuer of Patient ID used for PIX Queries,
+      if the query request does not contains a value for the Issuer of Patient
+      ID. Only effective, if <i>PIXQueryIssuersOfPatientID</i> = <code>ANY</code>.]]>
+      </description>
+      <name>PIXQueryDefaultIssuerOfPatientID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isCoerceRequestPatientIds"
+      setMethod="setCoerceRequestPatientIds">
+      <description><![CDATA[Override PatientId and IssuerOfPatientID, 
+      and those values contained in the OtherPatientIDSequence with the values
+      from the request (including PIX Query results).
+      ]]>
+      </description>
+      <name>CoerceRequestPatientIds</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCoerceRequestPatientIdsAETs"
+      setMethod="setCoerceRequestPatientIdsAETs">
+      <description><![CDATA[AE Titles of C-FIND SCUs, for which to
+      Override PatientId and IssuerOfPatientID, and those values
+      contained in the OtherPatientIDSequence with the values
+      from the request (including PIX Query results).      
+      Separate multiple values by \(backslash).
+      ANY = Override Ids for all C-FIND SCUs.
+      Only effective, if <i>CoerceRequestPatientIds</i> = <code>true</code>.]]>
+      </description>
+      <name>CoerceRequestPatientIdsAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getUnrestrictedQueryPermissionsToAETitles"
+      setMethod="setUnrestrictedQueryPermissionsToAETitles">
+      <description><![CDATA[AE Titles of C-FIND SCUs with Query Permissions
+      on all archived Studies, independent of Study Permissions to roles
+      of the user associated to the active association.
+      Separate multiple values by \(backslash).
+      ANY = Disable restriction of queries according granted Study Permissions.]]>
+      </description>
+      <name>UnrestrictedQueryPermissionsToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getUnrestrictedReadPermissionsToAETitles"
+      setMethod="setUnrestrictedReadPermissionsToAETitles">
+      <description><![CDATA[AE Titles of Move Destinations with Read Permissions
+      on all archived Studies, independent of Study Permissions to roles
+      of the user associated with the AE.<br/>
+      Separate multiple values by \(backslash).
+      ANY = Disable restriction of retrieve to Move Destinations according
+      granted Study Read Permissions.<br/>
+      Attention: For successful Media Creation by the archive, the AE Title of
+      the Media Creation Service (default: CDRECORD) have to be included in the
+      configured list.<br/>
+      Note: If the Move Destination differs from the AE requesting the retrieve
+      (= C-MOVE SCU), the associated user is defined by the AE configuration
+      entry. If the C-MOVE SCU also acts as Move Destination, the user
+      identification may be also provided by C-MOVE SCU by User Identity
+      Negotiation.
+      ]]>
+      </description>
+      <name>UnrestrictedReadPermissionsToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getUnrestrictedExportPermissionsToAETitles"
+      setMethod="setUnrestrictedExportPermissionsToAETitles">
+      <description><![CDATA[AE Titles of C-MOVE SCUs with Export Permissions
+      on all archived Studies, independent of Study Permissions to roles
+      of the user associated to the request association.  
+      Separate multiple values by \(backslash).
+      ANY = Disable restriction of queries according granted Study Permissions.<br/>
+      Attention: For successful auto-forwarding of received objects as for
+      manual DICOM export using the Web Interface, the Calling AE Title of the
+      internal Move SCU Service (default: DCM4CHEE) have to be included in the
+      configured list.<br/>
+      Note: If the C-MOVE SCU also acts as Move Destination, no Export
+      Permission - but still Read Permission - is needed to retrieve a Study.]]>
+      </description>
+      <name>UnrestrictedExportPermissionsToAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHideWithoutIssuerOfPatientIDFromAETs"
+      setMethod="setHideWithoutIssuerOfPatientIDFromAETs">
+      <description><![CDATA[AE Titles of C-FIND SCUs to which only responses
+      for matching entities of Patients which <i>Patient ID</i> is qualified by
+      an <i>Issuer Of Patient ID</i> are returned.
+      Separate multiple values by '\'(backslash).
+      <br/>If the list is prefixed by '!\', entities of Patients which
+      <i>Patient ID</i> is not qualified by an <i>Issuer Of Patient ID</i> will
+      be hidden from <b>any</b> C-FIND SCU, <b>except</b> which AE title is
+      specified in the list.
+      <br/>'NONE' = do not hide entities of Patients without
+      <i>Issuer of Patient ID</i> from any C-FIND SCU.]]>
+      </description>
+      <name>HideWithoutIssuerOfPatientIDFromAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getIgnorableSOPClasses"
+      setMethod="setIgnorableSOPClasses">
+      <description><![CDATA[
+      Failed transfer of instances of listed SOP Classes to move destinations
+      caused by rejection of the SOP Class by the destination STORE SCP will NOT
+      result in a warning status "Sub-Operation fails" in the final Move
+      Response to the Move SCU. Use either the SOP Class UID value or the name
+      specified in DICOM Part 6, Annex A Registry of DICOM unique identifiers,
+      concatenating individual words without spaces.]]>
+      </description>
+      <name>IgnorableSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           BasicTextSR
+           EnhancedSR
+           ComprehensiveSR
+           ProcedureLogStorage
+           MammographyCADSR
+           KeyObjectSelectionDocument
+           ChestCADSR
+           XRayRadiationDoseSR
+           TwelveLeadECGWaveformStorage
+           GeneralECGWaveformStorage
+           AmbulatoryECGWaveformStorage
+           HemodynamicWaveformStorage
+           CardiacElectrophysiologyWaveformStorage
+           BasicVoiceAudioWaveformStorage
+           MRSpectroscopyStorage
+           GrayscaleSoftcopyPresentationStateStorage
+           ColorSoftcopyPresentationStateStorage
+           PseudoColorSoftcopyPresentationStateStorage
+           BlendingSoftcopyPresentationStateStorage
+           RawDataStorage
+           SpatialRegistrationStorage
+           SpatialFiducialsStorage
+           RealWorldValueMappingStorage
+           StereometricRelationshipStorage
+           EncapsulatedPDFStorage
+           RTDoseStorage
+           RTStructureSetStorage
+           RTBeamsTreatmentRecordStorage
+           RTPlanStorage
+           RTBrachyTreatmentRecordStorage
+           RTTreatmentSummaryRecordStorage
+           RTIonPlanStorage
+           RTIonBeamsTreatmentRecordStorage
+           StandaloneOverlayStorage
+           StandaloneCurveStorage
+           StandaloneModalityLUTStorage
+           StandaloneVOILUTStorage
+           StandalonePETCurveStorage
+           AgfaAttributePresentationState
+           SiemensCSANonImageStorage
+           StructuredReportTextStorageRetired
+           StructuredReportAudioStorageRetired
+           StructuredReportDetailStorageRetired
+           StructuredComprehensiveStorageRetired           
+           "/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getRequestStgCmtFromAETs"
+      setMethod="setRequestStgCmtFromAETs">
+      <description><![CDATA[Move Destination AE titles, from which Storage Commitment
+      for transmitted objects shall be requested.
+      <br>Format: 
+      <br><i>STORAGE_AET</i>:<i>STGCMT_AET</i>.
+      <br>The AE title of the Storage Commitment Service (<i>STGCMT_AET</i>)
+      can be omitted, if identical to the AE title of the 
+      Move Destination (<i>STORAGE_AET</i>). 
+      Separate multiple values with a \(backslash). 
+      NONE = No Move Destination from which Storage Commitment
+      will be requested.]]> 
+      </description>
+      <name>RequestStorageCommitFromAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="isNoMatchForNoValue"
+      setMethod="setNoMatchForNoValue">
+      <description>Do not match entities with zero-length value for specified
+      matching keys (= non DICOM conform matching behavior).
+      </description>
+      <name>NoMatchForNoValue</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedStandardSOPClasses"
+      setMethod="setAcceptedStandardSOPClasses">
+      <description><![CDATA[
+        List of accepted Query/Retrieve SOP Classes. Use either the SOP Class 
+        UID value, or following defined symbolic names:
+        PatientRootQueryRetrieveInformationModelFIND,
+        PatientRootQueryRetrieveInformationModelGET
+        PatientRootQueryRetrieveInformationModelMOVE,
+        StudyRootQueryRetrieveInformationModelFIND,
+        StudyRootQueryRetrieveInformationModelGET
+        StudyRootQueryRetrieveInformationModelMOVE,
+        PatientStudyOnlyQueryRetrieveInformationModelFIND,
+        PatientStudyOnlyQueryRetrieveInformationModelGET
+        PatientStudyOnlyQueryRetrieveInformationModelMOVE,
+        ]]>
+      </description>
+      <name>AcceptedStandardSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           PatientRootQueryRetrieveInformationModelFIND
+           PatientRootQueryRetrieveInformationModelGET
+           PatientRootQueryRetrieveInformationModelMOVE
+           StudyRootQueryRetrieveInformationModelFIND
+           StudyRootQueryRetrieveInformationModelGET
+           StudyRootQueryRetrieveInformationModelMOVE
+           PatientStudyOnlyQueryRetrieveInformationModelFIND
+           PatientStudyOnlyQueryRetrieveInformationModelGET
+           PatientStudyOnlyQueryRetrieveInformationModelMOVE
+           "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedTransferSyntax"
+      setMethod="setAcceptedTransferSyntax">
+      <description><![CDATA[
+        List of accepted Transfer Syntaxes. Order defines selection preference.
+        Use either the Transfer Syntaxes UID value or following defined
+        symbolic names: 
+        ImplicitVRLittleEndian,
+        ExplicitVRLittleEndian,
+        DeflatedExplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]]>
+      </description>
+      <name>AcceptedTransferSyntaxForStandardSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           ImplicitVRLittleEndian
+         "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedPrivateSOPClasses"
+      setMethod="setAcceptedPrivateSOPClasses">
+      <description><![CDATA[
+        List of accepted Query/Retrieve SOP Classes. Use either the SOP Class 
+        UID value, or following defined symbolic names:
+        Dcm4cheStudyRootQueryRetrieveInformationModelFIND,
+        Dcm4cheBlockedStudyRootQueryRetrieveInformationModelFIND,
+        Dcm4cheVirtualMultiFrameStudyRootQueryRetrieveInformationModelFIND,
+        ]]>
+      </description>
+      <name>AcceptedPrivateSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           Dcm4cheStudyRootQueryRetrieveInformationModelFIND
+           Dcm4cheBlockedStudyRootQueryRetrieveInformationModelFIND
+           Dcm4cheVirtualMultiFrameStudyRootQueryRetrieveInformationModelFIND
+           "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedTransferSyntaxForPrivateSOPClasses"
+      setMethod="setAcceptedTransferSyntaxForPrivateSOPClasses">
+      <description><![CDATA[
+        List of accepted Transfer Syntaxes. Order defines selection preference.
+        Use either the Transfer Syntaxes UID value or following defined
+        symbolic names: 
+        ImplicitVRLittleEndian,
+        ExplicitVRLittleEndian,
+        DeflatedExplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]]>
+      </description>
+      <name>AcceptedTransferSyntaxForPrivateSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           DeflatedExplicitVRLittleEndian
+           ExplicitVRLittleEndian
+           ImplicitVRLittleEndian
+         "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxBlockedFindRSP"
+      setMethod="setMaxBlockedFindRSP">
+      <description>Maximum number of result records blocked in one 
+      Find Response by Private Blocked FIND services.
+      </description>
+      <name>MaximumBlockedFindResponse</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getVirtualEnhancedCTConfigFile"
+      setMethod="setVirtualEnhancedCTConfigFile">
+      <description><![CDATA[Configuration file which defines included
+      attributes in Enhanced CT Instance enities return by
+      Private Virtual Multiframe FIND Service.      
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>VirtualEnhancedCTConfigFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-vmf/enhanced-ct.xml"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getVirtualEnhancedMRConfigFile"
+      setMethod="setVirtualEnhancedMRConfigFile">
+      <description><![CDATA[Configuration file which defines included
+      attributes in Enhanced MR Instance entities return by
+      Private Virtual Multiframe FIND Service.      
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>VirtualEnhancedMRConfigFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-vmf/enhanced-mr.xml"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLogCallingAETs"
+      setMethod="setLogCallingAETs">
+      <description><![CDATA[List of the AE titles for the Q/R SCUs for which XMLized
+      query and result attributes are logged into files 
+      <i>AET</i>/<i>timestamp</i>-cfindrq.xml and 
+      <i>AET</i>/<i>timestamp</i>-cfindrsp.xml in the log directory.
+      Useful for creation of XSL stylesheets for query/result attribute coercion.
+      Separate multiple values by \(backslash).
+      NONE = no calling AE titles.]]>  
+      </description>
+      <name>LogAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCoerceConfigDir"
+      setMethod="setCoerceConfigDir">
+      <description><![CDATA[Directory where configuration files for query/result
+      attribute coercion are located: if XSL stylesheet "cfindrq.xsl" or 
+      "cfindrsp.xsl" exists in this directory or a sub-directory equal to the
+      AE Title of a QR SCU, query/result attributes from/to this SCU will be coerced 
+      according these stylesheets. A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>CoerceConfigDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-ae"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isWriteCoercionXmlLog"
+      setMethod="setWriteCoercionXmlLog">
+      <description><![CDATA[Enable logging of coercions in separate log files.<br/>
+      	FileName: &lt;LOG_DIR&gt;/coercion/&lt;timestamp&gt;.&lt;xsl file&gt;.[in]|[out]<br/>
+      	Coercion logs are only written for Calling AETs specified in LogAETitles!]]>
+      </description>
+      <name>WriteCoercionXmlLog</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSendPendingRetrieveRSP"
+      setMethod="setSendPendingRetrieveRSP">
+      <description><![CDATA[Flag indicating if optional C-Move/C-Get Response DICOM
+      message with pending status are returned in the interval defined by
+      attribute <i>PendingRetrieveResponseInterval</i>.]]>
+      </description>
+      <name>SendPendingRetrieveResponse</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPendingRetrieveRSPInterval"
+      setMethod="setPendingRetrieveRSPInterval">
+      <description><![CDATA[Interval in ms in which C-Move/C-Get Response DICOM
+      message with pending status are returned. Even send (identical) response
+      messages, if no storage sub-operation was performed during such interval,
+      to keep the association alive. Only effective, if sending C-Move/C-Get Response
+      DICOM message with pending status is activated by attribute
+      <i>SendPendingRetrieveResponse</i>.]]>
+      </description>
+      <name>PendingRetrieveResponseInterval</name>
+      <type>long</type>
+      <descriptors>
+         <value value="5000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isForwardAsMoveOriginator"
+      setMethod="setForwardAsMoveOriginator">
+      <description>Use the calling AE title of the requesting 
+      Move SCU instead of the called AE title when opening an 
+      association to another Move SCP to forward a Move Request.
+      </description>
+      <name>ForwardAsMoveOriginator</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDirectForwardingList" 
+      setMethod="setDirectForwardingList">
+      <description><![CDATA[A list of rules of direct forwarding in C-Move for
+      external retrieve AE. Assume the local AE is A and C-Move to C is
+      requested. The files do not exist in A, but the local database has the
+      database entries for the requested objects with external retrieve AE B.
+      If B to C is defined in the Direct-Forwarding list, a C-Move from B to C
+      will be initiated. If B to C is not included in the list, the requested
+      objects will be first stored to A and then moved from A to C. <br>
+      Format:<br>
+        [source1],[destination1],[destination2];[source2],any;...<br>
+        Use 'any' for all destinations.<br>]]>
+      </description>
+      <name>DirectForwardingList</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isRecordStudyAccessTime"
+      setMethod="setRecordStudyAccessTime">
+      <description>Record last retrieve time of instances of a study. Should be enabled,
+      if delete functions of the File System Management Service are activated, to delete
+      the most infrequently accessed studies.      
+      </description>
+      <name>RecordStudyAccessTime</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isCheckMatchingKeySupported"
+      setMethod="setCheckMatchingKeySupported">
+      <description>Enable check if unsupported matching key(s) are used in C-FIND. 
+      	In this case the C-FIND PENDING status is changed from 0xff00 to 0xff01.      
+      </description>
+      <name>CheckMatchingKeySupported</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getMaxUIDsPerMoveRQ"
+      setMethod="setMaxUIDsPerMoveRQ">
+      <description>Maximum number of SOP Instance UIDs in forwarded Move Requests.
+      Larger Move Requests are split into smaller ones according to this constraint.
+      </description>
+      <name>MaximumUIDsPerMoveRequest</name>
+      <type>int</type>
+      <descriptors>
+         <value value="100"/>
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum protocol data unit (PDU) package length for receiving PDUs.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsInvoked"
+      setMethod="setMaxOpsInvoked">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to invoke asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsInvoked</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsPerformed"
+      setMethod="setMaxOpsPerformed">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to perform asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsPerformed</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxStoreOpsInvoked"
+      setMethod="setMaxStoreOpsInvoked">
+      <description>The maximum number of asynchronously invoked storage
+      operations. A value of zero indicates an unlimited number.
+      </description>
+      <name>MaximumStorageOperationsInvoked</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcTimeout"
+      setMethod="setAcTimeout">
+      <description>A-Associate accept timeout in milliseconds. 0 = no timeout.
+      </description>
+      <name>AcceptTimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="10000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDimseTimeout"
+      setMethod="setDimseTimeout">
+      <description>DIMSE message timeout in milliseconds. 0 = no timeout.
+      </description>
+      <name>DIMSETimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="60000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSoCloseDelay"
+      setMethod="setSoCloseDelay">
+      <description>Socket close delay in milliseconds after an A-Release response.
+      </description>
+      <name>SocketCloseDelay</name>
+      <type>int</type>
+      <descriptors>
+         <value value="50"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isTcpNoDelay"
+      setMethod="setTcpNoDelay">
+      <description>Send packets as quickly as possible (Disable Nagle's algorithmn).
+      </description>
+      <name>TcpNoDelay</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendBufferSize"
+      setMethod="setSendBufferSize">
+      <description>Buffer size used for socket output. 0 = use platform default.
+      </description>
+      <name>SendBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getReceiveBufferSize"
+      setMethod="setReceiveBufferSize">
+      <description>Buffer size used for socket input. 0 = use platform default.
+      </description>
+      <name>ReceiveBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getBufferSize"
+      setMethod="setBufferSize">
+      <description>Size of byte buffer used for copying data from TCP channel to file.
+      </description>
+      <name>BufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="8192"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isRetrieveWithoutLeftJoins"
+      setMethod="setRetrieveWithoutLeftJoins">
+      <description><![CDATA[Controls usage of LEFT JOINS in executed SQL
+        statement triggered by retrieve requests. <b>Attention:</b> Must be
+        set to <code>false</code>, if the archive is configured as short-term
+        cache, which delegates long-term storage to an external DICOM archive
+        and therefore does not hold file records for each stored instance!]]>
+      </description>
+      <name>RetrieveWithoutLeftJoins</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLazyFetchSeriesAttrsOnImageLevelQuery"
+      setMethod="setLazyFetchSeriesAttrsOnImageLevelQuery">
+      <description>Activates lazy fetch of Series, Study and Instance
+      attributes stored in BLOB columns by an additional query for
+      each series.on queries on IMAGE level.
+      </description>
+      <name>LazyFetchSeriesAttrsOnImageLevelQuery</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCacheSeriesAttrsOnImageLevelQuery"
+      setMethod="setCacheSeriesAttrsOnImageLevelQuery">
+      <description>Activates caching of Series attributes between IMAGE level
+      C-FIND RSPs, which reduces the number of BLOB access from 4 x Number of
+      matching Instances to Number of matching Instances + 3 * Number of
+      different Series. Implicit set by LazyFetchSeriesAttrsOnImageLevelQuery
+      = true.
+      </description>
+      <name>CacheSeriesAttrsOnImageLevelQuery</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAccessBlobAsLongVarBinaryOnQuery"
+      setMethod="setAccessBlobAsLongVarBinaryOnQuery">
+      <description>Change JDBC binding for Oracle BLOB's to LONGVARBINARY for
+      accessing attributes stored in BLOB columns of DB records on query.
+      Only effective with Oracle as DB.
+      </description>
+      <name>AccessBlobAsLongVarBinaryOnQuery</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAccessSeriesBlobAsLongVarBinaryOnImageLevelQuery"
+      setMethod="setAccessSeriesBlobAsLongVarBinaryOnImageLevelQuery">
+      <description>
+       Change JDBC binding for Oracle BLOB's to LONGVARBINARY for accessing
+       Patient, Study and Series attributes stored in BLOB columns of DB records
+       on query on IMAGE level. Only effective with Oracle as DB. Should only be
+       enabled with LazyFetchSeriesAttrsOnImageLevelQuery = true or
+       CacheSeriesAttrsOnImageLevelQuery = false.
+      </description>
+      <name>AccessSeriesBlobAsLongVarBinaryOnImageLevelQuery</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLazyFetchSeriesAttrsOnRetrieve"
+      setMethod="setLazyFetchSeriesAttrsOnRetrieve">
+      <description>Activates lazy fetch of Series, Study and Instance
+      attributes stored in BLOB columns by an additional query for
+      each series.on DICOM Retrieve and access by WADO with 
+      contentType=application/dicom.
+      </description>
+      <name>LazyFetchSeriesAttrsOnRetrieve</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCacheSeriesAttrsOnRetrieve"
+      setMethod="setCacheSeriesAttrsOnRetrieve">
+      <description>Activates caching of Series attributes on DICOM Retrieve,
+      - but also for successive WADO requests for Instances of the same Series - 
+      which reduces the number of BLOB access from 4 x Number of
+      retrieved Instances to Number of retrieved Instances + 3 * Number of
+      different Series. Implicit set by LazyFetchSeriesAttrsOnRetrieve
+      = true.
+      </description>
+      <name>CacheSeriesAttrsOnRetrieve</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCacheSeriesAttrsOnRetrieveMaxSize"
+      setMethod="setCacheSeriesAttrsOnRetrieveMaxSize">
+      <description>Defines maximal number of Series, which attributes are cached
+       on retrieve of Instances.
+       Only effective if CacheSeriesAttrsOnRetrieve = true.
+      </description>
+      <name>CacheSeriesAttrsOnRetrieveMaxSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="100"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCacheSeriesAttrsOnRetrieveCurrencyTimeLimit"
+      setMethod="setCacheSeriesAttrsOnRetrieveCurrencyTimeLimit">
+      <description>Defines how long cached Series Attributes on retrieve are
+       valid. 
+       Format: ##s (in seconds), ##m (in minutes)
+       Only effective if CacheSeriesAttrsOnRetrieve = true
+      </description>
+      <name>CacheSeriesAttrsOnRetrieveCurrencyTimeLimit</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1m"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAccessBlobAsLongVarBinaryOnRetrieve"
+      setMethod="setAccessBlobAsLongVarBinaryOnRetrieve">
+      <description>Change JDBC binding for Oracle BLOB's to LONGVARBINARY for
+      accessing attributes stored in BLOB columns of DB records on retrieve.
+      Only effective with Oracle as DB.
+      </description>
+      <name>AccessBlobAsLongVarBinaryOnRetrieve</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAccessSeriesBlobAsLongVarBinaryOnRetrieve"
+      setMethod="setAccessSeriesBlobAsLongVarBinaryOnRetrieve">
+      <description>
+       Change JDBC binding for Oracle BLOB's to LONGVARBINARY for accessing
+       Patient, Study and Series attributes stored in BLOB columns of DB records
+       on retrieve. Only effective with Oracle as DB. Should only be
+       enabled with LazyFetchSeriesAttrsOnRetrieve = true or
+       CacheSeriesAttrsOnRetrieve = false.
+      </description>
+      <name>AccessSeriesBlobAsLongVarBinaryOnRetrieve</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueryTransactionIsolationLevel"
+      setMethod="setQueryTransactionIsolationLevel">
+      <description>Transaction isolation level for queries. Values can be one of: 
+      DEFAULT|READ_UNCOMMITTED|READ_COMMITTED|REPEATABLE_READ|SERIALIZABLE
+      </description>
+      <name>QueryTransactionIsolationLevel</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DEFAULT"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getRetrieveTransactionIsolationLevel"
+      setMethod="setRetrieveTransactionIsolationLevel">
+      <description>Transaction isolation level for retrieves. Values can be one of:
+          DEFAULT|READ_UNCOMMITTED|READ_COMMITTED|REPEATABLE_READ|SERIALIZABLE
+      </description>
+      <name>RetrieveTransactionIsolationLevel</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DEFAULT"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDcmServerName"
+      setMethod="setDcmServerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DcmServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDicomSecurityServiceName"
+      setMethod="setDicomSecurityServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DicomSecurityServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStgCmtScuScpName"
+      setMethod="setStgCmtScuScpName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StgCmtScuScpName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTarRetrieverName"
+      setMethod="setTarRetrieverName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TarRetrieverName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAEServiceName"
+      setMethod="setAEServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AEServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPerfMonServiceName"
+      setMethod="setPerfMonServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>PerfMonServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPixQueryServiceName"
+      setMethod="setPixQueryServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>PixQueryServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Used internally</description>
+      <name>queueStgCmtOrder</name>
+      <parameter>
+        <name>calling</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <name>called</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <name>actionInfo</name>
+        <type>org.dcmche.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <name>scpRole</name>
+        <type>boolean</type>
+      </parameter>
+       <return-type>void</return-type>
+   </operation>
+
+   <operation impact="INFO">
+      <description>Locate SOP Instance. Return a File object, if the instance
+      is locally available, or the hostname as String object if a file
+      of the instance is located on another host.</description>
+      <name>locateInstance</name>
+      <parameter>
+        <description>SOP Instance UID</description>
+        <name>iuid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.lang.Object</return-type>
+   </operation>
+
+   <operation impact="INFO">
+      <description>Locate SOP Instance. Return a Dataset object, if the instance
+      is locally available. The attributes of the dataset are updated with the attributes from database.</description>
+      <name>getDatasourceOfInstance</name>
+      <parameter>
+        <description>SOP Instance UID</description>
+        <name>iuid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>org.dcm4che.net.DataSource</return-type>
+   </operation>
+
+   <operation impact="INFO">
+      <description><![CDATA[Determines if specified AE Title is one of the
+        configured <b>CalledAETitles</b>.]]>
+      </description>
+      <name>isLocalRetrieveAET</name>
+      <parameter>
+        <description>AE Title</description>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description><![CDATA[Add a direct forward rule of external C-Move from
+      source to destination]]>
+      </description>
+      <name>addDirectForwarding</name>
+      <parameter>
+         <description><![CDATA[Source of C-Move]]></description>
+         <name>source</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+         <description><![CDATA[Destination of C-Move. Use any for all
+         destination]]>
+         </description>
+         <name>destination</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description><![CDATA[Remove a direct forward rule of external C-Move for
+      a source AE]]>
+      </description>
+      <name>removeDirectForwarding</name>
+      <parameter>
+         <description><![CDATA[Source of C-Move]]></description>
+         <name>source</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description><![CDATA[Remove a direct forward rule of external C-Move
+      from source to destination]]>
+      </description>
+      <name>removeDirectForwarding</name>
+      <parameter>
+         <description><![CDATA[Source of C-Move]]></description>
+         <name>source</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+         <description><![CDATA[Destination of C-Move. Use any for all
+          desinations]]>
+         </description>
+         <name>destination</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description><![CDATA[Check whether an external C-Move should use direct
+      forwarding]]>
+      </description>
+      <name>isDirectForwarding</name>
+      <parameter>
+         <description><![CDATA[Source of C-Move]]></description>
+         <name>source</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+         <description><![CDATA[Destination of C-Move.]]></description>
+         <name>destination</name>
+         <type>java.lang.String</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+
+   <!-- Notifications -->
+</mbean>
+

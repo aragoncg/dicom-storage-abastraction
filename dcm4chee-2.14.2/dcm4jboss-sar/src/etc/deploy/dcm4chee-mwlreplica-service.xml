@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  Version $Revision:$ $Date:$ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.mwlscu.MwlReplicaService" 
+         name="dcm4chee.archive:service=MWLReplica"
+         xmbean-dd="xmdesc/dcm4chee-mwlreplica-xmbean.xml">
+
+    <depends>jboss.j2ee:jndiName=ejb/MWLManager,service=EJB</depends>
+    <depends optional-attribute-name="SchedulerServiceName">dcm4chee.archive:service=Scheduler</depends>
+    <depends optional-attribute-name="TemplatesServiceName">dcm4chee.archive:service=Templates</depends>
+
+  </mbean>
+</server>

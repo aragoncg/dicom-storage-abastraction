@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[AE Configuration Service.
+   Used to list/add/remove AE configuration entities - alternatively to more convenient
+   AE Management Page of the <a href='http://localhost:8080/dcm4chee-web/'>
+   Administration Web Application</a>.
+   Used/Required by various DICOM services (Query/Retrieve SCP, Storage Commitment SCU/SCP,
+   DICOM Hanging Protocol SCP) to 'guess' the port number of DICOM peer Application Entities,
+   if no AE configuration entry for a given AE Title matches.
+   ]]></description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.AEService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>AEService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-only" getMethod="getAEs">
+      <description>Configured application entities.&lt;br&gt;
+      Use the addAE and removeAE commands  below to add and remove AE configurations.</description>
+      <name>AEConfiguration</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write" getMethod="getPortNumbers" setMethod="setPortNumbers">
+     <!-- Network -->
+      <description>Port numbers for AE auto configuration.&lt;br&gt;
+      			   The method getAE(title, hostname) use this list to find a DICOM service hosted by hostname.&lt;br&gt;
+      			   'NONE' will disable auto AE configuration!
+      </description>
+      <name>PortNumbers</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="104,11112"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isDontSaveIP" setMethod="setDontSaveIP">
+      <description> This flag is used by auto AE configuration, if no hostname is available.&lt;br&gt;
+      				Set this flag to false if you explicitly allow the saving of ip address.&lt;br&gt;
+      				This should be only necessary if your network have static ip address and no name service active!&lt;br&gt;
+      				Avoid this option if you use DHCP!
+      </description>
+      <name>DontSaveIP</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getMaxCacheSize" setMethod="setMaxCacheSize">
+      <description>Maximal number of cached AE configurations.
+      </description>
+      <name>MaxCacheSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="20"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-only" getMethod="getCacheSize">
+      <description>Current number of cached AE configurations.
+      </description>
+      <name>CacheSize</name>
+      <type>int</type>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getUpdateStudiesBatchSize"
+      setMethod="setUpdateStudiesBatchSize">
+      <description><![CDATA[Defines maximal number of studies fetched from the
+        data base in one transaction by operation <i>updateAETitle</i>
+        for update of <i>RetrieveAETs</i> values in Study, Series and Instance
+        records.]]>
+      </description>
+      <name>UpdateStudiesBatchSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getOtherServiceAETAttrs"
+      setMethod="setOtherServiceAETAttrs">
+      <description><![CDATA[List of AE Title attributes of other services
+      which are updated by operation updateAETitle.
+       ]]>
+      </description>
+      <name>OtherServiceAETitleAttributesToUpdate</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+         dcm4chee.archive:service=AuditLogger#SupressLogForAETitles
+         dcm4chee.archive:service=AuditLogger#LocalAETitles
+         dcm4chee.archive:service=ContentEditService#CalledAETitle
+         dcm4chee.archive:service=ContentEditService#CallingAETitle
+         dcm4chee.archive:service=ECHOService#CallingAETitle
+         dcm4chee.archive:service=ExportManager#CallingAETitle
+         dcm4chee.archive:service=Forward#ForwardModifiedToAETitles
+         dcm4chee.archive:service=FileSystemMgt,group=ONLINE_STORAGE#DefaultRetrieveAETitle
+         dcm4chee.archive:service=FileSystemMgt#RetrieveAETitle
+         dcm4chee.archive:service=GPWLScp#CalledAETitles
+         dcm4chee.archive:service=GPWLScp#CallingAETitles
+         dcm4chee.archive:service=GPWLScu#CallingAETitle
+         dcm4chee.archive:service=GPWLScu#CalledAETitle
+         dcm4chee.archive:service=HPScp#CalledAETitles
+         dcm4chee.archive:service=HPScp#CallingAETitles
+         dcm4chee.archive:service=IANScu#NotifiedAETitles
+         dcm4chee.archive:service=IANScu#CallingAETitle
+         dcm4chee.archive:service=MCMScu#CallingAETitle
+         dcm4chee.archive:service=MCMScu#RetrieveAETitle
+         dcm4chee.archive:service=MCMScu#MoveDestinationAETitle
+         dcm4chee.archive:service=MCMScu#McmScpAETitle
+         dcm4chee.archive:service=MoveScu#CallingAETitle
+         dcm4chee.archive:service=MoveScu#CalledAETitle
+         dcm4chee.archive:service=MPPSEmulator#ModalityAETitles
+         dcm4chee.archive:service=MPPSEmulator#CalledAETitle
+         dcm4chee.archive:service=MPPSScp#CalledAETitles
+         dcm4chee.archive:service=MPPSScp#CallingAETitles
+         dcm4chee.archive:service=MPPSScu#ForwardAETitles
+         dcm4chee.archive:service=MPPSScu#CallingAETitle
+         dcm4chee.archive:service=MWLFindScp#CalledAETitles
+         dcm4chee.archive:service=MWLFindScp#CallingAETitles
+         dcm4chee.archive:service=MWLFindScp#LogAETitles
+         dcm4chee.archive:service=MWLScu#CallingAETitle
+         dcm4chee.archive:service=MWLScu#CalledAETitle
+         dcm4chee.archive:service=PPSScu#DestinationAETitles
+         dcm4chee.archive:service=PPSScu#CallingAETitle
+         dcm4chee.archive:service=Prefetch#PrefetchSourceAETitle
+         dcm4chee.archive:service=Prefetch#DestinationQueryAETitle
+         dcm4chee.archive:service=Prefetch#DestinationStorageAETitle
+         dcm4chee.archive:service=Prefetch#CallingAETitle
+         dcm4chee.archive:service=QueryRetrieveScp#CalledAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#CallingAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#LocalStorageAETitle
+         dcm4chee.archive:service=QueryRetrieveScp#SendWithDefaultTransferSyntaxToAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#SendNoPixelDataToAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#IgnoreUnsupportedSOPClassFailures
+         dcm4chee.archive:service=QueryRetrieveScp#PIXQueryCallingAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#CoerceRequestPatientIdsAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#UnrestrictedQueryPermissionsToAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#UnrestrictedReadPermissionsToAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#UnrestrictedExportPermissionsToAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#RequestStorageCommitFromAETitles
+         dcm4chee.archive:service=QueryRetrieveScp#LogAETitles
+         dcm4chee.archive:service=StgCmtScuScp#CalledAETitles
+         dcm4chee.archive:service=StgCmtScuScp#CallingAETitles
+         dcm4chee.archive:service=StoreScp#CalledAETitles
+         dcm4chee.archive:service=StoreScp#CallingAETitles
+         dcm4chee.archive:service=StoreScp#UnrestrictedAppendPermissionsToAETitles
+         dcm4chee.archive:service=StoreScp#WarnForCoercedAETitles
+         dcm4chee.archive:service=StoreScp#IgnorePatientIDAETitles
+         dcm4chee.archive:service=StoreScp#LogAETitles
+         dcm4chee.archive:service=StudyReconciliation#FindSCPAETitle
+         dcm4chee.archive:service=StudyReconciliation#CallingAETitle
+         dcm4chee.archive:service=StudyMgtScp#CalledAETitles
+         dcm4chee.archive:service=StudyMgtScp#CallingAETitles
+         dcm4chee.archive:service=StudyMgtScu#CallingAETitle
+         dcm4chee.archive:service=XDS-I#DocRepositoryAET
+         " />
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getAuditLoggerName" setMethod="setAuditLoggerName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" getMethod="getEchoServiceName" setMethod="setEchoServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>EchoServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   <operation impact="INFO">
+     <description>Get list of AE Configurations</description>
+     <name>listAEs</name>
+     <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+     <description>Get AE Configuration</description>
+     <name>getAE</name>
+     <parameter>
+       <description>AE Title</description>
+       <name>title</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>org.dcm4chex.archive.ejb.interfaces.AEDTO</return-type>
+	</operation>
+    <operation impact="ACTION">
+     <description>Get AE Configuration</description>
+     <name>getAE</name>
+     <parameter>
+       <description>AE Title</description>
+       <name>title</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Hostname or ip</description>
+       <name>host</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>org.dcm4chex.archive.ejb.interfaces.AEDTO</return-type>
+	</operation>
+    <operation impact="ACTION">
+     <description>Get AE Configuration</description>
+     <name>getAE</name>
+     <parameter>
+       <description>AE Title</description>
+       <name>title</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>InetAddress</description>
+       <name>addr</name>
+       <type>java.net.InetAddress</type>
+     </parameter>
+     <return-type>org.dcm4chex.archive.ejb.interfaces.AEDTO</return-type>
+	</operation>
+   
+   <operation impact="ACTION">
+     <description>Update AE configuration</description>
+     <name>updateAE</name>
+     <parameter>
+       <description>Primary key of AE (use -1 for new AE)</description>
+       <name>pk</name>
+       <type>long</type>
+     </parameter>
+     <parameter>
+       <description>AE Title</description>
+       <name>aet</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Hostname or ip</description>
+       <name>host</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Port number</description>
+       <name>port</name>
+       <type>int</type>
+     </parameter>
+     <parameter>
+       <description>Cipher (seperated with ',')</description>
+       <name>cipher</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Default Issuer of Patient ID associated with this AE</description>
+       <name>issuer</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Default User ID associated with this AE</description>
+       <name>user</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Password of Default User ID associated with this AE</description>
+       <name>password</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>File System Group ID associated with this AE</description>
+       <name>fsGroupID</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Free text description of this AE</description>
+       <name>description</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>WADO URL for this AE</description>
+       <name>wadoUrl</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Enable/disable check if host can be resolved to an IP address</description>
+       <name>checkHost</name>
+       <type>boolean</type>
+     </parameter>
+     <return-type>void</return-type>
+	</operation>
+	
+   <operation impact="ACTION">
+     <description>Add AE configuration</description>
+     <name>addAE</name>
+     <parameter>
+       <description>AE Title</description>
+       <name>aet</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Hostname or ip</description>
+       <name>host</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Port number</description>
+       <name>port</name>
+       <type>int</type>
+     </parameter>
+     <parameter>
+       <description>Cipher (seperated with ',')</description>
+       <name>cipher</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Default Issuer of Patient ID associated with this AE</description>
+       <name>issuer</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Default User ID associated with this AE</description>
+       <name>user</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Password of Default User ID associated with this AE</description>
+       <name>password</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>File System Group ID associated with this AE</description>
+       <name>fsGroupID</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Free text description of this AE</description>
+       <name>description</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>WADO URL for this AE</description>
+       <name>wadoUrl</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Enable/disable check if host can be resolved to an IP address</description>
+       <name>checkHost</name>
+       <type>boolean</type>
+     </parameter>
+     <return-type>void</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Remove AE Configuration</description>
+     <name>removeAE</name>
+     <parameter>
+       <description>AET</description>
+       <name>aet</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>void</return-type>
+	</operation>
+	
+   <operation impact="ACTION">
+      <description><![CDATA[Update specified AE Title to new value in AE
+        Configuration and in all service attributes listed by attribute
+        <b>OtherServiceAETitleAttributesToUpdate</b>. If the specified AE Title
+        is associated with file systems, also the Retrieve AE Title of these
+        file systems is updated to the new value as the Retrieve AE Titles
+        associated with Instances, Series and Studies that have files on this
+        file systems.]]>
+      </description>
+      <name>updateAETitle</name>
+      <parameter>
+        <description>AE Title to update.</description>
+        <name>prevAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>new AE Title.</description>
+        <name>newAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+  <operation impact="ACTION">
+     <description>Clear AE Cache</description>
+     <name>clearCache</name>
+  </operation>
+
+  &defaultOperations;
+</mbean>
+

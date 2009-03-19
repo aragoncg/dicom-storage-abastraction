@@ -1,0 +1,40 @@
+-- Update DB from dcm4chee-2.9.x to dcm4chee-2.10.x
+
+ALTER TABLE series_req ADD req_service TEXT,
+                       ADD req_physician TEXT,
+                       ADD req_phys_i_name TEXT,
+                       ADD req_phys_p_name TEXT;
+CREATE INDEX ser_req_service ON series_req(req_service);
+CREATE INDEX ser_req_phys ON series_req(req_physician);
+CREATE INDEX ser_req_phys_i ON series_req(req_phys_i_name);
+CREATE INDEX ser_req_phys_p ON series_req(req_phys_p_name);
+
+CREATE TABLE audit_record_old(
+	pk 				SERIAL NOT NULL CONSTRAINT audit_rec_old_pk PRIMARY KEY,
+	msg_type 		TEXT,
+	host_name 		TEXT,
+	time_stamp 		TIMESTAMP,
+	aet 			TEXT,
+	user_name 		TEXT,
+	patient_name	TEXT,
+	patient_id 		TEXT,
+	xml_data 		TEXT
+);
+INSERT INTO audit_record_old SELECT * FROM audit_record;
+SELECT setval('audit_record_old_pk_seq', max(pk)) FROM audit_record_old;
+DROP TABLE audit_record;
+CREATE INDEX arr_msg_type ON audit_record_old(msg_type);
+CREATE INDEX arr_host_name ON audit_record_old(UPPER(host_name));
+CREATE INDEX arr_time_stamp ON audit_record_old(time_stamp);
+CREATE INDEX arr_aet ON audit_record_old(aet);
+CREATE INDEX arr_user_name ON audit_record_old(user_name);
+CREATE INDEX arr_patient_name ON audit_record_old(UPPER(patient_name));
+CREATE INDEX arr_patient_id ON audit_record_old(patient_id);
+
+-- Increase sps_status > 1 to respect the new inserted status READY(2).
+UPDATE mwl_item SET sps_status=sps_status+1 where sps_status > 1;
+
+DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value,code_designator);
+
+UPDATE roles SET roles='AuditLogUser' WHERE roles='arr-user';

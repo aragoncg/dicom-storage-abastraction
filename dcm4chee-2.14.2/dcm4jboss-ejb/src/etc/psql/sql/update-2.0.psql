@@ -1,0 +1,24 @@
+-- Update DB from dcm4chee-0.9.x to dcm4chee-2.0.x
+
+ALTER TABLE filesystem RENAME COLUMN retrieve_aets TO retrieve_aet;
+ALTER TABLE filesystem DROP COLUMN highwater_mark;
+ALTER TABLE filesystem DROP COLUMN disk_usage;
+
+ALTER TABLE study ADD COLUMN fileset_iuid TEXT;
+ALTER TABLE study ADD COLUMN fileset_id TEXT;
+
+ALTER TABLE series ADD COLUMN fileset_iuid TEXT;
+ALTER TABLE series ADD COLUMN fileset_id TEXT;
+
+CREATE TABLE media (
+	pk          	SERIAL PRIMARY KEY,
+	fileset_iuid	TEXT NOT NULL,
+	fileset_id		TEXT,
+	media_status	INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX fileset_iuid ON media(fileset_iuid);
+CREATE INDEX media_status ON media(media_status);
+
+ALTER TABLE instance ADD COLUMN media_fk INTEGER;
+ALTER TABLE instance ADD CONSTRAINT media_fk FOREIGN KEY (media_fk) REFERENCES media(pk);
+ALTER TABLE instance ADD COLUMN ext_retr_aet TEXT;

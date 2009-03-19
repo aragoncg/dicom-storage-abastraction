@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Used in page-tpl.xsl -->
+<!ENTITY English "English">
+<!ENTITY German "German">
+<!ENTITY French "French">
+<!ENTITY Folder "Folder">
+<!ENTITY Trash "Trash">
+<!ENTITY AEManagement "AE Management">
+<!ENTITY OfflineStorage "Offline Storage">
+<!ENTITY WorklistConsole "Worklist Console">
+<!ENTITY MPPSConsole "MPPS Console">
+<!ENTITY GPWorklistConsole "GP Worklist Console">
+<!ENTITY GPPPSConsole "GPPPS Console">
+<!ENTITY UserAdmin "User Admin">
+<!ENTITY AuditRepository "Audit Repository">
+<!ENTITY Logout "Logout">
+
+<!-- Used in folder-tpl.xsl and trash-tpl.xsl -->
+<!ENTITY ShowPatientsWithoutStudies "Show patients without studies">
+<!ENTITY woStudies "w/o studies">
+<!ENTITY ListStudiesOfOnePatientBeginningWithTheMostRecentStudy "List studies of one patient beginning with the most recent study">
+<!ENTITY latestStudiesFirst "latest studies first">
+<!ENTITY NoMatchingStudiesFound "No matching studies found!">
+<!ENTITY DisplayingStudies "Displaying studies">
+<!ENTITY to "to">
+<!ENTITY of "of">
+<!ENTITY matchingStudies "matching studies">
+<!ENTITY NewSearch "New Search">
+<!ENTITY PreviousSearchResults "Previous Search Results">
+<!ENTITY NextSearchResults "Next Search Results">
+<!ENTITY AddNewPatient  "Add new Patient">
+<!ENTITY MergeSelectedPatients "Merge selected Patients">
+<!ENTITY MoveSelectedEntities "Move selected Entities">
+<!ENTITY ExportSelectedEntitiesToTeachingFileSystem "Export selected Entities to Teaching File system">
+<!ENTITY ExportSelectedEntitiesToXDSRepository "Export selected Entities to XDS Repository">
+<!ENTITY DeleteSelectedEntities "Delete selected Entities">
+<!ENTITY RecoverSelectedEntities "Recover selected Entities">
+<!ENTITY DeleteSelectedEntitiesIrrevocable "Delete selected Entities irrevocable">
+<!ENTITY EmptyTrash "Empty Trash (=Deletes all Entities irrevocable)">
+<!ENTITY SendSelectedEntitiesToSpecifiedDestination "Send selected Entities to specified Destination">
+<!ENTITY confirmSendSelectedEntitiesTo1 "Send selected Entities to ">
+<!ENTITY confirmSendSelectedEntitiesTo2 "?">
+<!ENTITY SendDestination "Send Destination">
+<!ENTITY ShowOnlyStudiesFromSelectedSourceAET "Show only studies from selected source AET">
+<!ENTITY AETFilter "AET Filter">
+<!ENTITY PatientName "Patient Name">
+<!ENTITY PatientID "Patient ID">
+<!ENTITY formatPatientID "format: id[^^^issuer]">
+<!ENTITY StudyIUID "Study Instance UID">
+<!ENTITY SeriesIUID "Series Instance UID">
+<!ENTITY StudyID "Study ID">
+<!ENTITY StudyDate "Study Date">
+<!ENTITY formatStudyDate "format: yyyy/mm/dd or yyyy/mm/dd-yyyy/mm/dd">
+<!ENTITY AccessionNo "Accession No.">
+<!ENTITY Modality "Modality">
+<!ENTITY Patient "Patient">
+<!ENTITY Name "Name">
+<!ENTITY BirthDate "Birth Date">
+<!ENTITY Sex "Sex">
+<!ENTITY Study "Study">
+<!ENTITY StudyIDMedia "Study ID (@Media)">
+<!ENTITY Date "Date">
+<!ENTITY Time "Time">
+<!ENTITY StudyDescription "Study Description">
+<!ENTITY ShowStudyIUID "Show Study Instance UID">
+<!ENTITY ShowStudyDescription "Show Study Description">
+<!ENTITY AccNo "Acc. No.">
+<!ENTITY RefPhysician "Ref. Physician">
+<!ENTITY Status "Status">
+<!ENTITY NoS "NoS">
+<!ENTITY NoI "NoI">
+<!ENTITY Series "Series">
+<!ENTITY SeriesNoMedia "Series No (@Media)">
+<!ENTITY SeriesDescription "Series Description">
+<!ENTITY BodyPart "Body Part">
+<!ENTITY ShowSeriesIUID "Show Series Instance UID">
+<!ENTITY ShowSeriesDescription "Show Series Description">
+<!ENTITY PPSStatus "PPS Status">
+<!ENTITY Model "Model">
+<!ENTITY Vendor "Vendor">
+<!ENTITY SelectAllStudies "Select all Studies">
+<!ENTITY DeselectAll "Deselect all">
+<!ENTITY ShowStudies "Show Studies">
+<!ENTITY HideStudies "Hide Studies">
+<!ENTITY XDS "XDS">
+<!ENTITY ShowXDSDocuments "Show XDS Documents">
+<!ENTITY HideXDSDocuments "Hide XDS Documents">
+<!ENTITY AddNewStudy "Add new Study">
+<!ENTITY EditPatientAttributes "Edit Patient attributes">
+<!ENTITY ShowPatientAttributesInDB "Show Patient attributes in DB">
+<!ENTITY ShowStudyPermissionsForPatient "Show Study Permissions for Patient">
+<!ENTITY RecoverPatient "Recover Patient">
+<!ENTITY ShowSeries "Show Series">
+<!ENTITY HideSeries "Hide Series">
+<!ENTITY StudyDateTime "Study Date/Time">
+<!ENTITY StudyStatusID "Study Status ID">
+<!ENTITY NumberOfSeries "Number Of Series">
+<!ENTITY NumberOfInstances "Number Of Instances">
+<!ENTITY ViewStudyInWebviewer "View Study in Webviewer">
+<!ENTITY AddWorklistItem "Add worklist item">
+<!ENTITY AddNewSeries "Add new Series">
+<!ENTITY EditStudyAttributes "Edit Study Attributes">
+<!ENTITY ShowStudyAttributesInDB "Show Study attributes in DB">
+<!ENTITY ShowStudyPermissions "Show Study Permissions">
+<!ENTITY RecoverStudy "Recover Study">
+<!ENTITY ShowInstances "Show Instances">
+<!ENTITY HideInstances "Hide Instances">
+<!ENTITY SeriesDateTime "Series Date/Time">
+<!ENTITY ViewSeriesInWebviewer "View Series in Webviewer">
+<!ENTITY ViewKeyObjectsInWebviewer "View Key Objects in Webviewer">
+<!ENTITY EditSeriesAttributes "Edit Series Attributes">
+<!ENTITY ShowSeriesAttributesInDB "Show Series attributes in DB">
+<!ENTITY RecoverSeries "Recover Series">
+<!ENTITY ShowFiles "Show Files">
+<!ENTITY HideFiles "Hide Files">
+<!ENTITY ContentDateTime "Content Date/Time">
+<!ENTITY InstanceNumber "Instance Number">
+<!ENTITY ImageType "Image Type">
+<!ENTITY PixelMatrix "Pixel Matrix">
+<!ENTITY NumberOfFiles "Number of Files">
+<!ENTITY RetrieveAET "Retrieve AET">
+<!ENTITY SopIUID "SOP Instance UID">
+<!ENTITY ViewImage "View Image">
+<!ENTITY ShowInstanceAttributesInDB "Show Instance Attributes in DB">
+<!ENTITY ShowDICOMAttributes "Show DICOM Attributes">
+<!ENTITY DownloadDICOMObject "Download DICOM Object">
+<!ENTITY RecoverInstance "Recover Instance">
+<!ENTITY notOnline "not online">
+<!ENTITY CreationDateTime "Creation Date/Time">
+<!ENTITY PresentationDescription "Presentation Description">
+<!ENTITY PresentationLabel "Presentation Label">
+<!ENTITY NumberOfReferencedImages "Number of Referenced Images">
+<!ENTITY ViewImagesWithAppliedPresentationStateInWebviewer "View Images with applied Presentation State in Webviewer">
+<!ENTITY DocumentTitle "Document Title">
+<!ENTITY DocumentStatus "Document Status">
+<!ENTITY ViewReportAsPDF "View Report as PDF">
+<!ENTITY ViewReportAsHTML "View Report as HTML">
+<!ENTITY ExportPDFtoXDSRepository "Export PDF to XDS Repository">
+<!ENTITY WaveformType "Waveform Type">
+<!ENTITY ViewWaveform "View Waveform">
+<!ENTITY MIMEType "MIME Type">
+<!ENTITY ViewDocument "View Document">
+<!ENTITY TSUID "Transfer Syntax UID" >
+<!ENTITY OK "OK" >
+<!ENTITY toArchive "to archive" >
+<!ENTITY archived "archived" >
+<!ENTITY compressionFailed "compression failed" >
+<!ENTITY compressionVerificationFailed "compression verification failed" >
+<!ENTITY MD5CheckFailed "MD5 check failed">
+<!ENTITY HSMQueryFailed "HSM query failed">
+<!ENTITY FileSize "File size">
+<!ENTITY FilePath "File path">
+<!ENTITY MD5Sum "MD5 sum">
+<!ENTITY ShowOriginalReceivedDICOMAttributes "Show original received DICOM Attributes">
+<!ENTITY DownloadOriginalReceivedDICOMObject "Download original received DICOM Object">
+<!ENTITY XDSDocuments "XDS Documents">
+<!ENTITY QueryForXDSDocuments "Query for XDS documents">
+<!ENTITY ClearListOfXDSDocuments "Clear list of XDS documents">
+<!ENTITY DocumentID "Document ID">
+<!ENTITY OpenXDSIManifest "Open XDSI Manifest">
+<!ENTITY ViewManifestInWebviewer "View Manifest in Webviewer">
+<!ENTITY OpenPDFDocument "Open PDF Document">
+<!ENTITY OpenXDSDocument "Open XDS Document">
+<!ENTITY QueryHasIssuer "Show only studies for patients that have (With) or haven't (Without) an Issuer of PID">
+<!ENTITY QueryHasIssuer_text1 "Show only With">
+<!ENTITY QueryHasIssuer_text2 "Without">
+<!ENTITY QueryHasIssuer_text3 "Issuer of PID">

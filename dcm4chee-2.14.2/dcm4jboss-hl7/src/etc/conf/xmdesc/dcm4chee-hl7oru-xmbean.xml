@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[The <b>ORU HL7 Service</b> converts ORU^R01 messages
+   into DICOM structured reports, so a viewer can just use the PACS system to
+   access the report.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hl7.ORUService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>ORUService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getMessageTypes"
+      setMethod="setMessageTypes">
+      <description>Comma separated list of Message Types handled by this Service.
+      </description>
+      <name>MessageTypes</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ORU^R01" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStylesheet"
+      setMethod="setStylesheet">
+      <description><![CDATA[Stylesheet for HL7 ORU^R01 to DICOM SR mapping.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>Stylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-hl7/oru2sr.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getObxIgnoreStati"
+      setMethod="setObxIgnoreStati">
+      <description><![CDATA[List of OBX Stati that should be ignored by this service. <br/>
+      		Seperate multiple stati with ','.<br/>
+       		Use NONE to process all ORU messages<p/>
+       		Default field number in OBX segment is 11 (OBSERV RESULT STATUS). 
+       		You can change the default by preceeding '&lt;fieldNr&gt;:'<br/>
+       		e.g.: 'D,X' ignore all ORU message with status D and X in OBX field 11 <br/>
+       		'8:A' ignore all ORU messages with A in OBX field 8 (Abnormal Flags)]]>
+      </description>
+      <name>ObxIgnoreStati</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getStorePriority"
+      setMethod="setStorePriority">
+      <description>Store priority. Enumerated Values: LOW, MEDIUM, HIGH.
+      </description>
+      <name>StorePriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getExportManagerName"
+      setMethod="setExportManagerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>ExportManagerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHL7ServerName"
+      setMethod="setHL7ServerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>HL7ServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Process XML message</description>
+      <name>process</name>
+      <parameter>
+        <name>msg</name>
+        <type>org.dom4j.Document</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+</mbean>

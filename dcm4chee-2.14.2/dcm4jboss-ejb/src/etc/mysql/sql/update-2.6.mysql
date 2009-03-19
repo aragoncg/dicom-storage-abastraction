@@ -1,0 +1,5 @@
+-- Update DB from dcm4chee-2.5.x to dcm4chee-2.6.x
+
+ALTER TABLE filesystem ADD availability INTEGER;
+ALTER TABLE filesystem ADD user_info VARCHAR(250) BINARY;
+UPDATE filesystem SET availability=0;

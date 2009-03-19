@@ -1,0 +1,31 @@
+-- Update DB from dcm4chee-2.8.x to dcm4chee-2.9.x
+
+DROP TABLE assoc;
+
+ALTER TABLE priv_patient ADD pat_name TEXT;
+ALTER TABLE priv_study ADD accession_no TEXT;
+ALTER TABLE priv_series ADD src_aet TEXT;
+ALTER TABLE study ADD study_status INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE series ADD series_status INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE instance ADD inst_status INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE instance ADD all_attrs BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE study ADD study_status INTEGER;
+UPDATE study SET study_status=0;
+ALTER TABLE study ALTER study_status SET NOT NULL; 
+ALTER TABLE series ADD series_status INTEGER;
+UPDATE series SET series_status=0;
+ALTER TABLE series ALTER series_status SET NOT NULL; 
+ALTER TABLE instance ADD inst_status INTEGER;
+UPDATE instance SET inst_status=0;
+ALTER TABLE instance ALTER inst_status SET NOT NULL; 
+ALTER TABLE instance ADD all_attrs BOOLEAN;
+UPDATE instance SET all_attrs=false;
+ALTER TABLE instance ALTER all_attrs SET NOT NULL; 
+
+CREATE INDEX priv_patient_name ON priv_patient(pat_name);
+CREATE INDEX priv_study_accs_no ON priv_study(accession_no);
+CREATE INDEX priv_ser_src_aet ON priv_series(src_aet);
+CREATE INDEX study_status ON study(study_status);
+CREATE INDEX series_status ON series(series_status);
+CREATE INDEX instance_status ON instance(inst_status);

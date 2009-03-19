@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>MPPS Emulator. Use to emulate the generation of MPPS messages for the defined AE titles.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.mppsscu.MPPSEmulatorService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MPPSEmulatorService</name>
+   </constructor>
+
+   <attribute access="read-write" 
+     getMethod="getModalityAETitles" 
+     setMethod="setModalityAETitles">
+      <description><![CDATA[AE titles of modalities for which MPPS messages 
+        shall be emulated. Multiple AE titles are separated by new line.
+        For each AE title, a minimum delay time between the time the last
+        object of the a study is received and the generation of the MPPS
+        message can be explicit specified. If no delay is specified, a default
+        delay of 5 minutes is used.
+        <br/>Format: <i>aeTitle</i>[:<i>delay</i>] 
+        <br/><i>delay</i> can be specified in seconds (##s) or minutes (##m).
+        <br>Sample: MOD_MPPS:3m]]>
+      </description>
+      <name>ModalityAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MOD_AET:3m"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getPollInterval" setMethod="setPollInterval">
+      <description><![CDATA[Interval for polling for newly received series from
+          modalities you configured in the <b>ModalityAETitles</b> attribute.
+          The interval can be specified in seconds (##s) or minutes (##m). 
+          NEVER = disable MPPS emulation.]]>
+      </description>
+      <name>PollInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCalledAET" setMethod="setCalledAET">
+      <description>AE title  of the MPPS SCP, to which the emulated MPPS messages shall be sent.
+      </description>
+      <name>CalledAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+  
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckSeriesWithoutMPPS"
+      setMethod="setTimerIDCheckSeriesWithoutMPPS">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckSeriesWithoutMPPS</name>
+      <type>java.lang.String</type>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getMppsScuServiceName"
+      setMethod="setMppsScuServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>MppsScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description><![CDATA[Emulate MPPS messages for newly received series from the stations
+          or modalities specified by the <b>ModalityAETitles</b> attribute. Returns the number of
+          successfully created MPPS instances at the MPPS SCP that you specified with the <b>CalledAETitle</b> property.]]>
+      </description>
+      <name>emulateMPPS</name>
+      <return-type>int</return-type>
+   </operation>
+
+</mbean>

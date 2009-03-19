@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>TAR Retriever Service.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.hsm.TarRetrieverService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>TarRetrieverService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" 
+      getMethod="getCacheRoot"
+      setMethod="setCacheRoot">
+      <description><![CDATA[Root directory in which retrieved tars are extracted.
+      A relative path name is resolved relative to 
+      <i>archive-install-directory</i>/server/default/.
+      Attention: For reliable function of the deletion of least recent accessed
+      objects, a separate file system should be used for the cache.]]>   
+      </description>
+      <name>CacheRoot</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="tar-extracted"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getMinFreeDiskSpace"
+      setMethod="setMinFreeDiskSpace">
+      <description><![CDATA[Minimum free disk space on Cache Directory. If the
+      free available disk space on the cache directory falls below this value,
+      least recent accessed sub-directories are deleted, BEFORE further TARs
+      are retrieved and extracted. 1MB = 1000000 bytes, 1GB = 1000MB.]]>   
+      </description>
+      <name>MinimumFreeDiskSpace</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="50MB"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getPreferredFreeDiskSpace"
+      setMethod="setPreferredFreeDiskSpace">
+      <description><![CDATA[Preferred free disk space on Cache Directory. If the
+      free available disk space on the cache directory falls below this value,
+      least recent accessed sub-directories are deleted, WITHOUT blocking
+      retrieve and extraction of further TARs. 1MB = 1000000 bytes, 1GB = 1000MB.]]>   
+      </description>
+      <name>PreferredFreeDiskSpace</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="100MB"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isCheckMD5"
+    setMethod="setCheckMD5">
+    <description><![CDATA[
+     Defines if the MD5 sum of TAR file entries shall be checked against
+     values in first entry <code>MD5SUM</code> file during retrieval. If
+     the check fails, the retrieval will fail. If activated, but the first
+     TAR entry is not the <code>MD5SUM</code> file, a WARN messages will be
+     logged in <code>server.log</code>.]]>
+    </description>
+    <name>CheckMD5</name>
+    <type>boolean</type>
+    <descriptors>
+     <value value="true" />
+    </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getTarFetchCommand" 
+     setMethod="setTarFetchCommand">
+      <description><![CDATA[External command to fetch tarballs from the source
+      file system, with
+         <br>%d will be replaced by the source file system name,
+         <br>%f will be replaced by the path of tarball on the source file system,
+         <br>%p will be replaced by the destination path.
+         <br>NONE = TAR file on local accessable file system.
+       ]]>
+      </description>
+      <name>TarFetchCommand</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getTarIncomingDir" 
+     setMethod="setTarIncomingDir">
+      <description><![CDATA[Directory in which TARs shall be retrieved
+      by external <b>TarFetchCommand</b>. A relative path name is resolved
+      relative to <i>archive-install-directory</i>/server/default/.
+      Not effective if TarFetchCommand=<code>NONE<code>]]>
+      </description>
+      <name>TarIncomingDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="tar-incoming"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getBufferSize"
+      setMethod="setBufferSize">
+      <description>Size of write byte buffer.
+      </description>
+      <name>BufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="8192"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLRUCacheSize"
+      setMethod="setLRUCacheSize">
+      <description>Number of cached references to least recent accessed directories.
+      </description>
+      <name>LRUCacheSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="20"/>
+      </descriptors>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Retrieve file from TAR specified by File System ID and File ID. 
+      </description>
+      <name>retrieveFileFromTAR</name>
+      <parameter>
+        <description>File System ID</description>
+        <name>fsID</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>File ID</description>
+        <name>fileID</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.io.File</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Delete oldest directories to free specified amount of disk space. 
+      </description>
+      <name>free</name>
+      <parameter>
+        <description>minimal amount of disk space to be released</description>
+        <name>amount</name>
+        <type>long</type>
+      </parameter>
+      <return-type>long</return-type>
+   </operation>
+</mbean>
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-gpwlscp-service.xml 3323 2007-05-08 13:04:04Z javawilli $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.gpwlscp.GPWLScpService" 
+	     name="dcm4chee.archive:service=GPWLScp"
+	     xmbean-dd="xmdesc/dcm4chee-gpwlscp-xmbean.xml">
+    <depends optional-attribute-name="AEServiceName"
+      >dcm4chee.archive:service=AE</depends>
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="DcmServerName"
+      >dcm4chee.archive:service=DcmServer</depends>
+  </mbean>
+</server>

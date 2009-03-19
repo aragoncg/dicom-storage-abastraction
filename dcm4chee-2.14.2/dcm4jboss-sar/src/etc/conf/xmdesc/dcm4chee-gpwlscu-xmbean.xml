@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>General Purpose Worklist SCU</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.gpwlscu.GPWLScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>GPWLScuService</name>
+   </constructor>
+
+    <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>The calling AE title.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getCalledAET" setMethod="setCalledAET">
+      <description>The AE title of the general purpose worklist used for find. Use LOCAL
+      if the DICOM general purpose worklist is provided by the archive and can be accessed
+      directly from the database. 
+      </description>
+      <name>CalledAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="LOCAL"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-only" getMethod="isLocal">
+      <description>This value is is set to true if the &lt;b&gt;CalledAETitle&lt;/b&gt; attribute is set to LOCAL.
+      </description>
+      <name>Local</name>
+      <type>boolean</type>
+   </attribute>
+
+   &defaultSCUAttributes;
+
+   <attribute access="read-write" getMethod="getPriority" setMethod="setPriority">
+      <description>Priority for C-Find requests. Enumerated Values: LOW, MEDIUM, HIGH.
+      </description>
+      <name>Priority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   <!-- Operations -->
+   &defaultOperations;
+
+   <operation impact="ACTION">
+      <description>Get a list of general purpose worklist entries.
+      </description>
+      <name>findGPWLEntries</name>
+      <parameter>
+        <description>Dataset for C-Find</description>
+        <name>searchDS</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>Delete a general purpose worklist entry.
+      </description>
+      <name>deleteGPWLEntry</name>
+      <parameter>
+        <description>ID of general purpose worklist entry (Scheduled Procedure Step ID)</description>
+        <name>spsID</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+ 
+</mbean>

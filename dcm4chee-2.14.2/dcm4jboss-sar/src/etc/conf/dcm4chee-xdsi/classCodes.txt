@@ -1,0 +1,3 @@
+# ClassCodes (coarse classification)
+res_1^Angiography Result
+res_2^CT Result

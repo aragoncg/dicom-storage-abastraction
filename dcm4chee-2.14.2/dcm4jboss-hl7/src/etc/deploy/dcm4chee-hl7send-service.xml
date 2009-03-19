@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-hl7send-service.xml 5725 2008-01-21 11:59:26Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+
+  <mbean code="org.jboss.mq.server.jmx.Queue"
+	 name="dcm4chee.archive:service=Queue,name=HL7Send">
+     <depends optional-attribute-name="DestinationManager">
+     	jboss.mq:service=DestinationManager
+     </depends>
+  </mbean>
+   
+  <mbean code="org.dcm4chex.archive.hl7.HL7SendService" 
+	     name="dcm4chee.archive:service=HL7Send"
+	     xmbean-dd="xmdesc/dcm4chee-hl7send-xmbean.xml">
+    <depends>dcm4chee.archive:service=Queue,name=HL7Send</depends>
+    <depends>dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="HL7ServerName"
+      >dcm4chee.archive:service=HL7Server</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+    <depends optional-attribute-name="JMSServiceName"
+      >dcm4chee.archive:service=JMS</depends>
+  </mbean>
+</server>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+This is the XML DTD for the dcm4chee devices descriptor.
+
+Sample:
+
+<devices>
+  <device name="CT Station 1" modality="CT" aet="CT1">
+    <protocol>910910^CT: Chest^DSS_MESA</protocol>
+    <protocol>910950^CT: Abdomen^DSS_MESA</protocol>
+  </device>
+  <device name="MR Station 1" modality="MR" aet="MR1">
+    <protocol>911010^MR: Head^DSS_MESA</protocol>
+    <protocol>911050^MR: Neck^DSS_MESA</protocol>
+  </device>
+</devices>
+-->
+<!ELEMENT devices (device*) >
+<!ELEMENT device (protocol*) >
+<!ATTLIST device
+    name CDATA #REQUIRED
+    modality CDATA #REQUIRED
+    aet CDATA #REQUIRED >
+<!ELEMENT protocol (#PCDATA) >

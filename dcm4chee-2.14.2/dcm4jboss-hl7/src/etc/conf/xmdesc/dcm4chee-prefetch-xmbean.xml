@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[The <b>Prefetch Service</b> prefetches no longer
+     ONLINE available studies from an external archive or attached NEARLINE
+     storage on receive of a HL7 Order Message (ORM^O01) for the patient.]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hl7.PrefetchService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>PrefetchService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getStylesheet"
+      setMethod="setStylesheet">
+      <description><![CDATA[Stylesheet for HL7 ORM^O01 to C-FIND RQ mapping.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>Stylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-hl7/orm2prefetch.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPrefetchSourceAET"
+      setMethod="setPrefetchSourceAET">
+      <description><![CDATA[AE title of C-FIND SCP, which shall be queried for
+        available studies of a particular patient. NONE = prefetch disabled.]]>
+      </description>
+      <name>PrefetchSourceAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+       getMethod="getSourceQueryPriority"
+       setMethod="setSourceQueryPriority">
+      <description><![CDATA[Priority of query requests to the Prefetch Source AE. 
+      Enumerated Values: LOW, MEDIUM, HIGH.]]>
+      </description>
+      <name>SourceQueryPriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDestinationQueryAET"
+      setMethod="setDestinationQueryAET">
+      <description><![CDATA[AE title of C-FIND SCP, which shall be queried to
+        identify the availability of studies. Studies which are not ONLINE
+        available - which includes (parts of) studies which are not available
+        on this AE at all - will be retrieved to the configured Destination
+        Storage AE.]]>
+      </description>
+      <name>DestinationQueryAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+       getMethod="getDestinationQueryPriority"
+       setMethod="setDestinationQueryPriority">
+      <description><![CDATA[Priority of query requests to the Destination Query AE. 
+      Enumerated Values: LOW, MEDIUM, HIGH.]]>
+      </description>
+      <name>DestinationQueryPriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDestinationStorageAET"
+      setMethod="setDestinationStorageAET">
+      <description><![CDATA[AE title of C-STORE SCP, to which (parts of)
+        studies of a patient shall be retrieved, which are known by the
+        Prefetch Source AE, but are not ONLINE available from the Destination
+        Query AE.]]>
+      </description>
+      <name>DestinationStorageAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getCallingAET"
+      setMethod="setCallingAET">
+      <description>Calling AE title of the Move SCU.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" 
+       getMethod="getRetrievePriority"
+       setMethod="setRetrievePriority">
+      <description><![CDATA[Priority of invoked retrieve requests. 
+      Enumerated Values: LOW, MEDIUM, HIGH.]]>
+      </description>
+      <name>RetrievePriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>   <attribute access="read-write"
+      getMethod="getRetryIntervalls"
+      setMethod="setRetryIntervalls">
+      <description><![CDATA[Number and intervalls of retries of failed 
+      prefetch requests by a list of comma separated NUMBERxINTERVAL pairs.
+      The intervall can be specified in seconds (##s), minutes (##m),
+      hours (##h) or days (##d).]]>
+      </description>
+      <name>RetryIntervalls</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,12x1h" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getConcurrency"
+      setMethod="setConcurrency">
+      <description>Maximal number of concurrent processed prefetch orders.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+     getMethod="getAcTimeout"
+     setMethod="setAcTimeout">
+      <description>A-Associate accept timeout in milliseconds. 0 = no timeout.</description>
+      <name>AcceptTimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="10000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getDimseTimeout"
+     setMethod="setDimseTimeout">
+      <description>DIMSE message timeout in ms. 0 = no timeout.
+      </description>
+      <name>DIMSETimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="60000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+     getMethod="getSoCloseDelay"
+     setMethod="setSoCloseDelay">
+      <description>Socket close delay in milliseconds after an A-Release response.
+      </description>
+      <name>SocketCloseDelay</name>
+      <type>int</type>
+      <descriptors>
+         <value value="50"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum protocol data unit (PDU) package length for receiving PDUs.
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isTcpNoDelay"
+      setMethod="setTcpNoDelay">
+      <description>Send packets as quickly as possible (Disable Nagle's algorithmn).
+      </description>
+      <name>TcpNoDelay</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendBufferSize"
+      setMethod="setSendBufferSize">
+      <description>Buffer size used for socket output. 0 = use platform default.
+      </description>
+      <name>SendBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getReceiveBufferSize"
+      setMethod="setReceiveBufferSize">
+      <description>Buffer size used for socket input. 0 = use platform default.
+      </description>
+      <name>ReceiveBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMoveScuServiceName"
+      setMethod="setMoveScuServiceName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>MoveScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHL7ServerName"
+      setMethod="setHL7ServerName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>HL7ServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>         
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Schedule 'Test' Pre-Fetch Order.</description>
+      <name>processFile</name>
+      <parameter>
+        <description>Filename of hl7 file containing ORM message</description>
+        <name>filename</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>   
+    
+</mbean>
+    

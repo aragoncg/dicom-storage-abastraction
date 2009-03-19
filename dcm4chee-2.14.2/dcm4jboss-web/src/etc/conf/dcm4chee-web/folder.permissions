@@ -1,0 +1,76 @@
+#
+# Cofiguration file for role / application permission settings.
+#
+
+# Method Groups.
+# Collect methods of an application to logical group.
+# Format: <application>.*[<grpid>]=<method1>[,<method2>[,<method3>]..]
+# e.g. 'folder.*=delete,export_tf' 
+
+# add_worklist currently hides "Add Series" function in Web Folder  
+# folder.*=edit,move,delete,*export,add_worklist,edit.newStudyUID,xds_consumer,mergepat,study_permission,query_has_issuer
+# study_permission.free_role_action: show role and action input field to allow unconfigured roles and actions.
+# study_permission.show_only_studyPermissionRoles: hide all roles that are not of type StudyPermission.
+#
+folder.*=edit,move,delete,*export,edit.newStudyUID,mergepat,study_permission,study_permission.free_role_action,query_has_issuer
+folder.*export=export_tf,export_xds
+
+# Application - Role Mapping
+# Format: <application>=<role1>(<method1|group1>[,<method2|group2>[,...]])[;<role2>(<method|group>[..])[;...]]
+#
+# You can use method groups using *[<grpid>]
+# If a method group is not defined the method '?' is added to the application. 
+# (Usefull for application that does not need explicit method permission settings. e.g. trash)
+#
+# All users of folder applications have at least same permissions as WebUser (role WebUser is required) 
+# for all folder applications
+
+#Folder: move,send,edit,delete,export_tf,export_xds,add_worklist
+folder=WebUser(send);DatacareUser(edit,move,delete,export_xds);WebAdmin(*)
+
+#Trash: undelete, remove (+undelete)
+trash=DatacareUser(undelete);WebAdmin(remove)
+
+#AE Managment Console: echo, edit (+echo)
+ae_mgr=WebAdmin(edit);WebUser(echo)
+
+offline_storage=WebAdmin(*);McmUser(*)
+mwl_console=DatacareUser(*);WebAdmin(*)
+mpps_console=DatacareUser(*);WebAdmin(*)
+gpwl_console=DatacareUser(*);WebAdmin(*)
+gppps_console=DatacareUser(*);WebAdmin(*)
+user_admin=WebAdmin(*)
+audit_repository=AuditLogUser(*)
+
+# USER AE Filter mapping
+# Format:aefilter.<userId>=<AET1>[,<AET2>[,...[,<AETn>]]]
+# 
+# Attention: This filter doesnt mean to be 'multi-client capable'. 
+# (It is not guaranteed to have access to 'allowed' images.
+# 	You will see always the whole study even there is only  one series from an allowed AE!
+#
+
+#aefilter.user1=PACS_NODE1,PACS_NODE2
+#aefilter.user2=PACS_NODE2
+
+# Station AET grouping
+#
+# Defining groups:
+# 1) Set named group of station AETs
+#    Format:stationAetGroup.<groupName>=<AET1>[,<AET2>[,...[,<AETn>]]]
+# 2) Set List of groups
+#    Format:stationAetGroupList=<groupName_1>[,<groupName_2>[,...[,<groupName_n>]]]
+#
+#stationAetGroup.stat1=STAT1_CT1,STAT1_CT2,STAT2_CR
+#stationAetGroup.stat2=STAT2_CT1,STAT2_NM
+#
+#stationAetGroupList=stat1,stat2
+
+# USER StationAET filtering
+#
+# Format:stationAetFilter.<userId>=<AET1|groupName_1>[,<AET2|groupName_2>[,...[,<AETn|groupName_m>]]]
+#
+#stationAetFilter.admin=stat1,stat2
+#stationAetFilter.rta1=stat1
+#stationAetFilter.rta2=stat2
+

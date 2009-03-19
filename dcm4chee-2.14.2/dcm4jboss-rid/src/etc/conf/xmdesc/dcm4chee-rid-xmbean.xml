@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[<b>Retrieve Information for Display Service</b><br/>
+    Provides a RID Information Source Actor with ECG support.<br/>
+    This Information Source is based on this PACs system and therefore only allows access to DICOM documents (Structured Reports, Waveforms (RID-ECG) and encapsulated Documents (PDF,CDA) <br/>
+    The enumerated DICOM objects can be queried via RID retrieve information request 
+    and are rendered (and cached) as PDF documents for a RID retrieve document request.<br/>
+    DICOM waveform objects are only visible in cardiology related queries and due to the resolution requirements 
+    of ECG RID profile rendered as vector graphic (PDF or xml+svg).
+    <p>
+    To allow domain specific queries (radiology, cardiology..), the Concept Name Code is used to assign 'document titles'
+    to info request type (e.g requestType=SUMMARY-RADIOLOGY). This can be done in 'ConceptNameCodes'.
+    </p><p>
+    You may also define a list of SOP Class UIDs that are aware of Concept Name Code and always visible in a SUMMARY info request. (CuidsForSummaryAll) 
+    </p>]]>
+  </description>
+
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+
+  <class>org.dcm4chex.rid.mbean.RIDService</class>
+
+  <constructor>
+    <description>The default constructor</description>
+    <name>RIDService</name>
+  </constructor>
+
+  <attribute access="read-write" getMethod="getECGSopCuids"
+    setMethod="setECGSopCuids">
+    <description> List of SOP Class UIDs that are used to find ECG
+      documents (seperated with semicolon or newline). Use either the
+      SOP Class UID or the symbolic name! Use an empty value to reset
+      this list. </description>
+    <name>ECGSopCuids</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getSRSopCuids"
+    setMethod="setSRSopCuids">
+    <description> List of SOP Class UIDs that are used to find SR (text)
+      documents (separated with semicolon or newline). Use either the
+      SOP Class UID or the symbolic name! </description>
+    <name>SRSopCuids</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value
+        value="
+           BasicTextSR;
+           EnhancedSR;
+           ComprehensiveSR;
+           ProcedureLogStorage;
+           MammographyCADSR;
+           KeyObjectSelectionDocument;
+           ChestCADSR;
+           XRayRadiationDoseSR;
+           StructuredReportTextStorageRetired;
+           StructuredReportDetailStorageRetired;
+           StructuredComprehensiveStorageRetired
+           " />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getEncapsulatedDocumentSopCuids"
+    setMethod="setEncapsulatedDocumentSopCuids">
+    <description><![CDATA[List of SOP Class UIDs that are used to find encapsulated documents (PDF, CDA or others(private))<br/>
+      Use either the SOP Class UID or the symbolic name! (seperated with semicolon or newline).<br/>
+      Default: EncapsulatedPDFStorage;EncapsulatedCDAStorage
+      ]]></description>
+    <name>EncapsulatedDocumentSopCuids</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value
+        value="EncapsulatedPDFStorage;
+            EncapsulatedCDAStorage" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getCuidsForSummaryAll"
+    setMethod="setCuidsForSummaryAll">
+    <description><![CDATA[List of SOP Class UIDs that should be added to a SUMMARY (all) list.<br/>
+        Use either the SOP Class UID or the symbolic name (seperated with semicolon or newline).<br/>
+        Use NONE to disable this feature.
+       ]]></description>
+    <name>CuidsForSummaryAll</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NONE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getSopCuidGroups"
+    setMethod="setSopCuidGroups">
+    <description><![CDATA[List of SOP Class UID Groups.(seperated with semicolon or newline)<br/>
+        <dl><dt>Format: &lt;cuidGrpID&gt;:&lt;SOPClassUID&gt;</dt>
+                <dd>cuidGrpID: configurable (case sensitive) with exception to default groups:
+                <dd> SR  - Structured Reports</dd>
+                <dd> ECG - ECG Waveforms</dd>
+                <dd> DOC - Encapsulated Documents</dd>
+                <dd/>
+                <dd> SOPClassUID:Use either the SOP Class UID or the symbolic name</dd>
+        </dl>
+      ]]></description>
+    <name>SOPClassUIDGroups</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getConceptNameCodes"
+    setMethod="setConceptNameCodes">
+    <description><![CDATA[List of Concept Name Codes to assign 'document titles' to domains (requestType).<br/>
+        <dl><dt>Format: &lt;Code&gt;:&lt;reqTypes&gt;</dt>
+            <dd> Code:&lt;CodeValue&gt;^&lt;Designator&gt;[^&lt;Meaning&gt;]</dd>
+            <dd> reqTypes:&lt;reqType&gt;[,&lt;reqType&gt;[,..]]</dd>
+            <dd> reqType :&lt;reqTypeID&gt;[(&lt;cuidGrp&gt;,&lt;cuidGrp&gt;,..)]</dd>
+            <dd> cuidGrp: List of SOPClassUID Groups that are used to find document for this ConceptNameCode. 
+                          (if not specified: all configured SOPClassUIDs in SOPClassUIDGroups)</dd>
+        </dl>
+        <dl><dt>reqType: Following reqTypeID can be used:</dt>
+                <dd> A   - SUMMARY</dd>
+                <dd> R   - SUMMARY-RADIOLOGY</dd>
+                <dd> C   - SUMMARY-CARDIOLOGY</dd>
+                <dd> ECG - SUMMARY-CARDIOLOGY-ECG</dd>
+                <dd> L   - SUMMARY-LABORATORY</dd>
+                <dd> S   - SUMMARY-SURGERY</dd>
+                <dd> E   - SUMMARY-EMERGENCY</dd>
+                <dd> D   - SUMMARY-DISCHARGE</dd>
+                <dd> I   - SUMMARY-ICU (Intensive Care Report)</dd>
+                <dd> P   - SUMMARY-RX (Prescription Report)</dd>
+        </dl>
+        <dl><dt>cuidGrp: Each cuidGrpID defined in SOPClassUIDGroups can be used. Default groups:</dt>
+                <dd> SR  - Structured Reports</dd>
+                <dd> ECG - ECG Waveforms</dd>
+                <dd> DOC - Encapsulated Documents</dd>
+        </dl>
+      ]]></description>
+    <name>ConceptNameCodes</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="
+        11522-0^LN^Echocardiography Report:A,C;
+        11538-6^LN^CT Chest Report:R,A;
+        18760-9^LN^Ultrasound Report:R,A;
+        18758-3^LN^PET Scan Report:R,A;
+        18757-5^LN^Nuclear Medicine Report:R,A;
+        18745-0^LN^Cardiac Catheteization Report:A,C;
+        11541-0^LN^MRI Head Report:R,A;
+        11540-2^LN^CT Abdomen Report:R,A;
+        18756-7^LN^MRI Spine Report:R,A;
+        18755-9^LN^MRI Report:R,A;
+        125200^DCM^Adult Echocardiography Procedure Report:A,C;
+        11525-3^LN^Ultrasound Obstetric and Gyn Report:R,A;
+        18747-6^LN^CT Report:R,A;
+        10001^99SUPP97^Quantitative Arteriography report:A,C;
+        122291^DCM^CT/MR Cardiovascular Report:A,C;
+        18748-4^LN^Diagnostic Imaging Report:R,A;
+        122292^DCM^Quantitative Ventriculography Report:A,C;
+        11539-4^LN^CT Head Report:R,A;
+        11528-7^LN^Radiology Report:R,A" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDocTitlePatterns"
+    setMethod="setDocTitlePatterns">
+    <description><![CDATA[List of RegEx patterns to find encapsulated documents by Document Title (0042,0010).<br/>
+        <dl><dt>Format: &lt;reqType&gt;:&lt;title&gt;</dt>
+        <dt>reqType: Following IDs can be used:</dt>
+                <dd> A   - SUMMARY</dd>
+                <dd> R   - SUMMARY-RADIOLOGY</dd>
+                <dd> C   - SUMMARY-CARDIOLOGY</dd>
+                <dd> ECG - SUMMARY-CARDIOLOGY-ECG</dd>
+                <dd> L   - SUMMARY-LABORATORY</dd>
+                <dd> S   - SUMMARY-SURGERY</dd>
+                <dd> E   - SUMMARY-EMERGENCY</dd>
+                <dd> D   - SUMMARY-DISCHARGE</dd>
+                <dd> I   - SUMMARY-ICU (Intensive Care Report)</dd>
+                <dd> P   - SUMMARY-RX (Prescription Report)</dd>
+        <dt>title: Regular expression for selecting Document Title</dt>
+        </dl>
+      ]]></description>
+    <name>DocTitlePatterns</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NONE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getWadoURL"
+    setMethod="setWadoURL">
+    <description> URL to WADO service to get images for reports. 
+    </description>
+    <name>WadoURL</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="http://localhost:8080/wado" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getRIDSummaryXsl"
+    setMethod="setRIDSummaryXsl">
+    <description> Path and name of XSL file to render RID Summary
+      request. </description>
+    <name>RIDSummaryXsl</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="xsl/IHEDocumentList.xsl" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isUseXSLInstruction"
+    setMethod="setUseXSLInstruction">
+    <description> Enables XSL processing instruction in xml file. 
+    </description>
+    <name>UseXSLInstruction</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isUseOrigFile"
+    setMethod="setUseOrigFile">
+    <description> If enabled, A RID request will use the original dicom
+      file to generate a document. </description>
+    <name>UseOrigFile</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getSrImageRows"
+    setMethod="setSrImageRows">
+    <description> Set fixed size of referenced images in rendered
+      Structured Reports (by rows). NONE means original image size. 
+    </description>
+    <name>SRfixedImageRows</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NONE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getWaveformCorrection"
+    setMethod="setWaveformCorrection">
+    <description>Waveform Correction factor.</description>
+    <name>WaveformCorrection</name>
+    <type>float</type>
+    <descriptors>
+  <value value="1" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getQueryRetrieveScpName"
+    setMethod="setQueryRetrieveScpName">
+    <description>Used internally. Do NOT modify.</description>
+    <name>QueryRetrieveScpName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getAuditLoggerName"
+    setMethod="setAuditLoggerName">
+    <description>Used internally. Do NOT modify.</description>
+    <name>AuditLoggerName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  &defaultAttributes;
+
+<!-- Operations -->
+  &defaultOperations;
+
+  <operation impact="ACTION">
+    <description> Retrieve Information for Display (Summary) 
+    </description>
+    <name>getRIDSummary</name>
+    <parameter>
+      <description>Value object of the request.</description>
+      <name>reqVO</name>
+      <type>org.dcm4chex.rid.common.RIDRequestObject</type>
+    </parameter>
+    <return-type> org.dcm4chex.rid.common.RIDResponseObject 
+    </return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Retrieve Document for Display</description>
+    <name>getRIDDocument</name>
+    <parameter>
+      <description>Value object of the request.</description>
+      <name>reqVO</name>
+      <type>org.dcm4chex.rid.common.RIDRequestObject</type>
+    </parameter>
+    <return-type> org.dcm4chex.rid.common.RIDResponseObject 
+    </return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Get File Object for Document</description>
+    <name>getDocumentFile</name>
+    <parameter>
+      <description>ObjectUID of Document.</description>
+      <name>objectUID</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <parameter>
+      <description>Content Type (MIME Type).</description>
+      <name>contentType</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>java.io.File</return-type>
+  </operation>
+
+</mbean>

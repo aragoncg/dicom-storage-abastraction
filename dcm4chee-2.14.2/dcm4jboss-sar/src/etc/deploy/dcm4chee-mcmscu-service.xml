@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-mcmscu-service.xml 3341 2007-05-12 17:19:22Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.jboss.mq.server.jmx.Queue"
+    name="dcm4chee.archive:service=Queue,name=MCMScu">
+    <depends optional-attribute-name="DestinationManager"
+      >jboss.mq:service=DestinationManager</depends>
+  </mbean>
+  <mbean code="org.dcm4chex.archive.dcm.mcmscu.MCMScuService"
+    name="dcm4chee.archive:service=MCMScu"
+    xmbean-dd="xmdesc/dcm4chee-mcmscu-xmbean.xml">
+    <depends optional-attribute-name="JMSServiceName"
+      >dcm4chee.archive:service=JMS</depends>
+    <depends optional-attribute-name="SendmailServiceName"
+      >dcm4chee.archive:service=Sendmail</depends>
+    <depends optional-attribute-name="SchedulerServiceName"
+      >dcm4chee.archive:service=Scheduler</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+    <depends>dcm4chee.archive:service=Queue,name=MCMScu</depends>
+    <attribute name="QueueName">MCMScu</attribute>
+    <!-- To avoid NameNotBoundExceptions during server startup. MUST be
+	   removed, if the service is NOT deployed in the same jboss instance
+	   as the MediaComposer EJB!
+	   -->
+    <depends>jboss.j2ee:jndiName=ejb/MediaComposer,service=EJB</depends>
+    <attribute name="TimerIDCheckForMediaToBurn">CheckForMediaToBurn</attribute>
+    <attribute name="TimerIDCheckForStudiesToSchedule"
+      >CheckForStudiesToSchedule</attribute>
+    <attribute name="TimerIDCheckMediaStatus">CheckMediaStatus</attribute>
+  </mbean>
+</server>

@@ -1,0 +1,114 @@
+-- Update DB from dcm4chee-0.7.x/0.8.x to dcm4chee-0.9.x
+
+CONNECT TO tiani;
+SET CURRENT SCHEMA TIANI;
+
+-- >> necessary for update from < 0.8.4
+-- DROP TABLE move_order;
+-- DROP SEQUENCE move_order_pk_seq;
+-- <<
+
+DROP TABLE mwl_item;
+CREATE TABLE mwl_item (
+	pk          	INTEGER PRIMARY KEY NOT NULL,
+	patient_fk      INTEGER,
+	sps_id			VARCHAR(254) NOT NULL,
+	start_datetime	TIMESTAMP NOT NULL,
+	station_aet     VARCHAR(254) NOT NULL,
+	modality	    VARCHAR(254) NOT NULL,
+	perf_physician  VARCHAR(254),
+	perf_physician_up GENERATED ALWAYS AS (UPPER(perf_physician)),
+	req_proc_id    	VARCHAR(254) NOT NULL,
+	accession_no	VARCHAR(254),
+	item_attrs		BLOB(64000),
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+);
+CREATE INDEX mwl_patient_fk ON mwl_item(patient_fk);
+CREATE UNIQUE INDEX mwl_sps_id ON mwl_item(sps_id);
+CREATE INDEX mwl_start_time ON mwl_item(start_datetime);
+CREATE INDEX mwl_station_aet ON mwl_item(station_aet);
+CREATE INDEX mwl_modality ON mwl_item(modality);
+CREATE INDEX mwl_perf_physician ON mwl_item(perf_physician_up);
+CREATE INDEX mwl_req_proc_id ON mwl_item(req_proc_id);
+CREATE INDEX mwl_accession_no ON mwl_item(accession_no);
+
+ALTER TABLE study
+	ADD COLUMN created_time TIMESTAMP;
+ALTER TABLE study
+	ADD COLUMN updated_time TIMESTAMP;
+
+ALTER TABLE series
+	ADD COLUMN created_time TIMESTAMP;
+ALTER TABLE series
+	ADD COLUMN updated_time TIMESTAMP;
+
+
+CREATE SEQUENCE filesystem_pk_seq;
+CREATE TABLE filesystem (
+	pk              INTEGER PRIMARY KEY  NOT NULL,
+	dirpath			VARCHAR(254) NOT NULL,
+	retrieve_aets	VARCHAR(254) NOT NULL,
+	disk_usage		BIGINT DEFAULT 0 NOT NULL,
+	highwater_mark	BIGINT DEFAULT 0 NOT NULL
+);
+CREATE UNIQUE INDEX dirpath ON filesystem(dirpath);
+
+-- >> use clipboard table to extract normalized fields from old files table to new filesystem table
+CREATE TABLE clipboard (
+	pk				INTEGER GENERATED ALWAYS AS IDENTITY
+						(START WITH 1, INCREMENT BY 1) PRIMARY KEY,
+    dirpath			VARCHAR(254) NOT NULL,
+	retrieve_aets	VARCHAR(254) NOT NULL,
+	pk2				INTEGER
+);
+
+INSERT INTO clipboard (dirpath, retrieve_aets)
+	SELECT DISTINCT dirpath, retrieve_aets FROM files;
+
+INSERT INTO filesystem (pk, dirpath, retrieve_aets)
+	SELECT pk, dirpath, retrieve_aets FROM clipboard;
+
+-- Increment sequence to next pk
+UPDATE clipboard SET pk2 = NEXTVAL FOR filesystem_pk_seq;
+	
+DROP TABLE clipboard;
+-- <<
+
+-- >> create and populate new files table
+CREATE TABLE newfiles (
+	pk              INTEGER PRIMARY KEY  NOT NULL,
+	instance_fk     INTEGER,
+	filesystem_fk	INTEGER,
+	filepath		VARCHAR(254) NOT NULL,
+	file_tsuid      VARCHAR(254) NOT NULL,
+	file_md5        VARCHAR(254),
+	file_size       INTEGER
+);
+
+-- if INSERT fails for to many files records, separate inserts by files.pk range
+INSERT INTO newfiles (
+	pk, instance_fk, filesystem_fk, filepath, file_tsuid, file_md5, file_size
+) SELECT
+	files.pk, files.instance_fk, filesystem.pk, files.filepath, files.file_tsuid, files.file_md5, file_size 
+FROM files, filesystem WHERE filesystem.dirpath = files.dirpath;
+
+DROP TABLE files;
+
+RENAME TABLE newfiles to files;
+
+ALTER TABLE files 
+	ADD CONSTRAINT instance_fk FOREIGN KEY (instance_fk) REFERENCES instance(pk);
+ALTER TABLE files 
+	ADD CONSTRAINT filesystem_fk FOREIGN KEY (filesystem_fk) REFERENCES filesystem(pk);
+CREATE INDEX instance_fk ON files(instance_fk);
+CREATE INDEX filesystem_fk ON files(filesystem_fk);
+-- <<
+
+
+GRANT ALL PRIVILEGES ON TABLE files TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE filesystem TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE mwl_item TO USER tiani;
+
+GRANT USAGE ON SEQUENCE filesystem_pk_seq TO USER tiani;
+
+TERMINATE;

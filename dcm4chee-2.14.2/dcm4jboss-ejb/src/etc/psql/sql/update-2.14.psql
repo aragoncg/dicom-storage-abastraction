@@ -1,0 +1,178 @@
+-- Update DB from dcm4chee-2.13.x to dcm4chee-2.14.x
+
+DROP INDEX pat_id;
+CREATE INDEX pat_id ON patient(pat_id, pat_id_issuer);
+
+CREATE INDEX mpps_drcode_fk ON mpps(drcode_fk);
+
+DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value,code_designator,code_version);
+
+-- MODIFY patient.pat_birthdate from DATE to TEXT
+ALTER TABLE patient ADD pat_birthdate_text TEXT;
+UPDATE patient SET pat_birthdate_text = TO_CHAR(pat_birthdate,'YYYYMMDD') WHERE pat_birthdate IS NOT NULL;
+DROP INDEX pat_birthdate;
+ALTER TABLE patient DROP COLUMN pat_birthdate;
+ALTER TABLE patient RENAME COLUMN pat_birthdate_text TO pat_birthdate;
+CREATE INDEX pat_birthdate ON patient(pat_birthdate);
+
+ALTER TABLE study ADD cuids_in_study TEXT;
+
+ALTER TABLE ae ADD wado_url TEXT;
+ALTER TABLE ae
+  ALTER pk TYPE INT8;
+
+ALTER TABLE code
+  ALTER pk TYPE INT8;
+
+ALTER TABLE patient
+  ALTER pk TYPE INT8,
+  ALTER merge_fk TYPE INT8;
+
+ALTER TABLE other_pid
+  ALTER pk TYPE INT8;
+
+ALTER TABLE rel_pat_other_pid
+  ALTER patient_fk TYPE INT8,
+  ALTER other_pid_fk TYPE INT8;
+
+ALTER TABLE study
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8;
+
+ALTER TABLE rel_study_pcode
+  ALTER study_fk TYPE INT8,
+  ALTER pcode_fk TYPE INT8;
+
+ALTER TABLE study_permission
+  ALTER pk TYPE INT8;
+
+ALTER TABLE mpps
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8,
+  ALTER drcode_fk TYPE INT8;
+
+ALTER TABLE series
+  ALTER pk TYPE INT8,
+  ALTER study_fk TYPE INT8,
+  ALTER mpps_fk TYPE INT8;
+
+ALTER TABLE series_req
+  ALTER pk TYPE INT8,
+  ALTER series_fk TYPE INT8;
+
+ALTER TABLE media
+  ALTER pk TYPE INT8;
+
+ALTER TABLE instance
+  ALTER pk TYPE INT8,
+  ALTER series_fk TYPE INT8,
+  ALTER srcode_fk TYPE INT8,
+  ALTER media_fk TYPE INT8;
+
+ALTER TABLE verify_observer
+  ALTER pk TYPE INT8,
+  ALTER instance_fk TYPE INT8;
+
+ALTER TABLE filesystem
+  ALTER pk TYPE INT8,
+  ALTER next_fk TYPE INT8;
+
+ALTER TABLE files
+  ALTER pk TYPE INT8,
+  ALTER instance_fk TYPE INT8,
+  ALTER filesystem_fk TYPE INT8;
+
+ALTER TABLE study_on_fs
+  ALTER pk TYPE INT8,
+  ALTER study_fk TYPE INT8,
+  ALTER filesystem_fk TYPE INT8;
+
+ALTER TABLE mwl_item
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8;
+
+ALTER TABLE gpsps
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8,
+  ALTER code_fk TYPE INT8;
+
+ALTER TABLE rel_gpsps_appcode
+  ALTER gpsps_fk TYPE INT8,
+  ALTER appcode_fk TYPE INT8;
+
+ALTER TABLE rel_gpsps_devname
+  ALTER gpsps_fk TYPE INT8,
+  ALTER devname_fk TYPE INT8;
+
+ALTER TABLE rel_gpsps_devclass
+  ALTER gpsps_fk TYPE INT8,
+  ALTER devclass_fk TYPE INT8;
+
+ALTER TABLE rel_gpsps_devloc
+  ALTER gpsps_fk TYPE INT8,
+  ALTER devloc_fk TYPE INT8;
+
+ALTER TABLE gpsps_perf
+  ALTER pk TYPE INT8,
+  ALTER gpsps_fk TYPE INT8,
+  ALTER code_fk TYPE INT8;
+
+ALTER TABLE gpsps_req
+  ALTER pk TYPE INT8,
+  ALTER gpsps_fk TYPE INT8;
+
+ALTER TABLE gppps
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8;
+
+ALTER TABLE rel_gpsps_gppps
+  ALTER gpsps_fk TYPE INT8,
+  ALTER gppps_fk TYPE INT8;
+
+ALTER TABLE hp
+  ALTER pk TYPE INT8,
+  ALTER user_fk TYPE INT8;
+
+ALTER TABLE hpdef
+  ALTER pk TYPE INT8,
+  ALTER hp_fk TYPE INT8;
+
+ALTER TABLE rel_hpdef_region
+  ALTER hpdef_fk TYPE INT8,
+  ALTER region_fk TYPE INT8;
+
+ALTER TABLE rel_hpdef_proc
+  ALTER hpdef_fk TYPE INT8,
+  ALTER proc_fk TYPE INT8;
+
+ALTER TABLE rel_hpdef_reason
+  ALTER hpdef_fk TYPE INT8,
+  ALTER reason_fk TYPE INT8;
+
+ALTER TABLE priv_patient
+  ALTER pk TYPE INT8;
+
+ALTER TABLE priv_study
+  ALTER pk TYPE INT8,
+  ALTER patient_fk TYPE INT8;
+
+ALTER TABLE priv_series
+  ALTER pk TYPE INT8,
+  ALTER study_fk TYPE INT8;
+
+ALTER TABLE priv_instance
+  ALTER pk TYPE INT8,
+  ALTER series_fk TYPE INT8;
+
+ALTER TABLE priv_file
+  ALTER pk TYPE INT8,
+  ALTER instance_fk TYPE INT8,
+  ALTER filesystem_fk TYPE INT8;
+
+ALTER TABLE device
+  ALTER pk TYPE INT8;
+
+ALTER TABLE rel_dev_proto
+  ALTER device_fk TYPE INT8,
+  ALTER prcode_fk TYPE INT8;

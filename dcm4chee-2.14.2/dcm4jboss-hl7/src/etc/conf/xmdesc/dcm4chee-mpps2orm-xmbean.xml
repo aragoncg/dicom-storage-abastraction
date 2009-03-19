@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[DICOM MPPS to HL7 ORM converter. Converts DICOM Modality
+   Performed Procedure Step received by MPPS SCP Service into HL7 ORM message
+   sent to any HL7 receiver by utilizing the HL7 Send Service.<br/>
+   This service can be used with RIS systems that cannot handle MPPS messages.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hl7.MPPS2ORMService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MPPS2ORMService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="isEnabled" setMethod="setEnabled">
+      <description>Enable/disable this service</description>
+      <name>Enabled</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getReceivingApplication" setMethod="setReceivingApplication">
+      <description>Identifies the Receiving Application in HL7 messages that are directed to
+         the HL7 Send Service. The values in the ReceivingApplication attribute may be used to
+         configure specific forwarding rules for generated messages by this service in
+         the HL7 Send Service. NOTE: The Receiving Application encoded in the HL7 message
+         finally sent by the HL7 Send Service is defined by the matching Forwarding rule(s)
+         of the HL7 Send Service and will usually differ from the value of the ReceivingApplication
+         attribute of this service.</description>
+      <name>ReceivingApplication</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getReceivingFacility" setMethod="setReceivingFacility">
+      <description>Identifies the Receiving Facility in HL7 messages that are directed to
+         the HL7 Send Service. The values in the ReceivingFacility attribute may be used to
+         configure specific forwarding rules for generated messages by this service in
+         the HL7 Send Service. NOTE: The Receiving Facility encoded in the HL7 message
+         finally sent by the HL7 Send Service is defined by the matching Forwarding rule(s)
+         of the HL7 Send Service and will usually differ from the value of the ReceivingFacility
+         attribute of this service.</description>      <name>ReceivingFacility</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSendingApplication" setMethod="setSendingApplication">
+      <description>Identifies the Sending Application in HL7 messages that are directed to
+         the HL7 Send Service. The values in the SendingApplication attribute may be used to
+         configure specific forwarding rules for generated messages by this service in
+         the HL7 Send Service. NOTE: The Sending Application encoded in the HL7 message
+         finally sent by the HL7 Send Service is defined by the SendingApplication attribute
+         of the HL7 Send Service and may differ from the value of the SendingApplication
+         attribute of this service.</description>
+      <name>SendingApplication</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSendingFacility" setMethod="setSendingFacility">
+      <description>Identifies the Sending Facility in HL7 messages that are directed to
+         the HL7 Send Service. The values in the SendingFacility attribute may be used to
+         configure specific forwarding rules for generated messages by this service in
+         the HL7 Send Service. NOTE: The Sending Facility encoded in the HL7 message
+         finally sent by the HL7 Send Service is defined by the SendingFacility attribute
+         of the HL7 Send Service and may differ from the value of the SendingFacility
+         attribute of this service.</description>
+      <name>SendingFacility</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isIgnoreUnscheduled" setMethod="setIgnoreUnscheduled">
+      <description>Suppress generation of HL7 ORM messages for received MPPS which does not reference
+      any Scheduled Procedure Step. Otherwise, generates ORM messages with empty Placer/Filler Order Number
+      for received MPPS without Scheduled Procedure Step reference.
+      </description>
+      <name>IgnoreUnscheduled</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isIgnoreInProgress" setMethod="setIgnoreInProgress">
+      <description>Generates HL7 ORM messages for received MPPS with status COMPLETED or
+      DISCONTINUED, but does not generate HL7 ORM messages for received MPPS with status IN PROGRESS.
+      Otherwise, generates ORM messages also for received MPPS with status IN PROGRESS.
+      </description>
+      <name>IgnoreInProgress</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isOneORMperSPS" setMethod="setOneORMperSPS">
+      <description>Generates one HL7 ORM message for each referenced Scheduled Procedure Step in the
+      received MPPS. Therefore, if one MPPS references several Scheduled Procedure Steps, several HL7 ORM
+      messages will be generated. Otherwise, only one HL7 ORM message per received MPPS will be generated.
+      </description>
+      <name>OneORMperSPS</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isLogXSLT" setMethod="setLogXSLT">
+      <description><![CDATA[Activates logging of input (= XML Presentation of
+      DICOM MPPS object) and output (= XML representation of HL7 ORM^O01 message)
+      of XSLT into files (mpps-<uid>.xml and mpps-<uid>.orm.xml) in log directory.]]>
+      </description>
+      <name>LogXSLT</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStylesheet"
+      setMethod="setStylesheet">
+      <description><![CDATA[Stylesheet for DICOM MPPS to HL7 ORM^O01 mapping.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>Stylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-hl7/mpps2orm.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do NOT modify.     
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHl7SendServiceName"
+      setMethod="setHl7SendServiceName">
+      <description>Used internally. Do NOT modify.     
+      </description>
+      <name>Hl7SendServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>

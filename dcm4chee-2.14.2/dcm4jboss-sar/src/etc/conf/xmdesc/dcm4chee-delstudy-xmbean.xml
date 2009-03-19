@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC 
+    "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" 
+    "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[Delete Study Service. Perform scheduled deletion of
+    Studies.]]>
+  </description>
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+  <class>org.dcm4chex.archive.mbean.DeleteStudyService</class>
+  <constructor>
+    <description>The default constructor</description>
+    <name>DeleteStudyService</name>
+  </constructor>
+
+  <!-- Attributes -->
+  &defaultAttributes;
+
+  <attribute access="read-write" getMethod="isDeleteStudyFromDB"
+    setMethod="setDeleteStudyFromDB">
+    <description><![CDATA[Enables deletion of Studies also from the database,
+      if none of its instances is longer stored on any file system managed
+      by this archive instance. <b>Attention:</b> will also remove only
+      external retrieveable studies and studies archived to media from the
+      database, so its data is no longer accessable by the DICOM Query Service
+      and DICOM Retrieve requests can no longer be forwarded to the external
+      Retrieve Application Entity.]]>
+    </description>
+    <name>DeleteStudyFromDB</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isDeletePatientWithoutObjects"
+    setMethod="setDeletePatientWithoutObjects">
+    <description><![CDATA[Enables deletion of patients without Studies, MWL,
+      MPPS, GPWL or GPPPS entries. Only effective with activated
+      <i>DeleteStudiesFromDB</i>.]]>
+    </description>
+    <name>DeletePatientWithoutObjects</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isCreateIANonStudyDelete"
+    setMethod="setCreateIANonStudyDelete">
+    <description><![CDATA[Defines if an Instance Availability Notification
+      shall be created for deleted studies to notify remote Application
+      Entities configured in the IAN Service about changes of the Instance
+      Availability and Retrieve AETs.]]>
+    </description>
+    <name>CreateIANonStudyDelete</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="getAvailabilityOfExternalRetrieveable"
+    setMethod="setAvailabilityOfExternalRetrieveable">
+    <description><![CDATA[Defines Instance Availability of studies which
+      becomes only external retrievable after deletion from file systems
+      accessable by this archive instance. Enumerated values: "ONLINE",
+      "NEARLINE", "OFFLINE", "UNAVAILABLE"]]>
+    </description>
+    <name>AvailabilityOfExternalRetrieveable</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NEARLINE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getRetryIntervalsForJmsOrder"
+    setMethod="setRetryIntervalsForJmsOrder">
+    <description><![CDATA[Number and interval of retries made for failed JMS
+      order, e.g., deleteStudy.
+      <br>Format:
+      <br>Comma separated list of <i>number</i>x<i>interval</i> pairs.
+      <br>The interval can be specified in seconds (##s), minutes (##m),
+      hours (##h) or days (##d).
+      <br>Example: 
+      <br>5x1m,10x10m means retry a total of 5 times, one minute apart for
+      each retry; then retry a total of 10 times, 10 minutes apart for each
+      retry.]]>
+    </description>
+    <name>RetryIntervalsForJmsOrder</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="5x1m,12x5m,24x1h,7x1d" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDeleteStudyQueueName"
+    setMethod="setDeleteStudyQueueName">
+    <description>Used internally. Do NOT modify.</description>
+    <name>DeleteStudyQueueName</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getJmsServiceName"
+    setMethod="setJmsServiceName">
+    <description>Used internally. Do NOT modify.</description>
+    <name>JMSServiceName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <!-- Operations -->
+  &defaultOperations;
+
+  <operation impact="ACTION">
+    <description>Schedule Delete Study Order.</description>
+    <name>scheduleDeleteOrder</name>
+    <parameter>
+      <name>order</name>
+      <type>org.dcm4chex.archive.common.DeleteStudyOrder</type>
+    </parameter>
+    <return-type>void</return-type>
+  </operation>
+
+  <!-- Notifications -->
+
+  <notification>
+    <description>The notification sent for each deleted study, used by
+      the IAN SCU Service to notify configured remote Application Entities
+      about changes of the Instance Availability and Retrieve AETs.
+    </description>
+    <name>javax.management.Notification</name>
+    <notification-type>org.dcm4chex.archive.notif.StudyDeleted</notification-type>
+  </notification>
+</mbean>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+ "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>
+    Service to update patient.pat_attrs, study.study_attrs, series.series_attrs
+    and instance.inst_attrs BLOB columns from filed instances. Useful after
+    modification/extension of attribute filter configuration
+    conf/dcm4chee-attribute-filter.xml.
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager
+       value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.UpdateAttributesService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>UpdateAttributesService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getModality"
+   	setMethod="setModality">
+   	<description>
+   	 Limit update to Series with specified Modality. 'ANY' = update Series
+   	 with any Modality.
+   	</description>
+   	<name>Modality</name>
+   	<type>java.lang.String</type>
+   	<descriptors>
+   		<value value="ANY" />
+   	</descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSourceAETitle"
+   	setMethod="setSourceAETitle">
+   	<description>
+   	 Limit update to Series received from Storage SCU with specified AE
+   	 Title. 'ANY' = update Series received from any Storage SCU.
+   	</description>
+   	<name>SourceAETitle</name>
+   	<type>java.lang.String</type>
+   	<descriptors>
+   		<value value="ANY" />
+   	</descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getUpdatedAfter"
+    setMethod="setUpdatedAfter">
+    <description>
+     Limit update to Series which were last updated after the specified time.
+     Format: YYYY-MM-DD hh:mm:ss, with YYYY = Year, MM = Month, DD = Day,
+     hh = Hour, mm = Minute, ss = Second.
+     
+    </description>
+    <name>UpdatedAfter</name>
+    <type>java.lang.String</type>
+    <descriptors>
+     <value value="2004-01-01 00:00:00" />
+    </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getUpdatedBefore"
+    setMethod="setUpdatedBefore">
+    <description>
+     Limit update to Series which were last updated before the specified time.
+     Format: YYYY-MM-DD hh:mm:ss, with YYYY = Year, MM = Month, DD = Day, hh =
+     Hour, mm = Minute, ss = Second. 'AUTO' will be replaced by modification
+     date of attribute filter configuration conf/dcm4chee-attribute-filter.xml.
+    </description>
+    <name>UpdatedBefore</name>
+    <type>java.lang.String</type>
+    <descriptors>
+     <value value="AUTO" />
+    </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getAvailability"
+    setMethod="setAvailability">
+    <description>
+     Update Series with specified Availability: 'ONLINE' or 'NEARLINE'.
+    </description>
+    <name>Availability</name>
+    <type>java.lang.String</type>
+    <descriptors>
+     <value value="ONLINE" />
+    </descriptors>
+   </attribute>
+   <attribute access="read-write"
+    getMethod="getMaximalNumberOfSeriesToUpdateByOneTask"
+    setMethod="setMaximalNumberOfSeriesToUpdateByOneTask">
+    <description>
+     Limit maximal number of Series updated by operation updateMatchingSeries().
+    </description>
+    <name>MaximalNumberOfSeriesToUpdateByOneTask</name>
+    <type>int</type>
+    <descriptors>
+     <value value="100" />
+    </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueryRetrieveScpServiceName"
+      setMethod="setQueryRetrieveScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueryRetrieveScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTarRetrieverName"
+      setMethod="setTarRetrieverName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TarRetrieverName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="INFO">
+      <description>
+       Returns number of Series which match specified Modality, source AE Title
+       and last update time.
+      </description>
+      <name>countNumberOfMatchingSeriesToUpdate</name>
+      <return-type>int</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>
+       Update attributes of instances of Series which match specified Modality,
+       Source AE Title and last update time, limited by configured
+       MaximalNumberOfSeriesToUpdateByOneTask. Returns number of updated Series.
+      </description>
+      <name>updateMatchingSeries</name>
+      <return-type>int</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>
+       Update attributes of instances of Series which match specified Modality,
+       Source AE Title and last update time, limited by configured
+       MaximalNumberOfSeriesToUpdateByOneTask. Returns number of updated Series
+       and elapsed time in string message.
+      </description>
+      <name>updateMatchingSeriesShowElapsedTime</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>
+       Update attributes of instances of Series with specified Series Instance
+       UID. Returns number of updated Instances.
+      </description>
+      <name>updateSeries</name>
+      <parameter>
+        <name>uid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>int</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[
+       Reload Attribute Filter configuration from
+       <i>conf/dcm4chee-attribute-filter.xml</i>. Implicit invoked by
+       operations <b>updateMatchingSeries()</b>,
+       <b>updateMatchingSeriesShowElapsedTime()</b> and <b>updateSeries()</b>.]]>
+      </description>
+      <name>reloadAttributeFilter</name>
+      <return-type>void</return-type>
+   </operation>
+</mbean>

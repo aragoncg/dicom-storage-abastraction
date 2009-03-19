@@ -1,0 +1,24 @@
+-- Update DB from dcm4chee-2.1.x to dcm4chee-2.2.x
+
+ALTER TABLE series ADD COLUMN src_aet	TEXT;
+CREATE INDEX series_src_aet ON series(src_aet);
+CREATE INDEX series_created ON series(created_time);
+CREATE INDEX study_created ON study(created_time);
+
+ALTER TABLE mpps ADD COLUMN pps_start		TIMESTAMP;
+ALTER TABLE mpps ADD COLUMN station_aet		TEXT;
+ALTER TABLE mpps ADD COLUMN modality		TEXT;
+ALTER TABLE mpps ADD COLUMN accession_no	TEXT;
+CREATE INDEX mpps_pps_start ON mpps (pps_start);
+CREATE INDEX mpps_station_aet ON mpps (station_aet);
+CREATE INDEX mpps_modality ON mpps (modality);
+CREATE INDEX mpps_accession_no ON mpps (accession_no);	
+
+ALTER TABLE files ADD COLUMN file_status	INTEGER;
+ALTER TABLE files ADD COLUMN md5_check_time	TIMESTAMP;
+ALTER TABLE files ADD COLUMN created_time	TIMESTAMP;
+UPDATE files SET file_status = 0;
+CREATE INDEX file_tsuid ON files(file_tsuid);
+CREATE INDEX md5_check_time ON files(md5_check_time);
+CREATE INDEX file_created ON files(created_time);
+CREATE INDEX file_status ON files(file_status);

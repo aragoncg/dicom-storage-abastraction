@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+	<description><![CDATA[<b>Audit Record Repository 2.x Migration Service</b>.
+        Used to re-emit audit messages received by dcm4chee-arr-2.x to another
+	    - in particular to dcm4chee-arr-3.x - <i>Audit Record Repository</i>.]]>
+	</description>
+	<descriptors>
+		<persistence persistPolicy="OnUpdate" />
+		<persistence-manager
+			value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+	</descriptors>
+
+	<class>
+		org.dcm4chex.archive.mbean.MigrateOldAuditRecordRepositoryService
+	</class>
+
+	<constructor>
+		<description>The default constructor</description>
+		<name>MigrateOldAuditRecordRepositoryService</name>
+	</constructor>
+
+	<!-- Attributes -->
+	<attribute access="read-write" getMethod="getRecordsByPass"
+		setMethod="setRecordsByPass">
+		<description><![CDATA[Number of Audit Records fetched from the database and
+		emitted in one pass.]]>
+		</description>
+		<name>RecordsByPass</name>
+		<type>int</type>
+		<descriptors>
+			<value value="100" />
+		</descriptors>
+	</attribute>
+	<attribute access="read-write" getMethod="getEmissionInterval"
+		setMethod="setEmissionInterval">
+		<description><![CDATA[Delay in ms between emission of Audit Records.]]>
+		</description>
+		<name>EmissionInterval</name>
+		<type>int</type>
+		<descriptors>
+			<value value="100" />
+		</descriptors>
+	</attribute>
+  <attribute access="read-write" getMethod="getLastEmittedPk"
+      setMethod="setLastEmittedPk">
+      <description><![CDATA[Primary Key of last successfully emitted Audit
+      Records by former invocation of <i>emitAuditRecords()</i>.]]>
+      </description>
+      <name>LastEmittedPk</name>
+      <type>long</type>
+      <descriptors>
+          <value value="-1" />
+      </descriptors>
+  </attribute>
+
+	&defaultAttributes;
+
+	<!-- Operations -->
+	<operation impact="ACTION">
+		<description><![CDATA[Emit specified number of Audit Records in order
+		of their primary keys, starting with the Audit Record which primary key
+		exceeds <i>LastEmittedPk</i>.]]></description>
+		<name>emitAuditRecords</name>
+		<parameter>
+			<description>Maximal number of Audit Records to emit</description>
+			<name>num</name>
+			<type>int</type>
+		</parameter>
+		<return-type>java.lang.String</return-type>
+	</operation>
+
+	&defaultOperations;
+</mbean>
+

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>Private Study Management Service SCP</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.stymgt.StudyMgtScpService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>StudyMgtScpService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCalledAETs"
+      setMethod="setCalledAETs">
+      <description>List of accepted called AE titles, separated by \ (backslash). 
+      </description>
+      <name>CalledAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCallingAETs"
+      setMethod="setCallingAETs">
+      <description><![CDATA[
+      	List of accepted calling AE titles, separated by \(backslash).<br/>
+      	ANY = accept any. <br/>
+      	CONFIGURED_AETS = accept any configured AE Title.
+      	]]>       
+      </description>
+      <name>CallingAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isIgnoreDeleteFailed"
+      setMethod="setIgnoreDeleteFailed">
+      <description>Ignore study deletion failures if the study was not found.
+      </description>
+      <name>IgnoreStudyDeleteFailed</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedTransferSyntax"
+      setMethod="setAcceptedTransferSyntax">
+      <description><![CDATA[
+        List of accepted Transfer Syntaxes. Order defines selection preference.
+        Use either the  Transfer Syntaxes UID value or following defined
+        symbolic names: 
+        ImplicitVRLittleEndian,
+        ExplicitVRLittleEndian,
+        DeflatedExplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]]>
+      </description>
+      <name>AcceptedTransferSyntax</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           ExplicitVRLittleEndian
+           ImplicitVRLittleEndian
+         "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum protocol data unit (PDU) package length for receiving PDUs.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsInvoked"
+      setMethod="setMaxOpsInvoked">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to invoke asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsInvoked</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsPerformed"
+      setMethod="setMaxOpsPerformed">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to perform asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsPerformed</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDcmServerName"
+      setMethod="setDcmServerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DcmServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAEServiceName"
+      setMethod="setAEServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AEServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+</mbean>
+

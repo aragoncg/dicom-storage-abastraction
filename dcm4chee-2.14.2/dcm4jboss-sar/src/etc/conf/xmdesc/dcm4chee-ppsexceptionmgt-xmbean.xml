@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Service for IHE Transaction 'Modality Procedure Step Completed/Dicontinued' Option: PPS Exception Managment.<br>
+   				Checks a received MPPS for Discontinuation Reason Code 'Incorrect Worklist Entry Selected' (code:110514 designator:DCM)
+   				and move all referenced series to trash folder.<br>
+   				Instances stored after receiving such an MPPS will be ignored in StoreSCP directly. (if <i>CheckIncorrectWorklistEntry</i> is enabled)
+   				]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.PPSExceptionMgtService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>PPSExceptionMgtService</name>
+   </constructor>
+
+   <!-- Attributes -->
+  
+    <attribute access="read-write" getMethod="getDelay" setMethod="setDelay">
+      <description>Set delay for removing discontinued series in millisecond after MPPS received.
+      </description>
+      <name>Delay</name>
+      <type>long</type>
+      <descriptors>
+         <value value="0"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>   
+    <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>      
+
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>

@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>XDS-I Service. Cross-enterprise Document Sharing for Imaging. (Imaging Document Source actor)</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.xdsi.XDSIService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>XDSIService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getSourceID" setMethod="setSourceID">
+      <description>Source ID - unique identifier of this Document Source.
+      </description>
+      <name>SourceID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1.3.6.1.4.1.21367.2009.1.2.134.54.1.30.1"/> <!-- 2008-2009 OID Base: 1.3.6.1.4.1.21367.2009.1.2. -->
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getAutoPublishAETs" 
+     setMethod="setAutoPublishAETs">
+      <description>List of Source (Modality) AE titles separated by \(backslash), 
+      from which studies shall be automatically published to the configured
+      XDS-I Repository. NONE = do not publish studies received from any source
+      automatically.
+      </description>
+      <name>AutoPublishSourceAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getDocRepositoryURI" setMethod="setDocRepositoryURI">
+      <description>Document Repository URI.
+      </description>
+      <name>DocRepositoryURI</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="http://localhost:8080/dcm4chee-xds/XDSRepository"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getDocRepositoryAET" setMethod="setDocRepositoryAET">
+      <description>AET of Document Repository (for Audit Log only).
+      </description>
+      <name>DocRepositoryAET</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getPropertyFile" setMethod="setPropertyFile">
+      <description>Metadata Property File. 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>MetadataPropertyFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/metadata.conf"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getDocTitleCodeListFile" setMethod="setDocTitleCodeListFile">
+      <description>File containing Codes for Document Title (for KOS object and therefore xds metadata 'title').
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>DocTitleCodeListFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/docTitleCodes.txt"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getEventCodeListFile" setMethod="setEventCodeListFile">
+      <description>File containing Codes for eventCodeList.
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>EventCodeListFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/eventCodes.txt"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getClassCodeListFile" setMethod="setClassCodeListFile">
+      <description>File containing Codes for ClassCode.
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>ClassCodeListFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/classCodes.txt"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getContentTypeCodeListFile" setMethod="setContentTypeCodeListFile">
+      <description>File containing codes for Content Type Codes.
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>ContentTypeCodes</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/contentTypeCodes.txt"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getHealthCareFacilityCodeListFile" setMethod="setHealthCareFacilityCodeListFile">
+      <description>File containing codes for Healthcare Facility Type Codes.
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>HealthCareFacilityTypeCode</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/healthCareFacilityTypeCodes.txt"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getConfidentialityCodes" setMethod="setConfidentialityCodes">
+      <description>Code list for confidentialityCode.
+      		Format: [designator&#94;]codevalue&#94;meaning 
+      		Use either newline or semicolon to seperate codes
+      </description>
+      <name>ConfidentialityCodes</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="cc1&#94;confidentialityCode"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getAuthorPersonMapping" setMethod="setAuthorPersonMapping">
+      <description><![CDATA[Set either a fix authorPerson or a user to authorPerson mapping.
+					<br/>
+	 				Mapping format: &lt;user&gt;=&lt;authorPerson&gt;<br/>
+	 				Use either newline or semicolon to seperate mappings.
+	 				<br/>
+	 				If '=' is ommited, a fix (global) authorPerson is set]]>
+      </description>
+      <name>AuthorPersonMapping</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE&#94;&#94;&#94;XDSITEST"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getAuthorRoles" setMethod="setAuthorRoles">
+      <description><![CDATA[List of author roles (with display name).<br/>
+      				Format: &lt;role&gt;&#94;&lt;displayName&gt;<br/>
+      				Use either newline or semicolon to seperate codes.
+      				]]>
+      </description>
+      <name>AuthorRoles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="stdRole&#94;Standard Role;adminRole&#94;Admin Role"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getAutoPublishPropertyFile" setMethod="setAutoPublishPropertyFile">
+      <description>Metadata Property File for AutoPublish. 
+      		A relative path name is resolved relative to dcm4chee_home/server/default/.
+      </description>
+      <name>AutoPublishPropertyFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-xdsi/nist/metadata.conf"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getAutoPublishDocTitle" setMethod="setAutoPublishDocTitle">
+      <description><![CDATA[Document title for auto published metainfo KOS. <br> 
+      	Format:&lt;CodeValue&gt;^&lt;CodeMeaning&gt;[^&lt;CodeDesignator&gt;] ]]>
+      </description>
+      <name>AutoPublishDocTitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="AutoPublish^Automatic XDS-I export of received images"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getRidURL" setMethod="setRidURL">
+      <description>RID URL to get PDF Document for exportPDF.
+      </description>
+      <name>RidURL</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="http://localhost:8080/IHERetrieveDocument?requestType=DOCUMENT&amp;preferredContentType=application/pdf&amp;documentUID="/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getLocalDomain" setMethod="setLocalDomain">
+      <description><![CDATA[Local Affinity Domain (Authority)<br/>
+      		Name of the patient ID authorithy of this Document Source.<br/>
+      		This is normally the 'Issuer of patient ID' (issuer) DICOM attribute.<br/>
+      		We can overwrite this default behaviour with:<br/>
+      		'&lt;Domain&gt;' : use &lt;Domain&gt; if issuer is missing.<br/>
+      		'=&lt;Domain&gt;' : use always &lt;Domain&gt; as local authority. <br/>
+      		'NONE' : default behaviour: use always issuer as local authority. 
+      ]]></description>
+      <name>LocalDomain</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getAffinityDomain" setMethod="setAffinityDomain">
+      <description><![CDATA[XDS Affinity Domain (Authority)<br/>
+      		This name is used in PIX Query Service to get patient id of affinity domain.<br/>
+      		You can disable PIX Query by setting this value with '=' as first character.<br/>
+      		'=' : use the source patient ID and issuer.<br/>
+      		'=?&lt;Domain&gt;' : use patientID from source and &lt;Domain&gt; as issuer. <br/>
+      		'=&lt;patient&gt;' : use &lt;patient&gt; for patientID and issuer (patid&#94;&#94;&#94;issuer). 
+      ]]></description>
+      <name>AffinityDomain</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="=?AffinityDomain"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isLogSOAPMessage"
+      setMethod="setLogSOAPMessage">
+      <description>Enable logging of SOAP message.
+      </description>
+      <name>LogSOAPMessage</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isIndentSOAPLog"
+      setMethod="setIndentSOAPLog">
+      <description>Enable/disable indention of logged SOAP message.
+      </description>
+      <name>IndentSOAPLog</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getPixQueryServiceName"
+      setMethod="setPixQueryServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>PixQueryServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   <attribute access="read-write" 
+     getMethod="getIANScuServiceName"
+     setMethod="setIANScuServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>IANScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   <attribute access="read-write"
+     getMethod="getKeyObjectServiceName"
+     setMethod="setKeyObjectServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>KeyObjectServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+     getMethod="getXdsHttpCfgServiceName"
+     setMethod="setXdsHttpCfgServiceName">
+      <description><![CDATA[ internally. Do not modify. (dcm4chee.xds:service=XdsHttpCfgService)<br/>
+                   This service is part of dcm4chee-xds and you have to set proxy and ssl configuration in 
+                   start script when it is not installed! 
+      ]]></description>
+      <name>XdsHttpCfgServiceName</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isUseXDSb"
+      setMethod="setUseXDSb">
+      <description>Use XDS.b rather than XDS.a to export documents.
+      </description>
+      <name>UseXDSb</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+     getMethod="getXdsbSourceServiceName"
+     setMethod="setXdsbSourceServiceName">
+      <description>Used internally. Do not modify (dcm4chee.xds:service=XDSbSourceService).
+      </description>
+      <name>XdsbSourceServiceName</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE" />
+      </descriptors>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   <operation impact="ACTION">
+     <description>Performs a NIST test.</description>
+     <name>nistTest</name>
+     <parameter>
+       <description>TestID</description>
+       <name>testID</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Performs a simple soap test.</description>
+     <name>sendSOAP</name>
+     <parameter>
+       <description>SOP Instance UID of Key Object</description>
+       <name>kosIuid</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Metadata properties</description>
+       <name>mdProps</name>
+       <type>java.util.Properties</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Performs a simple soap test.</description>
+     <name>sendSOAP</name>
+     <parameter>
+       <description>SOP Instance UID of Key Object</description>
+       <name>kosIuid</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Performs a simple soap test.</description>
+     <name>exportPDF</name>
+     <parameter>
+       <description>SOP Instance UID of PDF RID document</description>
+       <name>iuid</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Metadata properties</description>
+       <name>mdProps</name>
+       <type>java.util.Properties</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Performs a simple soap test.</description>
+     <name>exportPDF</name>
+     <parameter>
+       <description>SOP Instance UID of PDF RID document</description>
+       <name>iuid</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Send a SOAP message to DocRepositoryURI.</description>
+     <name>sendSOAP</name>
+     <parameter>
+       <description>Filename of metadata file</description>
+       <name>metadataFilename</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>List of documents (Format:filename|mimiType|docUID[,filename|mimeType|docUID[,..]])</description>
+       <name>docNames</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Send a SOAP message to DocRepositoryURI.</description>
+     <name>sendSOAP</name>
+     <parameter>
+       <description>Key Object Selection Dataset to submit.</description>
+       <name>kos</name>
+       <type>org.dcm4che.data.Dataset</type>
+     </parameter>
+     <parameter>
+       <description>Metadata Properties</description>
+       <name>mdProps</name>
+       <type>java.util.Properties</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+
+   <operation impact="ACTION">
+     <description>Create a new XDS Folder.</description>
+     <name>createFolder</name>
+     <parameter>
+       <description>Metadata properties</description>
+       <name>mdProps</name>
+       <type>java.util.Properties</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+	
+   <operation impact="INFO">
+     <description>Get the authorPerson for a user.</description>
+     <name>getAuthorPerson</name>
+     <parameter>
+       <description>user</description>
+       <name>user</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>java.lang.String</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>Join Metadata Properties with properties from Metadata Property File.</description>
+     <name>joinMetadataProperties</name>
+     <parameter>
+       <description>Additional Metadata properties</description>
+       <name>props</name>
+       <type>java.util.Properties</type>
+     </parameter>
+     <return-type>java.util.Properties</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of roles.</description>
+     <name>listAuthorRoles</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of document titles.</description>
+     <name>listDocTitleCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of Event Type Codes.</description>
+     <name>listEventCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of Class Codes.</description>
+     <name>listClassCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of Content Type Codes.</description>
+     <name>listContentTypeCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of Healthcare Facility Type Codes.</description>
+     <name>listHealthCareFacilityTypeCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+   <operation impact="INFO">
+     <description>get list of Confidentiality Codes.</description>
+     <name>listConfidentialityCodes</name>
+     <return-type>java.util.List</return-type>
+	</operation>
+	   <operation impact="INFO">
+     <description>clear CodeFileCache.</description>
+     <name>clearCodeFileCache</name>
+     <return-type>void</return-type>
+	</operation>
+	
+   <operation impact="ACTION">
+     <description>Read the configured Metadata Property File</description>
+     <name>readPropertyFile</name>
+     <return-type>void</return-type>
+	</operation>
+	
+   <operation impact="INFO">
+     <description>Obtain Affinity Domain patient ID for given patient information</description>
+     <name>getAffinityDomainPatientID</name>
+     <parameter>
+       <description>Dataset containing local patient id and issuer of id</description>
+       <name>kos</name>
+       <type>org.dcm4che.data.Dataset</type>
+     </parameter>
+     <return-type>java.lang.String</return-type>
+    </operation>
+	
+   &defaultOperations;
+</mbean>
+

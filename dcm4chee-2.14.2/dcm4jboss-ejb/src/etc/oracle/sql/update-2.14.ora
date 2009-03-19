@@ -1,0 +1,23 @@
+-- Update DB from dcm4chee-2.13.x to dcm4chee-2.14.x
+
+DROP INDEX pat_id;
+CREATE INDEX pat_id ON patient(pat_id, pat_id_issuer);
+
+CREATE INDEX mpps_drcode_fk ON mpps(drcode_fk);
+
+DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value,code_designator,code_version);
+
+ALTER TABLE gppps MODIFY pps_status NUMBER(38,0);
+
+-- MODIFY patient.pat_birthdate from DATE to VARCHAR2
+ALTER TABLE patient ADD pat_birthdate_varchar VARCHAR2(255);
+UPDATE patient SET pat_birthdate_varchar = TO_CHAR(pat_birthdate,'YYYYMMDD') WHERE pat_birthdate IS NOT NULL;
+DROP INDEX pat_birthdate;
+ALTER TABLE patient DROP COLUMN pat_birthdate;
+ALTER TABLE patient RENAME COLUMN pat_birthdate_varchar TO pat_birthdate;
+CREATE INDEX pat_birthdate ON patient(pat_birthdate);
+
+ALTER TABLE study ADD cuids_in_study VARCHAR2(255);
+
+ALTER TABLE ae ADD wado_url VARCHAR2(255);

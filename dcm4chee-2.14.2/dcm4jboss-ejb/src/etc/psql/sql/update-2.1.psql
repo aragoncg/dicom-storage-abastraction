@@ -1,0 +1,42 @@
+-- Update DB from dcm4chee-2.0.x to dcm4chee-2.1.x
+
+ALTER TABLE study ADD COLUMN ext_retr_aet	TEXT;
+ALTER TABLE series ADD COLUMN ext_retr_aet	TEXT;
+
+ALTER TABLE media ADD COLUMN created_time TIMESTAMP;
+ALTER TABLE media ADD COLUMN updated_time TIMESTAMP;
+ALTER TABLE media ADD COLUMN media_usage INT8 DEFAULT 0 NOT NULL;
+ALTER TABLE media ADD COLUMN media_rq_iuid TEXT;
+ALTER TABLE media ADD COLUMN media_status_info TEXT;
+
+CREATE INDEX srcode_fk ON instance(srcode_fk);
+CREATE INDEX media_fk ON instance(media_fk);
+CREATE INDEX ext_retr_aet ON instance(ext_retr_aet);
+CREATE INDEX commitment ON instance(commitment);
+
+CREATE TABLE study_on_fs (
+	pk              SERIAL PRIMARY KEY,
+	study_fk		INTEGER,
+	filesystem_fk	INTEGER,
+	access_time		TIMESTAMP NOT NULL,
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (filesystem_fk) REFERENCES filesystem(pk)
+);
+CREATE UNIQUE INDEX i_study_on_fs ON study_on_fs(filesystem_fk,study_fk);
+
+CREATE TABLE device (
+	pk          	INTEGER PRIMARY KEY NOT NULL,
+	station_name    TEXT NOT NULL,
+	station_aet     TEXT NOT NULL,
+	modality		TEXT NOT NULL
+);
+CREATE UNIQUE INDEX station_name ON device(station_name);
+
+CREATE TABLE rel_dev_proto (
+	device_fk      INTEGER,
+	prcode_fk      INTEGER,
+FOREIGN KEY (device_fk) REFERENCES device(pk),
+FOREIGN KEY (prcode_fk) REFERENCES code(pk)
+);
+CREATE INDEX device_fk ON rel_dev_proto(device_fk);
+CREATE INDEX prcode_fk ON rel_dev_proto(prcode_fk);

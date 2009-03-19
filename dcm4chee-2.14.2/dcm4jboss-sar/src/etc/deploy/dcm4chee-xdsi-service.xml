@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+<!-- $Id: dcm4chee-xdsi-service.xml 3319 2007-05-07 21:53:52Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.xdsi.XDSIService"
+    name="dcm4chee.archive:service=XDS-I"
+    xmbean-dd="xmdesc/dcm4chee-xdsi-xmbean.xml">
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="PixQueryServiceName"
+      >dcm4chee.archive:service=PIXQuery</depends>
+    <depends optional-attribute-name="IANScuServiceName"
+      >dcm4chee.archive:service=IANScu</depends>
+    <depends optional-attribute-name="KeyObjectServiceName"
+      >dcm4chee.archive:service=KeyObjectService</depends>
+  </mbean>
+</server>

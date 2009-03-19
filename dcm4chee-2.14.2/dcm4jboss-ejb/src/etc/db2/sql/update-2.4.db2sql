@@ -1,0 +1,13 @@
+-- Update DB from dcm4chee-2.3.x to dcm4chee-2.4.x
+
+CONNECT TO tiani;
+SET CURRENT SCHEMA TIANI;
+
+ALTER TABLE instance ADD COLUMN content_datetime	TIMESTAMP;
+CREATE INDEX content_datetime ON instance(content_datetime);
+
+INSERT INTO roles VALUES('admin','WebUser');
+INSERT INTO users VALUES('user','user');
+INSERT INTO roles VALUES('user','WebUser');
+
+TERMINATE;

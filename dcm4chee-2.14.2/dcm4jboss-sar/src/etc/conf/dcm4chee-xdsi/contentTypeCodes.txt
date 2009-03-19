@@ -1,0 +1,5 @@
+# ContentTypeCodes 
+ctc_1^Content Type 1
+ctc_2^Content Type 2
+ctc_3^Content Type 3
+ctc_4^Content Type 4

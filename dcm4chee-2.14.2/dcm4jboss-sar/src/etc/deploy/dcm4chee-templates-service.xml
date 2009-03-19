@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-templates-service.xml 3309 2007-05-06 23:38:48Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.TemplatesService"
+    name="dcm4chee.archive:service=Templates"
+    xmbean-dd="xmdesc/dcm4chee-templates-xmbean.xml">
+  </mbean>
+</server>

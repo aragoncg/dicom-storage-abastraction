@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>PPS SCU Service to forward GP-PPS messages received by
+   the PPS SCP Service
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.gpwlscp.PPSScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>GPPPSScuService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getDestAETs" setMethod="setDestAETs">
+      <description>List of the AE titles of application entities being notified
+      about Work item status changes by GP-PPS messages, separated by \(backslash).
+      NONE = do not send GP-PPS messages to any application entities. Duplicate
+      GP-PPS N-CREATE messages triggered by multiple GP-SPS N-ACTION with status
+      IN PROGRESS can be avoided by configuration of local GP-PPS SCP as 
+      additional destination.  
+      </description>
+      <name>DestinationAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>Calling AE title used in the Association Request.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getPpsUidSuffix" setMethod="setPpsUidSuffix">
+      <description>Suffix used to derive SOP Instance UID of emitted GP-PPS from
+      SOP Instance UID of corresponding GP-SPS.
+      </description>
+      <name>PpsUidSuffix</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=".1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="isCopyWorkitemCode"
+       setMethod="setCopyWorkitemCode">
+      <description>Specifies if Scheduled Workitem Code of GP-SPS
+        is set as Performed Workitem Code in emitted GP-PPS.
+      </description>
+      <name>CopyWorkitemCode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="isCopyStationNameCode"
+       setMethod="setCopyStationNameCode">
+      <description>Specifies if Scheduled Station Name Code of GP-SPS
+        is set as Performed Station Name Code in emitted GP-PPS.
+      </description>
+      <name>CopyStationNameCode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="isCopyStationClassCode"
+       setMethod="setCopyStationClassCode">
+      <description>Specifies if Scheduled Station Class Code of GP-SPS
+        is set as Performed Station Class Code in emitted GP-PPS.
+      </description>
+      <name>CopyStationClassCode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="isCopyStationGeographicLocationCode"
+       setMethod="setCopyStationGeographicLocationCode">
+      <description>Specifies if Scheduled Station Geographic Location Code of GP-SPS
+        is set as Performed Station Geographic Location Code in emitted GP-PPS.
+      </description>
+      <name>CopyStationGeographicLocationCode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="isCopyProcessingApplicationsCode"
+       setMethod="setCopyProcessingApplicationsCode">
+      <description>Specifies if Scheduled Processing Applications Code of GP-SPS
+        is set as Performed Processing Applications Code in emitted GP-PPS.
+      </description>
+      <name>CopyProcessingApplicationsCode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getConcurrency" setMethod="setConcurrency">
+      <description>Maximum number of concurrent forwarded GP-PPS messages.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getRetryIntervalls" setMethod="setRetryIntervalls">
+      <description>Number and intervals of retries of failed 
+      GP-PPS forward requests.&lt;br&gt;Format:
+      &lt;br&gt;Comma separated list of &lt;i&gt;number&lt;/i&gt;x&lt;i&gt;interval&lt;/i&gt; pairs.
+      &lt;br&gt;The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      &lt;br&gt;Example: 
+      &lt;br&gt;5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.</description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d"/>
+      </descriptors>
+   </attribute>
+   
+   &defaultSCUAttributes;
+   
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getGpwlScpServiceName"
+      setMethod="setGpwlScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>GpwlScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="getTLSConfigName"
+       setMethod="setTLSConfigName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-gpwlscu-service.xml 3340 2007-05-12 16:00:31Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.gpwlscu.GPWLScuService" 
+         name="dcm4chee.archive:service=GPWLScu"
+         xmbean-dd="xmdesc/dcm4chee-gpwlscu-xmbean.xml">
+    <depends>jboss.j2ee:jndiName=ejb/GPWLManager,service=EJB</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+  </mbean>
+
+</server>

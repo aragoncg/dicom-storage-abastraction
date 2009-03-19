@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server PUBLIC
+    "-//JBoss//DTD MBean Service 4.2//EN"
+    "http://www.jboss.org/j2ee/dtd/jboss-service_4_2.dtd">
+
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.FileSystemMgt2Service"
+    name="dcm4chee.archive:service=FileSystemMgt,group=NEARLINE_STORAGE"
+    xmbean-dd="xmdesc/dcm4chee-fsmgt-nearline-xmbean.xml">
+    <attribute name="TimerIDScheduleStudiesForDeletion"
+      >ScheduleStudiesForDeletion2</attribute>
+    <attribute name="TimerIDDeleteOrphanedPrivateFiles"
+      >DeleteOrphanedPrivateFiles2</attribute>
+    <depends optional-attribute-name="SchedulerServiceName"
+      >dcm4chee.archive:service=Scheduler</depends>
+    <depends optional-attribute-name="DeleteStudyServiceName"
+      >dcm4chee.archive:service=DeleteStudy</depends>
+    <depends optional-attribute-name="StoreScpServiceName"
+      >dcm4chee.archive:service=StoreScp</depends>
+    <depends>jboss.j2ee:jndiName=ejb/FileSystemMgt2,service=EJB</depends>
+  </mbean>
+</server>

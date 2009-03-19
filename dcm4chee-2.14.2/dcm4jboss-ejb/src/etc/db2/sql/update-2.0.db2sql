@@ -1,0 +1,46 @@
+-- Update DB from dcm4chee-0.9.x to dcm4chee-2.0.x
+
+CONNECT TO tiani;
+SET CURRENT SCHEMA TIANI;
+
+-- emulate:
+-- ALTER TABLE filesystem RENAME COLUMN retrieve_aets TO retrieve_aet;
+-- ALTER TABLE filesystem DROP COLUMN highwater_mark;
+-- ALTER TABLE filesystem DROP COLUMN disk_usage;
+CREATE TABLE newfilesystem (
+	pk              INTEGER PRIMARY KEY NOT NULL,
+	dirpath			VARCHAR(254) NOT NULL,
+	retrieve_aet	VARCHAR(254) NOT NULL
+);
+INSERT INTO newfilesystem (pk, dirpath, retrieve_aet)
+	SELECT pk, dirpath, retrieve_aets FROM filesystem;
+DROP TABLE filesystem;
+RENAME TABLE newfilesystem to filesystem;
+CREATE UNIQUE INDEX dirpath ON filesystem(dirpath);
+CREATE INDEX retrieve_aet ON filesystem(retrieve_aet);
+GRANT ALL PRIVILEGES ON TABLE filesystem TO USER tiani;
+
+ALTER TABLE study ADD COLUMN fileset_iuid VARCHAR(254);
+ALTER TABLE study ADD COLUMN fileset_id VARCHAR(254);
+
+ALTER TABLE series ADD COLUMN fileset_iuid VARCHAR(254);
+ALTER TABLE series ADD COLUMN fileset_id VARCHAR(254);
+
+CREATE SEQUENCE media_pk_seq;
+CREATE TABLE media (
+	pk          	INTEGER PRIMARY KEY NOT NULL,
+	fileset_iuid	VARCHAR(254) NOT NULL,
+	fileset_id		VARCHAR(254),
+	media_status	INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX fileset_iuid ON media(fileset_iuid);
+CREATE INDEX media_status ON media(media_status);
+
+ALTER TABLE instance ADD COLUMN media_fk INTEGER;
+ALTER TABLE instance ADD CONSTRAINT media_fk FOREIGN KEY (media_fk) REFERENCES media(pk);
+ALTER TABLE instance ADD COLUMN ext_retr_aet VARCHAR(254);
+
+GRANT ALL PRIVILEGES ON TABLE media TO USER tiani;
+GRANT USAGE ON SEQUENCE media_pk_seq TO USER tiani;
+
+TERMINATE;

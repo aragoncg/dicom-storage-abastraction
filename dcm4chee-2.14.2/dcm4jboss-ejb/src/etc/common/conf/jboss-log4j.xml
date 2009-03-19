@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  Log4j Configuration                                                  -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+<!-- $Id: jboss-log4j.xml 7463 2008-10-08 20:23:40Z javawilli $ -->
+
+<!--
+   | For more configuration infromation and examples see the Jakarta Log4j
+   | owebsite: http://jakarta.apache.org/log4j
+ -->
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+   <renderer renderedClass="org.dcm4che.data.Dataset" renderingClass="org.dcm4che.log.DatasetRenderer" />
+
+   <!-- ================================= -->
+   <!-- Preserve messages in a local file -->
+   <!-- ================================= -->
+
+   <!-- A time/date based rolling appender
+   <appender name="FILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
+      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+      <param name="File" value="${jboss.server.log.dir}/server.log"/>
+      <param name="Append" value="false"/>
+
+      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d %-5p %X{calling}->%X{called} (%t) [%c] %m%n"/>
+      </layout>
+   </appender>
+   -->
+
+   <!-- A size based file rolling appender -->
+   <appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="File" value="${jboss.server.log.dir}/server.log"/>
+     <param name="Append" value="false"/>
+     <param name="MaxFileSize" value="10000KB"/>
+     <param name="MaxBackupIndex" value="1"/>
+
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="%d %-5p %X{calling}->%X{called} (%t) [%c] %m%n"/>
+     </layout>	    
+   </appender>
+
+   <!-- A File appender filtered by calling or called AET.
+   Multiple values for matching calling AET can be specified, separated by ';'.
+   
+   <appender name="AET_SIEMENS_CT" class="org.jboss.logging.appender.RollingFileAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="File" value="${jboss.server.home.dir}/log/server.log"/>
+     <param name="Append" value="false"/>
+     <param name="MaxFileSize" value="1000KB"/>
+     <param name="MaxBackupIndex" value="10"/>
+
+     <layout class="org.apache.log4j.PatternLayout">
+        <param name="ConversionPattern" value="%d %-5p %X{calling}->%X{called} (%t) [%c] %m%n"/>
+     </layout>	    
+     <filter class="org.dcm4che.log.MDCFilter">
+	      <param name="Key" value="calling"/>
+	      <param name="Value" value="SIEMENS_CT"/>
+	      <param name="AcceptOnMatch" value="true"/>
+	   </filter>
+	   <filter class="org.apache.log4j.varia.DenyAllFilter" />
+   </appender>
+   --> 
+   <!-- ============================== -->
+   <!-- Append messages to the console -->
+   <!-- ============================== -->
+
+   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+      <param name="Target" value="System.out"/>
+      <param name="Threshold" value="INFO"/>
+
+      <layout class="org.apache.log4j.PatternLayout">
+         <!-- The default pattern: Date Priority [Category] Message\n -->
+         <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+      </layout>
+   </appender>
+  
+   <!-- ====================== -->
+   <!-- More Appender examples -->
+   <!-- ====================== -->
+
+   <!-- Buffer events and log them asynchronously
+   <appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <appender-ref ref="FILE"/>
+     <appender-ref ref="CONSOLE"/>
+     <appender-ref ref="SMTP"/>
+   </appender>
+   -->
+
+   <!-- EMail events to an administrator
+   <appender name="SMTP" class="org.apache.log4j.net.SMTPAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="Threshold" value="ERROR"/>
+     <param name="To" value="admin@myhost.domain.com"/>
+     <param name="From" value="nobody@myhost.domain.com"/>
+     <param name="Subject" value="JBoss Sever Errors"/>
+     <param name="SMTPHost" value="localhost"/>
+     <param name="BufferSize" value="10"/>
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="[%d{ABSOLUTE},%c{1}] %m%n"/>
+     </layout>
+   </appender>
+   -->
+
+   <!-- Syslog events
+   <appender name="SYSLOG" class="org.apache.log4j.net.SyslogAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="Facility" value="LOCAL7"/>
+     <param name="FacilityPrinting" value="true"/>
+     <param name="SyslogHost" value="localhost"/>
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="[%d{ABSOLUTE},%c{1}] %m%n"/>
+     </layout>
+   </appender>
+   -->
+
+   <!-- Log events to JMS (requires a topic to be created)
+   <appender name="JMS" class="org.apache.log4j.net.JMSAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="Threshold" value="ERROR"/>
+     <param name="TopicConnectionFactoryBindingName" value="java:/ConnectionFactory"/>
+     <param name="TopicBindingName" value="topic/MyErrorsTopic"/>
+   </appender>
+   -->
+
+   <!-- Log events through SNMP
+   <appender name="TRAP_LOG" class="org.apache.log4j.ext.SNMPTrapAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="ImplementationClassName" value="org.apache.log4j.ext.JoeSNMPTrapSender"/>
+     <param name="ManagementHost" value="127.0.0.1"/>
+     <param name="ManagementHostTrapListenPort" value="162"/>
+     <param name="EnterpriseOID" value="1.3.6.1.4.1.24.0"/>
+     <param name="LocalIPAddress" value="127.0.0.1"/>
+     <param name="LocalTrapSendPort" value="161"/>
+     <param name="GenericTrapType" value="6"/>
+     <param name="SpecificTrapType" value="12345678"/>
+     <param name="CommunityString" value="public"/>
+     <param name="ForwardStackTraceWithTrap" value="true"/>
+     <param name="Threshold" value="DEBUG"/>
+     <param name="ApplicationTrapOID" value="1.3.6.1.4.1.24.12.10.22.64"/>
+     <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d,%p,[%t],[%c],%m%n"/>
+     </layout>
+   </appender>
+   -->
+
+   <!--  Emit events as JMX notifications -->
+   <appender name="JMX" class="org.jboss.monitor.services.JMXNotificationAppender">
+      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+      
+      <param name="Threshold" value="ERROR"/>
+      <param name="ObjectName" value="jboss.system:service=Logging,type=JMXNotificationAppender"/>
+      
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d %-5p [%c] %m"/>
+      </layout>
+   </appender>
+
+   <!-- ==================== -->
+   <!-- Audit Trail Messages -->
+   <!-- ==================== -->
+   <!-- Used for emitting RFC-3881 compliant Audit messages -->
+   <appender name="AUDITLOG"
+     class="org.dcm4che2.audit.log4j.net.SyslogAppender">
+     <param name="Facility" value="AUTHPRIV" />
+     <param name="SyslogHost" value="localhost:4000" />
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="${app.name}: %m" />
+     </layout>
+     <!-- Sample Audit Message Filter to suppress emission of Audit Messages 
+       triggered by Queries (Event ID = (110112,DCM,"Query")) invoked by
+       DICOM AE "DCMQR".
+     <filter class="org.dcm4che2.audit.log4j.AuditMessageFilter">
+       <param name="AcceptOnMatch" value="false" />
+       <param name="EventIDToMatch" value="110112^DCM" />
+       <param name="AETitlesToMatch" value="DCMQR" />
+       <param name="UserIsRequestorToMatch" value="true" />
+     </filter>
+     -->
+     <!-- Parameters supported by org.dcm4che2.audit.log4j.AuditMessageFilter:
+     AcceptOnMatch - defines if matching messages are included (=true) or 
+       excluded (=false). Be aware on the filter order if mixing include and
+       exclude filters!
+     Event parameters:
+       EventIDToMatch - Event ID code to match. Format: code^codeSystemName.
+       EventActionCodesToMatch - Comma separated list of Event Action Codes
+         {'C','R','U','D','E'} to match.
+       EventOutcomeIndicatorsToMatch - Comma separated list of Event Outcome
+         Indicators {'SUCCESS','WARN','ERROR'.'FATAL'} to match.
+       EventTypeCodeToMatch - Event Type code to match.
+         Format: code^codeSystemName.
+     Active Participant parameters (at least one of the Active Participants
+     of the message must match with ALL specified parameters):
+       UserIDToMatch - User ID of Active Participant to match.
+       RoleIDCodeToMatch - Role ID code of Active Participant to match.
+       AETitlesToMatch - AE Title of Active Participant to match.
+       UserIsRequestorToMatch - defines if the requesting (=true) or the
+         not requesting (=false) Active Participants matches.
+       MachineNameToMatch - Host name of Active Participant to match.
+       IPAddressToMatch - IP address of Active Participant to match.
+     -->
+   </appender>
+
+   <!-- set additivity="true" to log emitted Audit Messages in CONSOLE
+   and FILE appender -->
+   <category name="auditlog" additivity="false">
+     <priority value="INFO" />
+     <appender-ref ref="AUDITLOG"/>
+   </category>
+
+   <!-- ================ -->
+   <!-- Limit categories -->
+   <!-- ================ -->
+
+   <!-- Limit the org.dcm4chex.arr to INFO -->
+   <category name="org.dcm4chex.arr">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the org.infohazard category to INFO -->
+   <category name="org.infohazard">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the org.dcm4chex.archive category to INFO --> 
+   <category name="org.dcm4chex.archive">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the org.dcm4chex.archive category to INFO --> 
+   <category name="org.dcm4chex.cdw">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the org.dcm4chex.wado to INFO --> 
+   <category name="org.dcm4chex.wado">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.dcm4chex.rid to INFO --> 
+   <category name="org.dcm4chex.rid">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.dcm4chex.xds to INFO --> 
+   <category name="org.dcm4chex.xds">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.dcm4cheri category to INFO -->
+   <category name="org.dcm4cheri">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.dcm4che2 category to INFO -->
+   <category name="org.dcm4che2">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.dcm4che.util category to INFO -->
+   <category name="org.dcm4che.util">
+      <priority value="INFO"/>
+   </category>
+   <!-- Limit the org.dcm4chee category to INFO -->
+   <category name="org.dcm4chee">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.apache category to INFO as its DEBUG is verbose -->
+   <category name="org.apache">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.jboss.serial (jboss-serialization) to INFO as its DEBUG is verbose -->
+   <category name="org.jboss.serial">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the org.jgroups category to WARN as its INFO is verbose -->
+   <category name="org.jgroups">
+      <priority value="WARN"/>
+   </category>
+
+   <!-- Limit the jacorb category to WARN as its INFO is verbose -->
+   <category name="jacorb">
+      <priority value="WARN"/>
+   </category>
+
+   <!-- Limit JBoss categories -->
+   <category name="org.jboss">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Limit the JSR77 categories -->
+   <category name="org.jboss.management">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the JBossTS categories -->
+   <category name="com.arjuna">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the Hibernate categories -->
+   <category name="org.hibernate">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the JSF categories -->
+   <category name="javax.enterprise.resource.webcontainer.jsf">
+      <priority value="INFO"/>
+   </category>
+
+   <!-- Enable JBossWS message tracing
+   <category name="jbossws.SOAPMessage">
+    <priority value="TRACE"/>
+   </category>
+   -->
+
+   <!-- Decrease the priority threshold for the org.jboss.varia category
+   <category name="org.jboss.varia">
+     <priority value="DEBUG"/>
+   </category>
+   -->
+
+   <!-- Show the evolution of the DataSource pool in the logs [inUse/Available/Max]
+   <category name="org.jboss.resource.connectionmanager.JBossManagedConnectionPool">
+     <priority value="TRACE"/>
+   </category>
+   -->
+
+   <!--
+      | An example of enabling the custom TRACE level priority that is used
+      | by the JBoss internals to diagnose low level details. This example
+      | turns on TRACE level msgs for the org.jboss.ejb.plugins package and its
+      | subpackages. This will produce A LOT of logging output.
+      |
+      | Note: since jboss AS 4.2.x, the trace level is supported natively by
+      | log4j, so although the custom org.jboss.logging.XLevel priority will
+      | still work, there is no need to use it. The two examples that follow
+      | will both enable trace logging.
+   <category name="org.jboss.system">
+     <priority value="TRACE" class="org.jboss.logging.XLevel"/>
+   </category>
+   <category name="org.jboss.ejb.plugins">
+     <priority value="TRACE"/>
+   </category>
+   -->
+  
+   <!--
+       | Logs these events to SNMP:
+           - server starts/stops
+           - cluster evolution (node death/startup)
+           - When an EJB archive is deployed (and associated verified messages)
+           - When an EAR archive is deployed
+      	 
+   <category name="org.jboss.system.server.Server">
+     <priority value="INFO" />
+     <appender-ref ref="TRAP_LOG"/>
+   </category>
+  
+   <category name="org.jboss.ha.framework.interfaces.HAPartition.lifecycle">
+     <priority value="INFO" />
+     <appender-ref ref="TRAP_LOG"/>
+   </category>
+
+   <category name="org.jboss.deployment.MainDeployer">
+     <priority value="ERROR" />
+     <appender-ref ref="TRAP_LOG"/>
+   </category>
+   
+   <category name="org.jboss.ejb.EJBDeployer">
+     <priority value="INFO" />
+     <appender-ref ref="TRAP_LOG"/>
+   </category>
+   
+   <category name="org.jboss.deployment.EARDeployer">
+     <priority value="INFO" />
+     <appender-ref ref="TRAP_LOG"/>
+   </category>
+  
+   -->
+
+   <!-- ======================= -->
+   <!-- Setup the Root category -->
+   <!-- ======================= -->
+
+   <root>
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+      <appender-ref ref="JMX"/>
+   </root>
+
+   <!-- Clustering logging -->
+   <!-- Uncomment the following to redirect the org.jgroups and
+      org.jboss.ha categories to a cluster.log file.
+
+   <appender name="CLUSTER" class="org.jboss.logging.appender.RollingFileAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="File" value="${jboss.server.log.dir}/cluster.log"/>
+     <param name="Append" value="false"/>
+     <param name="MaxFileSize" value="500KB"/>
+     <param name="MaxBackupIndex" value="1"/>
+
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+     </layout>
+   </appender>
+   <category name="org.jgroups">
+     <priority value="DEBUG" />
+     <appender-ref ref="CLUSTER"/>
+   </category>
+   <category name="org.jboss.ha">
+     <priority value="DEBUG" />
+     <appender-ref ref="CLUSTER"/>
+   </category>
+   -->
+
+</log4j:configuration>

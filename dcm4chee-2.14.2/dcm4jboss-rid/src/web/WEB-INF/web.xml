@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<!--
+	$Id: web.xml 6237 2008-04-28 14:01:04Z javawilli $
+	$Source$
+-->
+
+<web-app>
+	<display-name>dcm4chee RID</display-name>
+
+	<servlet>
+		<servlet-name>IHERetrieveSummaryInfo</servlet-name>
+		<display-name>IHE RID - Retrieve Summary Information for Display</display-name>
+		<servlet-class>org.dcm4chex.rid.web.RIDServlet</servlet-class>
+		<init-param>
+			<param-name>ridServiceName</param-name>
+			<param-value>dcm4chee.archive:service=RIDService</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>IHERetrieveDocument</servlet-name>
+		<display-name>IHE RID - Retrieve Document for Display</display-name>
+		<servlet-class>org.dcm4chex.rid.web.RIDServlet</servlet-class>
+		<init-param>
+			<param-name>ridServiceName</param-name>
+			<param-value>dcm4chee.archive:service=RIDService</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowShortURL</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>IHERetrieveSummaryInfo</servlet-name>
+		<url-pattern>/IHERetrieveSummaryInfo/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>IHERetrieveDocument</servlet-name>
+		<url-pattern>/IHERetrieveDocument/*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+	</welcome-file-list>
+
+   <!-- A security constraint that restricts access to the
+   	RID service to users with the role WebAdmin.
+   -->
+<!--
+   <security-constraint>
+     <web-resource-collection>
+       <web-resource-name>rid</web-resource-name>
+       <description>Only allows users with the role WebAdmin
+       		to access the Archive Web Administration pages
+       </description>
+       <url-pattern>*</url-pattern>
+       <http-method>GET</http-method>
+       <http-method>POST</http-method>
+     </web-resource-collection>
+     <auth-constraint>
+       <role-name>WebUser</role-name>
+     </auth-constraint>
+   </security-constraint>
+
+   <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>Archive Web Admin</realm-name>
+   </login-config>
+
+   <security-role>
+      <role-name>WebUser</role-name>
+   </security-role>
+ -->  
+
+</web-app>

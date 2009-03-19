@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.UpdateAttributesService" 
+         name="dcm4chee.archive:service=UpdateAttributesService"
+         xmbean-dd="xmdesc/dcm4chee-updateattrs-xmbean.xml">
+    <depends optional-attribute-name="QueryRetrieveScpServiceName"
+      >dcm4chee.archive:service=QueryRetrieveScp</depends>
+    <depends optional-attribute-name="TarRetrieverName"
+      >dcm4chee.archive:service=TarRetriever</depends>
+  </mbean>
+</server>

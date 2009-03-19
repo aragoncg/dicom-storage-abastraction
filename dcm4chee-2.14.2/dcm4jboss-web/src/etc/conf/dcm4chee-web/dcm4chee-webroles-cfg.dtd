@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This is the XML DTD for the dcm4chee web roles config (WEB) descriptor.
+
+<dcm4chee-webroles-cfg>
+    <roles>
+        <role name="WebAdmin" descr="Admin Web role" dependency="WebUser" /> 
+        <role name="WebUser" descr="General Web User role"/> 
+    </roles>
+    <actions>
+        <action name="Q" descr="Query"/> 
+        <action name="R" descr="Read"/> 
+        <action name="E" descr="Export"/> 
+        <action name="A" descr="Append"/> 
+        <action name="U" descr="Update"/> 
+        <action name="D" descr="Delete"/> 
+    </actions>
+</dcm4chee-webroles-cfg>
+
+-->
+
+<!ELEMENT dcm4chee-webroles-cfg (roles,actions)>
+
+<!ELEMENT roles (role+)>
+<!ELEMENT role EMPTY>
+<!ATTLIST role name CDATA #REQUIRED>
+<!ATTLIST role display CDATA #IMPLIED>
+<!ATTLIST role type CDATA #IMPLIED>
+<!ATTLIST role descr CDATA #REQUIRED>
+<!ATTLIST role dependency CDATA #IMPLIED>
+
+<!ELEMENT actions (action+)>
+<!ELEMENT action EMPTY>
+<!ATTLIST action name CDATA #REQUIRED>
+<!ATTLIST action descr CDATA #REQUIRED>

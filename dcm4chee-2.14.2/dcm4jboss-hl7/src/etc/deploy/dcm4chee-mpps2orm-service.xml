@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-mpps2orm-service.xml 3340 2007-05-12 16:00:31Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+
+  <mbean code="org.dcm4chex.archive.hl7.MPPS2ORMService" 
+	     name="dcm4chee.archive:service=MPPS2ORM"
+	     xmbean-dd="xmdesc/dcm4chee-mpps2orm-xmbean.xml">
+    <depends optional-attribute-name="MppsScpServiceName"
+      >dcm4chee.archive:service=MPPSScp</depends>
+    <depends optional-attribute-name="Hl7SendServiceName"
+      >dcm4chee.archive:service=HL7Send</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+  </mbean>
+</server>
+

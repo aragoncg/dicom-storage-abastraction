@@ -1,0 +1,351 @@
+<?xml version="1.0"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<!--
+	$Id: web.xml 8199 2008-11-19 09:34:03Z javawilli $
+	$Source$
+-->
+
+<web-app>
+	<display-name>dcm4chee Archive Console</display-name>
+	
+	<!-- Session timeout in minutes. 30 is default timeout of tomcat -->
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+
+
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<display-name>Maverick Dispatcher</display-name>
+		<servlet-class>org.infohazard.maverick.Dispatcher</servlet-class>
+
+		<!--
+			The default charset used to decode input parameters.  If unspecified,
+			the web container default is used.
+		-->
+		<init-param>
+			<param-name>defaultRequestCharset</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		
+		<!--
+			The command which causes Maverick to reload the maverick.xml
+			config data and any cached/precompiled XSLT templates.  Commands
+			are still processed with the old data while the reloading is
+			in progress, so it isn't too big of a deal if your users call
+			this.  It wastes CPU resources, though, so you might want to
+			change the command to something more obscure.  If this param
+			is not defined, the reload command is disabled.
+		-->
+		<init-param>
+			<param-name>reloadCommand</param-name>
+			<param-value>reload</param-value>
+		</init-param>
+
+		<!--
+			This allows an extra query parameter to be added
+			to any request which halts the transformation process
+			after that number of steps, e.g. blah.m?maxTransforms=0
+		-->
+		<init-param>
+			<param-name>limitTransformsParam</param-name>
+			<param-value>t</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web folder application to limit results of studies.
+			Value must be an integer > 0
+		-->
+		<init-param>
+			<param-name>limitNrOfStudies</param-name>
+			<param-value>20</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>startWithoutQuery</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+        <!-- Enable/disable issuer of PID when PatientID is displayed
+             The display will be formatted like <PatientID>^^^<IssuerOfPatientID> 
+        -->		
+        <init-param>
+            <param-name>showIssuerOfPID</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <!-- The default query 'Has Issuer':
+             disabled ... Show all patients. Regardless if an issuer is set or not.
+             true     ... Show only patients that have an issuer.
+             false    ... Show only patients that have no issuer.
+         -->
+        <init-param>
+            <param-name>defaultQueryHasIssuer</param-name>
+            <param-value>disabled</param-value>
+        </init-param>
+		<!-- 
+			Used by dcm4chee-web application to find AuditLogger MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-auditlog-service.xml.
+		-->
+		<init-param>
+			<param-name>auditLoggerName</param-name>
+			<param-value>dcm4chee.archive:service=AuditLogger</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find MCMScuService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-mcmscu-service.xml.
+		-->
+		<init-param>
+			<param-name>mcmScuServiceName</param-name>
+			<param-value>dcm4chee.archive:service=MCMScu</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find MWLScuService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-mwlscu-service.xml.
+		-->
+		<init-param>
+			<param-name>mwlScuServiceName</param-name>
+			<param-value>dcm4chee.archive:service=MWLScu</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find MppsScpService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-mppsscp-service.xml.
+		-->
+		<init-param>
+			<param-name>mppsScpServiceName</param-name>
+			<param-value>dcm4chee.archive:service=MPPSScp</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find ContentEdit MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-contentedit-service.xml.
+		-->
+		<init-param>
+			<param-name>contentEditName</param-name>
+			<param-value>dcm4chee.archive:service=ContentEditService</param-value>
+		</init-param>
+		
+		<!-- 
+			Used by dcm4chee-web application to find GPWLFeedService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-contentedit-service.xml.
+		-->
+		<init-param>
+			<param-name>gpwlFeedServiceName</param-name>
+			<param-value>dcm4chee.archive:service=GPWLFeed</param-value>
+		</init-param>
+		
+		<!-- 
+			Used by dcm4chee-web application to find EchoService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-echo-service.xml.
+		-->
+		<init-param>
+			<param-name>echoServiceName</param-name>
+			<param-value>dcm4chee.archive:service=ECHOService</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find AEService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-ae-service.xml.
+		-->
+		<init-param>
+			<param-name>aeServiceName</param-name>
+			<param-value>dcm4chee.archive:service=AE</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find MppsScpService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-mppsscp-service.xml.
+		-->
+		<init-param>
+			<param-name>mppsScpServiceName</param-name>
+			<param-value>dcm4chee.archive:service=MPPSScp</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find KeyObjectService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-keyobject-service.xml.
+		-->
+		<init-param>
+			<param-name>keyObjectServiceName</param-name>
+			<param-value>dcm4chee.archive:service=KeyObjectService</param-value>
+		</init-param>
+		<!-- 
+			Used by dcm4chee-web application to find ExportManagerService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-exportmanager-service.xml.
+		-->
+		<init-param>
+			<param-name>exportManagerServiceName</param-name>
+			<param-value>dcm4chee.archive:service=ExportManager</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>xdsiServiceName</param-name>
+			<param-value>dcm4chee.archive:service=XDS-I</param-value>
+		</init-param>
+		<init-param>
+			<param-name>xdsQueryServiceName</param-name>
+			<param-value>dcm4chee.xds:service=XDSQueryService</param-value>
+		</init-param>
+
+		<!-- 
+			Used by dcm4chee-web application to find GPWLScuService MBean.
+			Value must match mbean name in configured in
+			deploy/dcm4chee-gpwlscu-service.xml.
+		-->
+		<init-param>
+			<param-name>gpwlScuServiceName</param-name>
+			<param-value>dcm4chee.archive:service=GPWLScu</param-value>
+		</init-param>
+		<init-param>
+			<param-name>gpppsScpServiceName</param-name>
+			<param-value>dcm4chee.archive:service=GPPPSScp</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>folderPermissionsFactory</param-name>
+			<param-value>org.dcm4chex.archive.web.maverick.admin.perm.FolderPermissionsPropertyFactory</param-value>
+		</init-param>
+		<init-param>
+			<param-name>folderPermissionsFactory_cfg</param-name>
+			<param-value>conf/dcm4chee-web/folder.permissions</param-value>
+		</init-param>
+		<init-param>
+			<param-name>qrscpServiceName</param-name>
+			<param-value>dcm4chee.archive:service=QueryRetrieveScp</param-value>
+		</init-param>
+		<init-param>
+			<param-name>moveScuServiceName</param-name>
+			<param-value>dcm4chee.archive:service=MoveScu</param-value>
+		</init-param>
+		
+		<!-- 
+			Used by MPPS/MWL linking to preset patientName search field in MWL console.
+			Value can be either delete, * (full name), or an int number (first n chars).
+			If you uncomment this parameter, the field will be not changed.
+		-->
+		<init-param>
+			<param-name>linkPresetPatientName</param-name>
+			<param-value>3</param-value>
+		</init-param> 
+		<!-- 
+			Used by MPPS/MWL linking to preset startDate search field in MWL console.
+			Value can be either delete, today, or mpps (StartDate of first selected MPPS).
+			If you uncomment this parameter, the field will be not changed.
+		-->
+		<init-param>
+			<param-name>linkPresetStartDate</param-name>
+			<param-value>mpps</param-value>
+		</init-param>
+		<!-- 
+			Used by MPPS/MWL linking to preset modality search field in MWL console.
+			Value can be either delete, or mpps (modality of first selected MPPS).
+			If you uncomment this parameter, the field will be not changed.
+		-->
+		<init-param>
+			<param-name>linkPresetModality</param-name>
+			<param-value>mpps</param-value>
+		</init-param>
+
+		<!-- 
+			Name of WebView Launcher Service. Only used to check if a webviewer application is installed.
+		-->
+		<init-param>
+			<param-name>webviewServiceName</param-name>
+			<param-value>dcm4chee.archive:service=WebViewService</param-value>
+		</init-param>
+		<!-- 
+			Name of WebViewer window. use _blank to open each Webviewer in a new window.
+		-->
+		<init-param>
+			<param-name>webViewerWindowName</param-name>
+			<param-value>webView</param-value>
+		</init-param>
+		<!-- 
+			Name of Study Permission Service.
+		-->
+		<init-param>
+			<param-name>studyPermissionServiceName</param-name>
+			<param-value>dcm4chee.archive:service=StudyPermission</param-value>
+		</init-param>
+		<!-- 
+			Enable/Disable StudyPermissionCheck for WEB folder.
+			true: restrict Webfolder to studies according Query permission of current user.
+			false: no restriction.
+		-->
+		<init-param>
+			<param-name>enableStudyPermissionCheck</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<!-- 
+			Disable StudyPermissionCheck for dedicated user(s).
+			List of users (seperated by ',') that should see all studies (e.g. to configure Study Permissions Roles.
+			default: admin
+		-->
+		<init-param>
+			<param-name>disableStudyPermissionCheckForUser</param-name>
+			<param-value>admin</param-value>
+		</init-param>
+
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.m</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+
+   <!-- A security constraint that restricts access to the
+   	Archive Web Administration pages to users with the role WebAdmin.
+   -->
+   <security-constraint>
+     <web-resource-collection>
+       <web-resource-name>dispatcher</web-resource-name>
+       <description>Only allows users with the role WebAdmin
+       		to access the Archive Web Administration pages
+       </description>
+       <url-pattern>*.jsp</url-pattern>
+       <url-pattern>*.js</url-pattern>
+       <url-pattern>*.m</url-pattern>
+       <url-pattern>*.xsl</url-pattern>
+       <url-pattern>*/?*/*</url-pattern>
+       <http-method>GET</http-method>
+       <http-method>POST</http-method>
+     </web-resource-collection>
+     <auth-constraint>
+       <role-name>WebUser</role-name>
+     </auth-constraint>
+   </security-constraint>
+   <login-config>
+      <auth-method>FORM</auth-method>
+      <realm-name>Archive Web Admin</realm-name>
+      <form-login-config>
+	      <form-login-page>login.jsp</form-login-page>
+	      <form-error-page>error.jsp</form-error-page>
+	  </form-login-config>
+   </login-config>
+
+   <security-role>
+      <role-name>WebUser</role-name>
+   </security-role>
+   <security-role>
+      <role-name>WebAdmin</role-name>
+   </security-role>
+</web-app>

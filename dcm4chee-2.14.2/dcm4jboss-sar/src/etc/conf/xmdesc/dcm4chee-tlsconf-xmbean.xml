@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>TLS Configuration</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.TLSConfigService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>TLSConfigService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getEnabledProtocols"
+      setMethod="setEnabledProtocols">
+      <!-- Security -->     
+      <description><![CDATA[Comma separated list of protocol versions enabled
+      for use on this connection. See <b>SupportedProtocols</b> for possible
+      values. Default: TLSv1,SSLv3]]>
+      </description>
+      <name>EnabledProtocols</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TLSv1,SSLv3" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getSupportedProtocols">
+      <description><![CDATA[Supported protocol versions by the used SSL provider.
+      Defines possible values for <b>EnabledProtocols</b>.]]>
+      </description>
+      <name>SupportedProtocols</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isNeedClientAuth"
+      setMethod="setNeedClientAuth">
+      <!-- Security -->     
+      <description><![CDATA[Set to <tt>true</tt> if client authentication is
+      required, or <tt>false</tt> if no client authentication is desired.]]>
+      </description>
+      <name>NeedClientAuthentication</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getKeyStoreURL"
+      setMethod="setKeyStoreURL">
+      <!-- Security -->     
+      <description>URL of key store containing key used in SSL handshake,
+         when running in TLS mode.
+      </description>
+      <name>KeyStoreURL</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="resource:identity.p12" />
+      </descriptors>
+   </attribute>
+   <attribute access="write-only"
+      setMethod="setKeyStorePassword">
+      <!-- Security -->     
+      <description>The password for access to key store,
+      specified by attribute KeyStoreURL.
+      </description>
+      <name>KeyStorePassword</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="secret" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTrustStoreURL"
+      setMethod="setTrustStoreURL">
+      <!-- Security -->     
+      <description>URL of trust store containing accepted certificates,
+         when running in TLS mode.
+      </description>
+      <name>TrustStoreURL</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="resource:cacerts.jks" />
+      </descriptors>
+   </attribute>
+   <attribute access="write-only"
+      setMethod="setTrustStorePassword">
+      <!-- Security -->     
+      <description>The password for access to trust store,
+      specified by attribute TrustStoreURL.
+      </description>
+      <name>TrustStorePassword</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="secret" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="INFO">
+      <description>Used internally</description>
+      <name>handshakeFailedListener</name>
+      <return-type>org.dcm4che.util.HandshakeFailedListener</return-type>
+   </operation>
+   <operation impact="INFO">
+      <description>Used internally</description>
+      <name>handshakeCompletedListener</name>
+      <return-type>javax.net.ssl.HandshakeCompletedListener</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Used internally</description>
+      <name>serverSocketFactory</name>
+      <parameter>
+        <name>cipherSuites</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>javax.net.ServerSocketFactory</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Used internally</description>
+      <name>socketFactory</name>
+      <parameter>
+        <name>cipherSuites</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>javax.net.SocketFactory</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Used internally</description>
+      <name>startHandshake</name>
+      <parameter>
+        <name>sock</name>
+        <type>java.net.Socket</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   
+   <!-- Notifications -->
+   <notification>
+      <description>The notification sent whenever a SSL handshake failed on a 
+        given SSL connection.
+      </description>
+      <name>javax.management.Notification</name>
+      <notification-type>org.dcm4che.util.HandshakeFailedEvent</notification-type>
+   </notification>
+   <notification>
+      <description>The notification sent whenever a SSL handshake completed on
+        a given SSL connection.
+      </description>
+      <name>javax.management.Notification</name>
+      <notification-type>javax.net.ssl.HandshakeCompletedEvent</notification-type>
+   </notification>
+</mbean>
+    

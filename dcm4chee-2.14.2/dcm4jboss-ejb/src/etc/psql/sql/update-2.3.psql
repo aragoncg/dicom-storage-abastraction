@@ -1,0 +1,103 @@
+-- Update DB from dcm4chee-2.2.x to dcm4chee-2.3.x
+
+ALTER TABLE study ADD COLUMN checked_time	TIMESTAMP;
+CREATE INDEX study_checked ON study(checked_time);
+
+CREATE TABLE series_req (
+	pk              SERIAL PRIMARY KEY,
+	series_fk       INTEGER,
+	req_proc_id     TEXT,
+	sps_id          TEXT,
+FOREIGN KEY (series_fk) REFERENCES series(pk)
+);
+CREATE INDEX ser_req_series_fk ON series_req(series_fk);
+CREATE INDEX ser_req_proc_id ON series_req(req_proc_id);
+CREATE INDEX ser_req_sps_id ON series_req(sps_id);	
+
+CREATE TABLE gpsps (
+	pk              SERIAL PRIMARY KEY,
+	patient_fk      INTEGER,
+	code_fk         INTEGER,
+	gpsps_iuid      TEXT NOT NULL,
+	gpsps_tuid      TEXT,
+	start_datetime  TIMESTAMP NOT NULL,
+	end_datetime    TIMESTAMP,
+	gpsps_status    INTEGER,
+	gpsps_prior     INTEGER,
+	in_availability INTEGER,
+	item_attrs      BYTEA,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (code_fk) REFERENCES code(pk)
+);
+CREATE INDEX gpsps_patient_fk ON gpsps(patient_fk);
+CREATE INDEX gpsps_code_fk ON gpsps(code_fk);
+CREATE UNIQUE INDEX gpsps_iuid ON gpsps(gpsps_iuid);
+CREATE INDEX gpsps_tuid ON gpsps(gpsps_tuid);
+CREATE INDEX gpsps_start_time ON gpsps(start_datetime);
+CREATE INDEX gpsps_end_time ON gpsps(end_datetime);
+CREATE INDEX gpsps_status ON gpsps(gpsps_status);
+CREATE INDEX gpsps_prior ON gpsps(gpsps_prior);
+CREATE INDEX in_availability ON gpsps(in_availability);
+
+CREATE TABLE rel_gpsps_appcode (
+	gpsps_fk       INTEGER,
+	appcode_fk     INTEGER,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (appcode_fk) REFERENCES code(pk)
+);
+CREATE INDEX appcode_gpsps_fk ON rel_gpsps_appcode(gpsps_fk);
+CREATE INDEX gpsps_appcode_fk ON rel_gpsps_appcode(appcode_fk);
+
+CREATE TABLE rel_gpsps_devname (
+	gpsps_fk       INTEGER,
+	devname_fk     INTEGER,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devname_fk) REFERENCES code(pk)
+);
+CREATE INDEX devname_gpsps_fk ON rel_gpsps_devname(gpsps_fk);
+CREATE INDEX gpsps_devname_fk ON rel_gpsps_devname(devname_fk);
+
+CREATE TABLE rel_gpsps_devclass (
+	gpsps_fk       INTEGER,
+	devclass_fk     INTEGER,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devclass_fk) REFERENCES code(pk)
+);
+CREATE INDEX devclass_gpsps_fk ON rel_gpsps_devclass(gpsps_fk);
+CREATE INDEX gpsps_devclass_fk ON rel_gpsps_devclass(devclass_fk);
+
+CREATE TABLE rel_gpsps_devloc (
+	gpsps_fk       INTEGER,
+	devloc_fk  INTEGER,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devloc_fk) REFERENCES code(pk)
+);
+CREATE INDEX devloc_gpsps_fk ON rel_gpsps_devloc(gpsps_fk);
+CREATE INDEX gpsps_devloc_fk ON rel_gpsps_devloc(devloc_fk);
+
+CREATE TABLE gpsps_perf (
+	pk                 SERIAL PRIMARY KEY,
+	gpsps_fk           INTEGER,
+	code_fk            INTEGER,
+	human_perf_name    TEXT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (code_fk) REFERENCES code(pk)
+);
+CREATE INDEX gpsps_perf_sps_fk ON gpsps_perf(gpsps_fk);
+CREATE INDEX gpsps_perf_code_fk ON gpsps_perf(code_fk);
+CREATE INDEX gpsps_perf_name ON gpsps_perf(human_perf_name);
+
+CREATE TABLE gpsps_req (
+	pk          	SERIAL PRIMARY KEY,
+	gpsps_fk        INTEGER,
+	req_proc_id		TEXT,
+	accession_no	TEXT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk)
+);
+CREATE INDEX gpsps_req_gpsps_fk ON gpsps_req(gpsps_fk);
+CREATE INDEX gpsps_req_proc_id ON gpsps_req(req_proc_id);
+CREATE INDEX gpsps_req_acc_no ON gpsps_req(accession_no);
+
+ALTER TABLE mwl_item ADD COLUMN sps_status INTEGER;
+CREATE INDEX sps_status ON mwl_item(sps_status);
+

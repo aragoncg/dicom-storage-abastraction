@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry path="src/java" kind="src"/>
+	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
+	<classpathentry path="/dcm4che14" kind="src"/>
+	<classpathentry path="/dcm4jboss-sar" kind="src"/>
+	<classpathentry path="JBOSS_HOME/lib/jboss-common.jar" kind="var"/>
+	<classpathentry path="JBOSS_HOME/lib/jboss-jmx.jar" kind="var"/>
+	<classpathentry path="JBOSS_HOME/lib/jboss-system.jar" kind="var"/>
+	<classpathentry path="JBOSS_HOME/server/default/lib/servlet-api.jar" kind="var"/>
+	<classpathentry path="FOP_HOME/build/fop.jar" kind="var"/>
+	<classpathentry path="/dcm4jboss-ejb" kind="src"/>
+	<classpathentry path="target/classes" kind="output"/>
+</classpath>

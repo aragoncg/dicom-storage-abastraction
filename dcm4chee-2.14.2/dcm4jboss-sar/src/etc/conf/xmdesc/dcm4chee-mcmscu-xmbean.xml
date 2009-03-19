@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>Media Creation Management SCU.  Used to where and how media are created, including the automatic creation of media.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.mcmscu.MCMScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MCMScuService</name>
+   </constructor>
+
+    <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>The calling AE title.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getRetrieveAET" setMethod="setRetrieveAET">
+      <description>The retrieve AE title for the move.
+      </description>
+      <name>RetrieveAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getMoveDestinationAET" setMethod="setMoveDestinationAET">
+      <description>The move destination AE title.
+      </description>
+      <name>MoveDestinationAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="CDRECORD"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getMcmScpAET" setMethod="setMcmScpAET">
+      <description>The Media Creation Management SCP AE Title.
+      </description>
+      <name>McmScpAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="CDRECORD"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getConcurrency" setMethod="setConcurrency">
+      <description>Maximum number of concurrent invoked Media Creation Requests.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getFileSetIdPrefix" setMethod="setFileSetIdPrefix">
+      <description>Prefix to be added the burn files for the file set ID.
+      </description>
+      <name>FileSetIdPrefix</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DISK_"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="getNrOfCopies" setMethod="setNrOfCopies">
+      <description>Number of copies to create, from 1-99.
+      </description>
+      <name>NumberOfCopies</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+ 
+    <attribute access="read-write" getMethod="getMaxMediaUsage" setMethod="setMaxMediaUsage">
+      <description>Maximum media usage for DICOM files. This values is usually
+      smaller than the real media size to keep space for index and optional html
+      files. 1MB = 1000000 Byte, 1GB = 1000MB
+      </description>
+      <name>MaxMediaUsage</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="600MB"/>
+      </descriptors>
+   </attribute>
+
+    <attribute access="read-write" getMethod="getMinStudyAge" setMethod="setMinStudyAge">
+      <description>The minimum duration before studies are
+      scheduled for offline storage. Increasing the delay for scheduling
+      ensures that all instances of a study are available, and will be stored on a single piece of media.
+      &lt;br&gt;Format: &lt;br&gt;##h (in hours), ##d (in days), ##w (in weeks)</description>
+      <name>MinStudyAge</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="2d"/>
+      </descriptors>
+   </attribute>
+
+    <attribute access="read-write" getMethod="getMaxStudyAge" setMethod="setMaxStudyAge">
+      <description>The maximum duration before studies are archived on
+      media. Only effective, if media creation is triggered automatically
+      if the &lt;b&gt;BurnMediaInterval&lt;/b&gt; attribute is enabled.
+      &lt;br&gt;Format: &lt;br&gt;##h (in hours), ##d (in days), ##w (in weeks)</description>
+      <name>MaxStudyAge</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="4w"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getScheduleMediaInterval" setMethod="setScheduleMediaInterval">
+      <description>Interval in which studies received thatare older than the configured
+          MinStudyAge are associated to media and scheduled for creation.
+          &lt;br&gt;Format: &lt;br&gt;##m (in minutes), ##h (in hours), ##d (in days) &lt;br&gt;NEVER = disable media scheduling          
+      </description>
+      <name>ScheduleMediaInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getUpdateMediaStatusInterval" setMethod="setUpdateMediaStatusInterval">
+      <description>Interval in which the Media Creation Server is queried for the status
+          of pending Media Creation Requests.
+          &lt;br&gt;Format: &lt;br&gt;##s (in seconds), ##m (in minutes), ##h (in hours)
+          &lt;br&gt;NEVER = disable query of Media Creation Server</description>
+      <name>UpdateMediaStatusInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getBurnMediaInterval" setMethod="setBurnMediaInterval">
+      <description>Interval in which creation of media with studies
+          received that are older than configured MaxStudyAge is triggered
+          automatically. &lt;br&gt;Format: &lt;br&gt;##h (in hours), ##d (in days), ##w (in weeks) &lt;br&gt;NEVER = no automatic trigger of media creation          
+      </description>
+      <name>BurnMediaInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isAutomaticMediaCreation" setMethod="setAutomaticMediaCreation">
+      <description>Enables automatic media creation.
+      	If automatic media creation is disabled, a notification is sent to the email list  
+      	defined in the &lt;b&gt;NotifyBurnMediaEmailTo&lt;/b&gt; attribute.         
+      </description>
+      <name>AutomaticMediaCreation</name>
+      <type>boolean</type>
+   </attribute>
+   <attribute access="read-write" getMethod="getNotifyBurnMediaEmailTo" setMethod="setNotifyBurnMediaEmailTo">
+      <description>List of comma-separated email addresses that should be notified when one or more media are ready to burn.          
+      </description>
+      <name>NotifyBurnMediaEmailTo</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getNotifyBurnMediaEmailFrom" setMethod="setNotifyBurnMediaEmailFrom">
+      <description>Email address that is used as the  from address in the notification email.          
+      </description>
+      <name>NotifyBurnMediaEmailFrom</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getPriority" setMethod="setPriority">
+      <description>Priority for move and media creation request. 
+      Enumerated Values: LOW, MEDIUM, HIGH.</description>
+      <name>Priority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getIncludeNonDICOMObj" setMethod="setIncludeNonDICOMObj">
+      <description>The type of none DICOM information or object that the SCP should include in the media.
+      Use NO if no additional information or objects should be included.
+      </description>
+      <name>IncludeNonDicomObj</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MD5_SUMS"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write" getMethod="isUseInstanceInfo" setMethod="setUseInstanceInfo">
+      <description>Specifies whether to extract label information from the instances.
+      </description>
+      <name>UseInstanceInfo</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckForMediaToBurn"
+      setMethod="setTimerIDCheckForMediaToBurn">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckForMediaToBurn</name>
+      <type>java.lang.String</type>
+   </attribute>
+ 
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckForStudiesToSchedule"
+      setMethod="setTimerIDCheckForStudiesToSchedule">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckForStudiesToSchedule</name>
+      <type>java.lang.String</type>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckMediaStatus"
+      setMethod="setTimerIDCheckMediaStatus">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckMediaStatus</name>
+      <type>java.lang.String</type>
+   </attribute>
+
+	&defaultSCUAttributes;
+	   
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+    
+   <attribute access="read-write"
+      getMethod="getSendmailServiceName"
+      setMethod="setSendmailServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SendmailServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+ 
+  
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Check the availability of the Media Creation Managment SCP. Returns OK, MOVE_DEST_UNAVAIL (move destination unavailable) or MCM_SCP_UNAVAIL (Media Creation Management SCP unavailable).
+      </description>
+      <name>checkMcmScpAvail</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>Initiate creation of media with studies received older than MinStudyAge</description>
+      <name>scheduleMedia</name>
+      <return-type>int</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>Update media status</description>
+      <name>updateMediaStatus</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>Initiate creation of media with studies received older than MaxStudyAge.
+      </description>
+      <name>burnMedia</name>
+      <return-type>int</return-type>
+   </operation>
+ 
+   <operation impact="ACTION">
+      <description>Delete media.
+      </description>
+      <name>deleteMedia</name>
+      <parameter>
+        <description>Primary key of media</description>
+        <name>mediaPk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+    
+   <operation impact="INFO">
+      <description>Check if all instances of medium are available as files.
+      </description>
+      <name>checkMediaInstances</name>
+      <parameter>
+        <description>Primary key of media</description>
+        <name>mediaPk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+   
+   <operation impact="ACTION">
+      <description>Schedule Media Creation. Used by WEB application</description>
+      <name>scheduleMediaCreation</name>
+      <parameter>
+        <description>Media DTO</description>
+        <name>mediaDTO</name>
+        <type>org.dcm4chex.archive.ejb.interfaces.MediaDTO</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+</mbean>

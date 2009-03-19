@@ -1,0 +1,315 @@
+-- Adjust BLOB limits for v2.8.2 
+
+CONNECT TO tiani;
+SET CURRENT SCHEMA TIANI;
+
+UPDATE patient SET pat_id = 'NOT - SET - ' || CHAR(PK) WHERE pat_id IS NULL;
+
+EXPORT TO hp.ixf OF ixf LOBFILE hp.lob MODIFIED BY lobsinfile METHOD N (PK,USER_FK,HP_IUID,HP_CUID,HP_NAME,HP_GROUP,HP_LEVEL,NUM_PRIORS,NUM_SCREENS,HP_ATTRS) MESSAGES hp.export.msg 
+SELECT PK,USER_FK,HP_IUID,HP_CUID,HP_NAME,HP_GROUP,HP_LEVEL,NUM_PRIORS,NUM_SCREENS,HP_ATTRS FROM hp;
+
+EXPORT TO patient.ixf OF ixf LOBFILE patient.lob MODIFIED BY lobsinfile METHOD N (PK,MERGE_FK,PAT_ID,PAT_ID_ISSUER,PAT_NAME,PAT_BIRTHDATE,PAT_SEX,PAT_ATTRS,CREATED_TIME,UPDATED_TIME,PAT_I_NAME,PAT_P_NAME) MESSAGES patient.export.msg 
+SELECT PK,MERGE_FK,PAT_ID,PAT_ID_ISSUER,PAT_NAME,PAT_BIRTHDATE,PAT_SEX,PAT_ATTRS,CREATED_TIME,UPDATED_TIME,PAT_I_NAME,PAT_P_NAME FROM patient;
+
+EXPORT TO study.ixf OF ixf LOBFILE study.lob MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,STUDY_IUID,STUDY_ID,STUDY_DATETIME,ACCESSION_NO,REF_PHYSICIAN,MODS_IN_STUDY,NUM_SERIES,NUM_INSTANCES,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,STUDY_ATTRS,CHECKED_TIME,STUDY_STATUS_ID,STUDY_DESC,REF_PHYS_I_NAME,REF_PHYS_P_NAME) MESSAGES study.export.msg 
+SELECT PK,PATIENT_FK,STUDY_IUID,STUDY_ID,STUDY_DATETIME,ACCESSION_NO,REF_PHYSICIAN,MODS_IN_STUDY,NUM_SERIES,NUM_INSTANCES,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,STUDY_ATTRS,CHECKED_TIME,STUDY_STATUS_ID,STUDY_DESC,REF_PHYS_I_NAME,REF_PHYS_P_NAME FROM study;
+
+EXPORT TO series.ixf OF ixf LOBFILE series.lob MODIFIED BY lobsinfile METHOD N (PK,STUDY_FK,MPPS_FK,SERIES_IUID,SERIES_NO,MODALITY,PPS_START,PPS_IUID,NUM_INSTANCES,SRC_AET,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,SERIES_ATTRS,INSTITUTION,DEPARTMENT) MESSAGES series.export.msg 
+SELECT PK,STUDY_FK,MPPS_FK,SERIES_IUID,SERIES_NO,MODALITY,PPS_START,PPS_IUID,NUM_INSTANCES,SRC_AET,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,SERIES_ATTRS,INSTITUTION,DEPARTMENT FROM series;
+
+EXPORT TO instance.ixf OF ixf LOBFILE instance.lob MODIFIED BY lobsinfile METHOD N (PK,SERIES_FK,SRCODE_FK,MEDIA_FK,SOP_IUID,SOP_CUID,INST_NO,SR_COMPLETE,SR_VERIFIED,EXT_RETR_AET,RETRIEVE_AETS,AVAILABILITY,COMMITMENT,INST_ATTRS,CONTENT_DATETIME,CREATED_TIME,UPDATED_TIME) MESSAGES instance.export.msg 
+SELECT PK,SERIES_FK,SRCODE_FK,MEDIA_FK,SOP_IUID,SOP_CUID,INST_NO,SR_COMPLETE,SR_VERIFIED,EXT_RETR_AET,RETRIEVE_AETS,AVAILABILITY,COMMITMENT,INST_ATTRS,CONTENT_DATETIME,CREATED_TIME,UPDATED_TIME FROM instance;
+
+EXPORT TO priv_patient.ixf OF ixf LOBFILE priv_patient.lob MODIFIED BY lobsinfile METHOD N (PK,PRIV_TYPE,PAT_ID,PAT_ID_ISSUER,PAT_ATTRS) MESSAGES priv_patient.export.msg 
+SELECT PK,PRIV_TYPE,PAT_ID,PAT_ID_ISSUER,PAT_ATTRS FROM priv_patient;
+
+EXPORT TO priv_study.ixf OF ixf LOBFILE priv_study.lob MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,PRIV_TYPE,STUDY_IUID,STUDY_ATTRS) MESSAGES priv_study.export.msg 
+SELECT PK,PATIENT_FK,PRIV_TYPE,STUDY_IUID,STUDY_ATTRS FROM priv_study;
+
+EXPORT TO priv_series.ixf OF ixf LOBFILE priv_series.lob MODIFIED BY lobsinfile METHOD N (PK,STUDY_FK,PRIV_TYPE,SERIES_IUID,SERIES_ATTRS) MESSAGES priv_series.export.msg 
+SELECT PK,STUDY_FK,PRIV_TYPE,SERIES_IUID,SERIES_ATTRS FROM priv_series;
+
+EXPORT TO priv_instance.ixf OF ixf LOBFILE priv_instance.lob MODIFIED BY lobsinfile METHOD N (PK,SERIES_FK,PRIV_TYPE,SOP_IUID,INST_ATTRS) MESSAGES priv_instance.export.msg 
+SELECT PK,SERIES_FK,PRIV_TYPE,SOP_IUID,INST_ATTRS FROM priv_instance;
+
+EXPORT TO mpps.ixf OF ixf LOBFILE mpps.lob MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,DRCODE_FK,MPPS_IUID,PPS_START,STATION_AET,MODALITY,ACCESSION_NO,MPPS_STATUS,MPPS_ATTRS,CREATED_TIME,UPDATED_TIME) MESSAGES mpps.export.msg 
+SELECT PK,PATIENT_FK,DRCODE_FK,MPPS_IUID,PPS_START,STATION_AET,MODALITY,ACCESSION_NO,MPPS_STATUS,MPPS_ATTRS,CREATED_TIME,UPDATED_TIME FROM mpps;
+
+DROP TABLE hp;
+DROP TABLE patient;
+DROP TABLE study;
+DROP TABLE series;
+DROP TABLE instance;
+DROP TABLE priv_patient;
+DROP TABLE priv_study;
+DROP TABLE priv_series;
+DROP TABLE priv_instance;
+DROP TABLE mpps;
+
+CREATE TABLE patient (
+	pk          	INTEGER NOT NULL CONSTRAINT patient_pk PRIMARY KEY,
+	merge_fk        INTEGER,
+	pat_id         	VARCHAR(254) NOT NULL,
+	pat_id_issuer  	VARCHAR(254),
+	pat_name    	VARCHAR(254),
+	pat_i_name    	VARCHAR(254),
+	pat_p_name    	VARCHAR(254),
+	pat_birthdate  	DATE,
+	pat_sex		  	VARCHAR(254),
+	created_time	TIMESTAMP,
+	updated_time	TIMESTAMP,
+	pat_attrs		BLOB(16384),
+FOREIGN KEY (merge_fk) REFERENCES patient(pk)
+);
+CREATE INDEX pat_merge_fk ON patient(merge_fk);
+CREATE UNIQUE INDEX pat_id ON patient(pat_id, pat_id_issuer);
+CREATE INDEX pat_name ON patient(pat_name);
+CREATE INDEX pat_i_name ON patient(pat_i_name);
+CREATE INDEX pat_p_name ON patient(pat_p_name);
+CREATE INDEX pat_birthdate ON patient(pat_birthdate);
+CREATE INDEX pat_sex ON patient(pat_sex);
+
+CREATE TABLE study (
+	pk              INTEGER NOT NULL CONSTRAINT study_pk PRIMARY KEY,
+	patient_fk      INTEGER,
+	study_iuid      VARCHAR(254) NOT NULL,
+	study_id        VARCHAR(254),
+	study_datetime	TIMESTAMP,
+	accession_no	VARCHAR(254),
+	ref_physician  VARCHAR(254),
+	ref_phys_i_name VARCHAR(254),
+	ref_phys_p_name VARCHAR(254),
+	study_desc      VARCHAR(254),
+	study_status_id VARCHAR(254),
+	mods_in_study	VARCHAR(254),
+	num_series		INTEGER NOT NULL,
+	num_instances	INTEGER NOT NULL,
+	ext_retr_aet	VARCHAR(254),
+	retrieve_aets	VARCHAR(254),
+	fileset_iuid	VARCHAR(254),
+	fileset_id		VARCHAR(254),
+	availability	INTEGER NOT NULL,
+	checked_time	TIMESTAMP,
+	created_time	TIMESTAMP,
+	updated_time	TIMESTAMP,
+	study_attrs		BLOB(16384),
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+);
+CREATE INDEX patient_fk ON study(patient_fk);
+CREATE UNIQUE INDEX study_iuid ON study(study_iuid);
+CREATE INDEX study_id ON study(study_id);
+CREATE INDEX study_datetime ON study(study_datetime);
+CREATE INDEX accession_no ON study(accession_no);
+CREATE INDEX ref_physician ON study(ref_physician);
+CREATE INDEX ref_phys_i_name ON study(ref_phys_i_name);
+CREATE INDEX ref_phys_p_name ON study(ref_phys_p_name);
+CREATE INDEX study_desc ON study(study_desc);
+CREATE INDEX study_status_id ON study(study_status_id);
+CREATE INDEX study_checked ON study(checked_time);
+CREATE INDEX study_created ON study(created_time);
+
+CREATE TABLE mpps (
+	pk				INTEGER NOT NULL CONSTRAINT mpps_pk PRIMARY KEY,
+	patient_fk		INTEGER,
+	drcode_fk		INTEGER,
+	mpps_iuid		VARCHAR(254) NOT NULL,
+	pps_start		TIMESTAMP,
+	station_aet		VARCHAR(254),
+	modality	    VARCHAR(254),
+	accession_no    VARCHAR(254),
+	mpps_status		INTEGER NOT NULL,
+	created_time	TIMESTAMP,
+	updated_time	TIMESTAMP,
+	mpps_attrs		BLOB(262144),
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (drcode_fk) REFERENCES code(pk)
+);
+CREATE UNIQUE INDEX mpps_iuid ON mpps (mpps_iuid);
+CREATE INDEX mpps_patient_fk ON mpps(patient_fk);
+CREATE INDEX mpps_pps_start ON mpps (pps_start);
+CREATE INDEX mpps_station_aet ON mpps (station_aet);
+CREATE INDEX mpps_modality ON mpps (modality);
+CREATE INDEX mpps_accession_no ON mpps (accession_no);	
+
+CREATE TABLE series (
+	pk              INTEGER NOT NULL CONSTRAINT series_pk PRIMARY KEY,
+	study_fk		INTEGER,
+	mpps_fk			INTEGER,
+	series_iuid     VARCHAR(254) NOT NULL,
+	series_no		VARCHAR(254),
+	modality		VARCHAR(254),
+	institution		VARCHAR(254),
+	department		VARCHAR(254),
+	pps_start		TIMESTAMP,
+	pps_iuid		VARCHAR(254),
+	num_instances	INTEGER,
+	src_aet			VARCHAR(254),
+	ext_retr_aet	VARCHAR(254),
+	retrieve_aets	VARCHAR(254),
+	fileset_iuid	VARCHAR(254),
+	fileset_id		VARCHAR(254),
+	availability	INTEGER NOT NULL,
+	created_time	TIMESTAMP,
+	updated_time	TIMESTAMP,
+	series_attrs	BLOB(16384),
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (mpps_fk) REFERENCES mpps(pk)
+);
+CREATE INDEX study_fk ON series(study_fk);
+CREATE INDEX series_mpps_fk ON series(mpps_fk);
+CREATE UNIQUE INDEX series_iuid ON series(series_iuid);
+CREATE INDEX series_no ON series(series_no);
+CREATE INDEX modality ON series(modality);
+CREATE INDEX institution ON series(institution);
+CREATE INDEX department ON series(department);
+CREATE INDEX series_pps_start ON series(pps_start);
+CREATE INDEX series_pps_iuid ON series(pps_iuid);
+CREATE INDEX series_src_aet ON series(src_aet);
+CREATE INDEX series_created ON series(created_time);
+
+
+CREATE TABLE instance (
+	pk             		INTEGER NOT NULL CONSTRAINT instance_pk PRIMARY KEY,
+	series_fk			INTEGER,
+	srcode_fk			INTEGER,
+	media_fk			INTEGER,
+	sop_iuid			VARCHAR(254) NOT NULL,
+	sop_cuid			VARCHAR(254) NOT NULL,
+	inst_no				VARCHAR(254),
+	content_datetime	TIMESTAMP,
+	sr_complete			VARCHAR(254),
+	sr_verified			VARCHAR(254),
+	ext_retr_aet		VARCHAR(254),
+	retrieve_aets		VARCHAR(254),
+	availability		INTEGER NOT NULL,
+	commitment			SMALLINT NOT NULL,
+	created_time		TIMESTAMP,
+	updated_time		TIMESTAMP,
+	inst_attrs			BLOB(262144),
+FOREIGN KEY (series_fk)	REFERENCES series(pk),
+FOREIGN KEY (srcode_fk)	REFERENCES code(pk),
+FOREIGN KEY (media_fk)	REFERENCES media(pk)
+);
+CREATE INDEX series_fk ON instance(series_fk);
+CREATE INDEX srcode_fk ON instance(srcode_fk);
+CREATE INDEX media_fk ON instance(media_fk);
+CREATE UNIQUE INDEX sop_iuid ON instance(sop_iuid);
+CREATE INDEX sop_cuid ON instance(sop_cuid);
+CREATE INDEX inst_no ON instance(inst_no);
+CREATE INDEX content_datetime ON instance(content_datetime);
+CREATE INDEX sr_complete ON instance(sr_complete);
+CREATE INDEX sr_verified ON instance(sr_verified);
+CREATE INDEX ext_retr_aet ON instance(ext_retr_aet);
+CREATE INDEX commitment ON instance(commitment);
+
+
+CREATE TABLE hp (
+	pk              INTEGER NOT NULL CONSTRAINT hp_pk PRIMARY KEY,
+	user_fk         INTEGER,
+	hp_iuid         VARCHAR(254) NOT NULL,
+	hp_cuid         VARCHAR(254),
+	hp_name         VARCHAR(254),
+	hp_group        VARCHAR(254),
+	hp_level        INTEGER,
+	num_priors      INTEGER,
+	num_screens     INTEGER,
+	hp_attrs        BLOB(16384),
+FOREIGN KEY (user_fk) REFERENCES code(pk)
+);
+CREATE INDEX hp_user_fk ON hp(user_fk);
+CREATE UNIQUE INDEX hp_iuid ON hp(hp_iuid);
+CREATE INDEX hp_cuid ON hp(hp_cuid);
+CREATE INDEX hp_name ON hp(hp_name);
+CREATE INDEX hp_level ON hp(hp_level);
+CREATE INDEX num_priors ON hp(num_priors);
+CREATE INDEX num_screens ON hp(num_screens);
+
+CREATE TABLE priv_patient (
+	pk          	INTEGER NOT NULL CONSTRAINT priv_patient_pk PRIMARY KEY,
+	priv_type		INTEGER NOT NULL,
+	pat_id         	VARCHAR(254),
+	pat_id_issuer  	VARCHAR(254),
+	pat_attrs		BLOB(16384)
+);
+CREATE INDEX priv_pat_id ON priv_patient(pat_id, pat_id_issuer);
+CREATE INDEX priv_pat_type ON priv_patient(priv_type);
+
+CREATE TABLE priv_study (
+	pk              INTEGER NOT NULL CONSTRAINT priv_study_pk PRIMARY KEY,
+	patient_fk      INTEGER,
+	priv_type		INTEGER NOT NULL,
+	study_iuid      VARCHAR(254) NOT NULL,
+	study_attrs		BLOB(16384),
+FOREIGN KEY (patient_fk) REFERENCES priv_patient(pk)
+);
+CREATE INDEX priv_patient_fk ON priv_study(patient_fk);
+CREATE INDEX priv_study_type ON priv_study(priv_type);
+CREATE INDEX priv_study_iuid ON priv_study(study_iuid);
+
+CREATE TABLE priv_series (
+	pk              INTEGER NOT NULL CONSTRAINT priv_series_pk PRIMARY KEY,
+	study_fk		INTEGER,
+	priv_type		INTEGER NOT NULL,
+	series_iuid     VARCHAR(254) NOT NULL,
+	series_attrs	BLOB(16384),
+FOREIGN KEY (study_fk) REFERENCES priv_study(pk)
+);
+CREATE INDEX priv_study_fk ON priv_series(study_fk);
+CREATE INDEX priv_series_type ON priv_series(priv_type);
+CREATE INDEX priv_series_iuid ON priv_series(series_iuid);
+
+CREATE TABLE priv_instance (
+	pk             	INTEGER NOT NULL CONSTRAINT priv_instance_pk PRIMARY KEY,
+	series_fk		INTEGER,
+	priv_type		INTEGER NOT NULL,
+	sop_iuid		VARCHAR(254) NOT NULL,
+	inst_attrs		BLOB(262144),
+FOREIGN KEY (series_fk) REFERENCES priv_series(pk)
+);
+CREATE INDEX priv_series_fk ON priv_instance(series_fk);
+CREATE INDEX priv_inst_type ON priv_instance(priv_type);
+CREATE INDEX priv_sop_iuid ON priv_instance(sop_iuid);
+
+GRANT ALL PRIVILEGES ON TABLE patient TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE study TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE mpps TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE series TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE instance TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE priv_patient TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE priv_study TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE priv_series TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE priv_instance TO USER tiani;
+
+LOAD FROM hp.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,USER_FK,HP_IUID,HP_CUID,HP_NAME,HP_GROUP,HP_LEVEL,NUM_PRIORS,NUM_SCREENS,HP_ATTRS) MESSAGES hp.load.msg
+  INSERT INTO hp (PK,USER_FK,HP_IUID,HP_CUID,HP_NAME,HP_GROUP,HP_LEVEL,NUM_PRIORS,NUM_SCREENS,HP_ATTRS) NONRECOVERABLE;
+
+LOAD FROM patient.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,MERGE_FK,PAT_ID,PAT_ID_ISSUER,PAT_NAME,PAT_BIRTHDATE,PAT_SEX,PAT_ATTRS,CREATED_TIME,UPDATED_TIME,PAT_I_NAME,PAT_P_NAME) MESSAGES patient.load.msg
+  INSERT INTO patient (PK,MERGE_FK,PAT_ID,PAT_ID_ISSUER,PAT_NAME,PAT_BIRTHDATE,PAT_SEX,PAT_ATTRS,CREATED_TIME,UPDATED_TIME,PAT_I_NAME,PAT_P_NAME) NONRECOVERABLE;
+
+LOAD FROM study.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,STUDY_IUID,STUDY_ID,STUDY_DATETIME,ACCESSION_NO,REF_PHYSICIAN,MODS_IN_STUDY,NUM_SERIES,NUM_INSTANCES,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,STUDY_ATTRS,CHECKED_TIME,STUDY_STATUS_ID,STUDY_DESC,REF_PHYS_I_NAME,REF_PHYS_P_NAME) MESSAGES study.load.msg
+  INSERT INTO study (PK,PATIENT_FK,STUDY_IUID,STUDY_ID,STUDY_DATETIME,ACCESSION_NO,REF_PHYSICIAN,MODS_IN_STUDY,NUM_SERIES,NUM_INSTANCES,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,STUDY_ATTRS,CHECKED_TIME,STUDY_STATUS_ID,STUDY_DESC,REF_PHYS_I_NAME,REF_PHYS_P_NAME) NONRECOVERABLE;
+
+LOAD FROM series.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,STUDY_FK,MPPS_FK,SERIES_IUID,SERIES_NO,MODALITY,PPS_START,PPS_IUID,NUM_INSTANCES,SRC_AET,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,SERIES_ATTRS,INSTITUTION,DEPARTMENT) MESSAGES series.load.msg
+  INSERT INTO series (PK,STUDY_FK,MPPS_FK,SERIES_IUID,SERIES_NO,MODALITY,PPS_START,PPS_IUID,NUM_INSTANCES,SRC_AET,EXT_RETR_AET,RETRIEVE_AETS,FILESET_IUID,FILESET_ID,AVAILABILITY,CREATED_TIME,UPDATED_TIME,SERIES_ATTRS,INSTITUTION,DEPARTMENT) NONRECOVERABLE;
+
+LOAD FROM instance.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,SERIES_FK,SRCODE_FK,MEDIA_FK,SOP_IUID,SOP_CUID,INST_NO,SR_COMPLETE,SR_VERIFIED,EXT_RETR_AET,RETRIEVE_AETS,AVAILABILITY,COMMITMENT,INST_ATTRS,CONTENT_DATETIME,CREATED_TIME,UPDATED_TIME) MESSAGES instance.load.msg
+  INSERT INTO instance (PK,SERIES_FK,SRCODE_FK,MEDIA_FK,SOP_IUID,SOP_CUID,INST_NO,SR_COMPLETE,SR_VERIFIED,EXT_RETR_AET,RETRIEVE_AETS,AVAILABILITY,COMMITMENT,INST_ATTRS,CONTENT_DATETIME,CREATED_TIME,UPDATED_TIME) NONRECOVERABLE;
+
+LOAD FROM priv_patient.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,PRIV_TYPE,PAT_ID,PAT_ID_ISSUER,PAT_ATTRS) MESSAGES priv_patient.load.msg
+  INSERT INTO priv_patient (PK,PRIV_TYPE,PAT_ID,PAT_ID_ISSUER,PAT_ATTRS) NONRECOVERABLE;
+
+LOAD FROM priv_study.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,PRIV_TYPE,STUDY_IUID,STUDY_ATTRS) MESSAGES priv_study.load.msg
+  INSERT INTO priv_study (PK,PATIENT_FK,PRIV_TYPE,STUDY_IUID,STUDY_ATTRS) NONRECOVERABLE;
+
+LOAD FROM priv_series.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,STUDY_FK,PRIV_TYPE,SERIES_IUID,SERIES_ATTRS) MESSAGES priv_series.load.msg
+  INSERT INTO priv_series (PK,STUDY_FK,PRIV_TYPE,SERIES_IUID,SERIES_ATTRS) NONRECOVERABLE;
+
+LOAD FROM priv_instance.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,SERIES_FK,PRIV_TYPE,SOP_IUID,INST_ATTRS) MESSAGES priv_instance.load.msg
+  INSERT INTO priv_instance (PK,SERIES_FK,PRIV_TYPE,SOP_IUID,INST_ATTRS) NONRECOVERABLE;
+
+LOAD FROM mpps.ixf OF ixf LOBS FROM . MODIFIED BY lobsinfile METHOD N (PK,PATIENT_FK,DRCODE_FK,MPPS_IUID,PPS_START,STATION_AET,MODALITY,ACCESSION_NO,MPPS_STATUS,MPPS_ATTRS,CREATED_TIME,UPDATED_TIME) MESSAGES mpps.load.msg
+  INSERT INTO mpps (PK,PATIENT_FK,DRCODE_FK,MPPS_IUID,PPS_START,STATION_AET,MODALITY,ACCESSION_NO,MPPS_STATUS,MPPS_ATTRS,CREATED_TIME,UPDATED_TIME) NONRECOVERABLE;
+  
+SET INTEGRITY FOR patient, study, mpps, series, instance, priv_study, hp, priv_series, priv_instance immediate checked;
+
+TERMINATE;

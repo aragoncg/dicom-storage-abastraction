@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-forward-service.xml 3310 2007-05-06 23:42:06Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.movescu.ForwardService"
+    name="dcm4chee.archive:service=Forward"
+    xmbean-dd="xmdesc/dcm4chee-forward-xmbean.xml">
+    <depends optional-attribute-name="StoreScpServiceName"
+      >dcm4chee.archive:service=StoreScp</depends>
+    <depends optional-attribute-name="MoveScuServiceName"
+      >dcm4chee.archive:service=MoveScu</depends>
+    <depends optional-attribute-name="EditContentServiceName"
+      >dcm4chee.archive:service=ContentEditService</depends>
+  </mbean>
+</server>

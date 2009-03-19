@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ <!-- Specific Character Set -->
+ <attr tag="00080005" vr="CS" />
+ <!-- SOP Class UID -->
+ <attr tag="00080016" vr="UI">1.2.40.0.13.1.5.1.4.1.1.2.1</attr>
+ <!-- Contrast/Bolus Agent -->
+ <attr tag="00180010" vr="LO" />
+ <!-- Contrast/Bolus Agent Sequence -->
+ <attr tag="00180012" vr="SQ" />
+ <!-- Contrast/Bolus Administration Route Sequence -->
+ <attr tag="00180014" vr="SQ" />
+ <!-- Contrast/Bolus Route -->
+ <attr tag="00181040" vr="LO" />
+ <!-- Contrast/Bolus Volume -->
+ <attr tag="00181041" vr="DS" />
+ <!-- Contrast/Bolus Start Time -->
+ <attr tag="00181042" vr="TM" />
+ <!-- Contrast/Bolus Stop Time -->
+ <attr tag="00181043" vr="TM" />
+ <!-- Contrast/Bolus Total Dose -->
+ <attr tag="00181044" vr="DS" />
+ <!-- Contrast Flow Rate -->
+ <attr tag="00181046" vr="DS" />
+ <!-- Contrast Flow Duration -->
+ <attr tag="00181047" vr="DS" />
+ <!-- Contrast/Bolus Ingredient -->
+ <attr tag="00181048" vr="CS" />
+ <!-- Contrast/Bolus Ingredient Concentration -->
+ <attr tag="00181049" vr="DS" />
+ <!-- Series Instance UID -->
+ <attr tag="0020000E" vr="UI" />
+ <!-- Samples per Pixel  -->
+ <attr tag="00280002" vr="US" />
+ <!-- Photometric Interpretation -->
+ <attr tag="00280004" vr="CS" />
+ <!-- Planar Configuration -->
+ <attr tag="00280006" vr="US" />
+ <!-- Rows -->
+ <attr tag="00280010" vr="US" />
+ <!-- Columns -->
+ <attr tag="00280011" vr="US" />
+ <!-- Pixel Aspect Ratio -->
+ <attr tag="00280034" vr="IS" />
+ <!-- Bits Allocated -->
+ <attr tag="00280100" vr="US" />
+ <!-- Bits Stored -->
+ <attr tag="00280101" vr="US" />
+ <!-- High Bit -->
+ <attr tag="00280102" vr="US" />
+ <!-- Pixel Representation -->
+ <attr tag="00280103" vr="US" />
+ <!-- Shared Functional Groups Sequence -->
+ <!-- Elements marked by (+) are not part of DICOM Enhanced CT IOD -->
+ <attr tag="52009229" vr="SQ">
+  <item>
+   <!-- Derivation Image Sequence -->
+   <attr tag="00089124" vr="SQ">
+    <item>
+     <!-- Derivation Description -->
+     <attr tag="00082111" vr="LO" />
+     <!-- Source Image Sequence -->
+     <attr tag="00082112" vr="SQ" />
+     <!-- Derivation Code Sequence -->
+     <attr tag="00089215" vr="SQ" />
+    </item>
+   </attr>
+   <!-- CT Acquisition Type Sequence -->
+   <attr tag="00189301" vr="SQ">
+    <item>
+     <!-- Scan Options(+) -->
+     <attr tag="00180022" vr="CS" />
+    </item>
+   </attr>
+   <!-- CT Acquisition Details Sequence -->
+   <attr tag="00189304" vr="SQ">
+    <item>
+     <!-- Data Collection Diameter -->
+     <attr tag="00180090" vr="DS" />
+     <!-- Gantry/Detector Tilt -->
+     <attr tag="00181120" vr="DS" />
+     <!-- Table Height -->
+     <attr tag="00181130" vr="DS" />
+     <!-- Rotation Direction -->
+     <attr tag="00181140" vr="CS" />
+     <!-- Revolution Time -->
+     <attr tag="00189305" vr="FD" />
+     <!-- Single Collimation Width -->
+     <attr tag="00189306" vr="FD" />
+     <!-- Total Collimation Width -->
+     <attr tag="00189307" vr="FD" />
+    </item>
+   </attr>
+   <!-- CT Table Dynamics Sequence -->
+   <attr tag="00189308" vr="SQ">
+    <item>
+     <!-- Table Speed -->
+     <attr tag="00189309" vr="FD" />
+     <!-- Table Feed per Rotation -->
+     <attr tag="00189310" vr="FD" />
+     <!-- Spiral Pitch Factor -->
+     <attr tag="00189311" vr="FD" />
+    </item>
+   </attr>
+   <!-- CT Geometry Sequence -->
+   <attr tag="00189312" vr="SQ">
+    <item>
+     <!-- Distance Source to Detector -->
+     <attr tag="00181110" vr="FD" />
+     <!-- Distance Source to Patient(+) -->
+     <attr tag="00181111" vr="FD" />
+    </item>
+   </attr>
+   <!-- CT Reconstruction Sequence -->
+   <attr tag="00189314" vr="SQ">
+    <item>
+     <!-- Reconstruction Diameter -->
+     <attr tag="00181100" vr="DS" />
+     <!-- Convolution Kernel -->
+     <attr tag="00181210" vr="SH" />
+    </item>
+   </attr>
+   <!-- CT Exposure Sequence -->
+   <attr tag="00189321" vr="SQ">
+    <item>
+     <!-- Exposure Time -->
+     <attr tag="00181150" vr="IS" />
+     <!-- X-ray Tube Current -->
+     <attr tag="00181151" vr="IS" />
+     <!-- Exposure -->
+     <attr tag="00181152" vr="IS" />
+     <!-- Exposure in μAs -->
+     <attr tag="00181153" vr="IS" />
+     <!-- Exposure Modulation Type -->
+     <attr tag="00189323" vr="CS" />
+     <!-- Estimated Dose Saving -->
+     <attr tag="00189324" vr="FD" />
+     <!-- CTDIvol -->
+     <attr tag="00189345" vr="FD" />
+    </item>
+   </attr>
+   <!-- CT X-ray Details Sequence -->
+   <attr tag="00189325" vr="SQ">
+    <item>
+     <!-- KVP -->
+     <attr tag="00180060" vr="DS" />
+     <!-- Filter Type -->
+     <attr tag="00181160" vr="SH" />
+     <!-- Generator Power(+) -->
+     <attr tag="00181170" vr="IS" />
+     <!-- Focal Spot -->
+     <attr tag="00181190" vr="DS" />
+    </item>
+   </attr>
+   <!-- Irradiation Event Identification Sequence -->
+   <attr tag="00189477" vr="SQ">
+    <item>
+     <!-- Irradiation Event UID -->
+     <attr tag="00083010" vr="UI" />
+    </item>
+   </attr>
+   <!-- Frame Anatomy Sequence -->
+   <attr tag="00209071" vr="SQ">
+    <item>
+     <!-- Anatomic Region Sequence -->
+     <attr tag="00082218" vr="SQ" />
+    </item>
+   </attr>
+   <!-- Plane Position Sequence -->
+   <attr tag="00209113" vr="SQ">
+    <item>
+     <!-- Image Position (Retired)(+) -->
+     <attr tag="00200030" vr="DS" />
+     <!-- Image Position (Patient) -->
+     <attr tag="00200032" vr="DS" />
+     <!-- Slice Location(+) -->
+     <attr tag="00201041" vr="DS" />
+    </item>
+   </attr>
+   <!-- Plane Orientation Sequence -->
+   <attr tag="00209116" vr="SQ">
+    <item>
+     <!-- Image Orientation (Retired)(+) -->
+     <attr tag="00200035" vr="DS" />
+     <!-- Image Orientation (Patient) -->
+     <attr tag="00200037" vr="DS" />
+    </item>
+   </attr>
+   <!-- Patient Orientation in Frame Sequence -->
+   <attr tag="00209450" vr="SQ">
+    <item>
+     <!-- Patient Orientation -->
+     <attr tag="00200020" vr="CS" />
+    </item>
+   </attr>
+   <!-- Pixel Measures Sequence -->
+   <attr tag="00289110" vr="SQ">
+    <item>
+     <!-- Slice Thickness -->
+     <attr tag="00180050" vr="DS" />
+     <!-- Pixel Spacing -->
+     <attr tag="00280030" vr="DS" />
+    </item>
+   </attr>
+   <!-- Frame VOI LUT Sequence -->
+   <attr tag="00289132" vr="SQ">
+    <item>
+     <!-- Window Center -->
+     <attr tag="00281050" vr="DS" />
+     <!-- Window Width -->
+     <attr tag="00281051" vr="DS" />
+    </item>
+   </attr>
+   <!-- Pixel Value Transformation Sequence -->
+   <attr tag="00289145" vr="SQ">
+    <item>
+     <!-- Rescale Intercept -->
+     <attr tag="00281052" vr="DS" />
+     <!-- Rescale Slope -->
+     <attr tag="00281053" vr="DS" />
+    </item>
+   </attr>
+  </item>
+ </attr>
+</dataset>

@@ -1,0 +1,58 @@
+-- Update DB from dcm4chee-0.5.x to dcm4chee-0.6.x
+
+CONNECT TO tiani;
+SET CURRENT SCHEMA TIANI;
+
+ALTER TABLE patient
+	ADD COLUMN merge_fk INTEGER;
+ALTER TABLE patient
+	ADD CONSTRAINT pat_merge_fk FOREIGN KEY (merge_fk) REFERENCES patient(pk);
+CREATE INDEX pat_merge_fk ON patient(merge_fk);
+
+ALTER TABLE study
+	ADD COLUMN availability INTEGER;
+UPDATE study SET availability = 0;
+ALTER TABLE series
+	ADD COLUMN availability INTEGER;
+UPDATE series SET availability = 0;
+ALTER TABLE instance
+	ADD COLUMN availability INTEGER;
+UPDATE instance SET availability = 0;
+ALTER TABLE instance
+	ADD COLUMN commitment SMALLINT;
+UPDATE instance SET commitment = 0;
+
+DROP TABLE ae ;
+CREATE SEQUENCE ae_pk_seq;
+CREATE TABLE ae (
+	pk          	INTEGER PRIMARY KEY NOT NULL,
+	aet          	VARCHAR(254) NOT NULL,
+	hostname     	VARCHAR(254) NOT NULL,
+	port			INTEGER NOT NULL,
+	cipher_suites  	VARCHAR(254)
+);
+CREATE UNIQUE INDEX aet ON ae(aet);
+
+CREATE TABLE users(
+	user_id		VARCHAR(254) PRIMARY KEY NOT NULL,
+	passwd 		VARCHAR(254)
+);
+CREATE TABLE roles(
+	user_id		VARCHAR(254) NOT NULL,
+	roles	 	VARCHAR(254),
+FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+CREATE INDEX user_id ON roles(user_id);
+
+GRANT ALL PRIVILEGES ON TABLE ae TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE users TO USER tiani;
+GRANT ALL PRIVILEGES ON TABLE roles TO USER tiani;
+
+GRANT USAGE ON SEQUENCE ae_pk_seq TO USER tiani;
+
+INSERT INTO users VALUES('admin','admin');
+INSERT INTO roles VALUES('admin','JBossAdmin');
+INSERT INTO roles VALUES('admin','WebAdmin');
+
+
+TERMINATE;

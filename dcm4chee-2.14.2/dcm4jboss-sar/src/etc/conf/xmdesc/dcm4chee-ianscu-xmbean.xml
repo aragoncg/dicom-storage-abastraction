@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>IAN/SCN SCU Service. Used to notify DICOM peers about available instances for Instance Available Notifications and Study Content Notifications.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.ianscu.IANScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>IanScuService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getNotifiedAETs" setMethod="setNotifiedAETs">
+      <description>List of AE titles of notified application entities, separated by \(backslash).
+      NONE = do not notify any application entity.
+      </description>
+      <name>NotifiedAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isNotifyOtherServices"
+      setMethod="setNotifyOtherServices">
+      <description><![CDATA[Enables notification of other services about the
+        event, that all objects referenced in a MPPS COMPLETE message became 
+        available in the archive. Must be activated, if XDS-I auto-publishing
+        feature is used.]]>
+      </description>
+      <name>NotifyOtherServices</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSendOneIANforEachMPPS"
+      setMethod="setSendOneIANforEachMPPS">
+      <description>Send IAN not before having received the last instance of the
+          instance set referenced in the MPPS. Otherwise send IAN already when
+          receiving the last instance of a Series or when the association over
+          which instances were received is closed by the sender.
+      </description>
+      <name>SendOneIANforEachMPPS</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>Calling AE title used in the Association Request.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getRetryIntervalls" setMethod="setRetryIntervalls">
+      <description>Number and intervals of retries for failed 
+      Instance Available or Study Content Notification requests. &lt;br&gt;Format:
+      &lt;br&gt;Comma separated list of &lt;i&gt;number&lt;/I&gt; x &lt;i&gt;interval&lt;/I&gt; pairs.
+      &lt;br&gt;The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      &lt;br&gt;Example: 
+      &lt;br&gt;5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.
+      </description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isOfferStudyContentNotification" setMethod="setOfferStudyContentNotification">
+      <description>Offer Basic Study Content Notification Service - additionally 
+      to the Instance Available Notification Service - in the Association Request.
+      </description>
+      <name>OfferStudyContentNotification</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isPreferInstanceAvailableNotification" setMethod="setPreferInstanceAvailableNotification">
+      <description>Prefer the use of the Instance Available Notification Service if
+      the Instance Available Notification and Basic Study Content Notification
+      Service is supported by the remote application entity.
+      </description>
+      <name>PreferInstanceAvailableNotification</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getConcurrency" setMethod="setConcurrency">
+      <description>Maximum number of concurrent sent notifications.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getScnPriority" setMethod="setScnPriority">
+      <description>Priority used in Basic Study Content Notification Requests.
+      Enumerated Values: LOW, MEDIUM, HIGH.
+      </description>
+      <name>StudyContentNotificationPriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   
+   &defaultSCUAttributes;
+
+   <attribute access="read-write" 
+     getMethod="getQueueName"
+     setMethod="setQueueName">
+      <description>Used internally. Do not modify.</description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do not modify.     
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDeleteStudyServiceName"
+      setMethod="setDeleteStudyServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>DeleteStudyServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>

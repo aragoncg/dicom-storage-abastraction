@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC 
+    "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" 
+    "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[OnSwitchStorageFileSystem Service. Executes
+    configurable system command when the current storage file system becomes
+    full and is switched to the next configured. ]]>
+  </description>
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+  <class>org.dcm4chex.archive.mbean.OnSwitchStorageFileSystemService</class>
+  <constructor>
+    <description>The default constructor</description>
+    <name>OnSwitchStorageFileSystemService</name>
+  </constructor>
+
+  <!-- Attributes --> &defaultAttributes;
+
+  <attribute access="read-write" getMethod="getOnSwitchStorageFileSystemInvoke"
+    setMethod="setOnSwitchStorageFileSystemInvoke">
+    <description><![CDATA[Executes specified command when the current
+      storage file system becomes full and is switched to the next configured.
+      '{0}' will be replaced by the directory path of the previous,
+      '{1}' with the directory path of the new storage file system.
+      NONE = service disabled.]]>
+    </description>
+    <name>OnSwitchStorageFilesystemInvoke</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NONE" />
+    </descriptors>
+  </attribute>
+
+   <attribute access="read-write"
+      getMethod="getFileSystemMgtName"
+      setMethod="setFileSystemMgtName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>FileSystemMgtName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+  <!-- Operations -->
+  &defaultOperations;
+
+</mbean>

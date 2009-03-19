@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[The <b>Study Permission Service</b> grants/revokes
+   study access permissions to particular roles on receive of HL7 messages,
+   MPPS N-CREATE messages, Series Stored events or by direct user interaction.]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hl7.StudyPermissionService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>StudyPermissionService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="isUpdateOnHl7Received"
+      setMethod="setUpdateOnHl7Received">
+     <!-- Security -->
+      <description><![CDATA[Activates grant/revoke of study permissions on
+      receive of HL7 messages according specified <i>Hl7ReceivedStylesheet</i>.]]>
+      </description>
+      <name>UpdateOnHl7Received</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHl7ReceivedStylesheet"
+      setMethod="setHl7ReceivedStylesheet">
+     <!-- Security -->
+      <description><![CDATA[Stylesheet defining study permissions to
+      grant/revoke on receive of HL7 messages. A relative path name is resolved
+      relative to <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>Hl7ReceivedStylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-permission/hl7-permission.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isUpdateOnMppsCreate"
+      setMethod="setUpdateOnMppsCreate">
+     <!-- Security -->
+      <description><![CDATA[Activates grant/revoke of study permissions on
+      receive of MPPS N-CREATE requests according specified
+      <i>MppsCreateStylesheet</i>.]]>
+      </description>
+      <name>UpdateOnMppsCreate</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsCreateStylesheet"
+      setMethod="setMppsCreateStylesheet">
+     <!-- Security -->
+      <description><![CDATA[Stylesheet defining study permissions to
+      grant/revoke on receive of MPPS N-CREATE requests. A relative path name is
+      resolved relative to <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>MppsCreateStylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-permission/mpps-permission.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isUpdateOnSeriesStored"
+      setMethod="setUpdateOnSeriesStored">
+     <!-- Security -->
+      <description><![CDATA[Activates grant/revoke of study permissions on
+      Series Stored events according specified <i>SeriesStoredStylesheet</i>.]]>
+      </description>
+      <name>UpdateOnSeriesStored</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSeriesStoredStylesheet"
+      setMethod="setSeriesStoredStylesheet">
+     <!-- Security -->
+      <description><![CDATA[Stylesheet defining study permissions to
+      grant/revoke on Series Stored events. A relative path name is resolved
+      relative to <i>archive-install-directory</i>/server/default/.]]>
+      </description>
+      <name>SeriesStoredStylesheet</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-permission/series-permission.xsl" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHL7ServerName"
+      setMethod="setHL7ServerName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>HL7ServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do not modify.     
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="INFO">
+      <description><![CDATA[Returns <code>true</code> if <i>role</i> has
+      permission for <i>action</i> on Study with given
+      <i>Study Instance UID</i>, otherwise returns <code>false</code>.]]>
+      </description>
+      <name>hasPermission</name>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>suid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Action</description>
+        <name>action</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+   <operation impact="INFO">
+      <description><![CDATA[Returns Study Permissions currently granted 
+      on all existing Studies of Patient with given primary key.]]>
+      </description>
+      <name>findByPatientPk</name>
+      <parameter>
+        <description>Patient Primary Key</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>
+   <operation impact="INFO">
+      <description><![CDATA[Returns Study Permissions currently granted on
+      Study with given <i>Study Instance UID</i>.]]>
+      </description>
+      <name>findByStudyIuid</name>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>suid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>
+   <operation impact="INFO">
+      <description><![CDATA[Returns Study Permissions for <i>action</i>
+      currently granted on Study with given <i>Study Instance UID</i>.]]>
+      </description>
+      <name>findByStudyIuidAndAction</name>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>suid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Action</description>
+        <name>action</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Grant permission for <i>actions</i> on Study with
+      given <i>Study Instance UID</i> to <i>role</i>. Returns number of new
+      granted Study Permissions.]]>
+      </description>
+      <name>grant</name>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>suid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Comma separated list of actions</description>
+        <name>actions</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>int</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Revoke permission for <i>actions</i> on Study with
+      given <i>Study Instance UID</i> from <i>role</i>. Returns number of
+      revoked Study Permissions..]]>
+      </description>
+      <name>revoke</name>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>suid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Comma separated list of actions</description>
+        <name>actions</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>int</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Revoke given <i>Study Permission</i>. Returns
+      <code>true</code>, if an existing Study Permission was revoked, or
+      <code>false</code>, if there was no such Study Permission.]]>
+      </description>
+      <name>revoke</name>
+      <parameter>
+        <description>Study Permission</description>
+        <name>permission</name>
+        <type>org.dcm4chex.archive.ejb.interfaces.StudyPermissionDTO</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Grant permission for <i>actions</i> on all existing
+      Studies of Patient with given primary key to <i>role</i>. Returns number
+      of new granted Study Permissions.]]>
+      </description>
+      <name>grantForPatient</name>
+      <parameter>
+        <description>Patient Primary Key</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <parameter>
+        <description>Comma separated list of actions</description>
+        <name>actions</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Grant permission for <i>actions</i> on all existing
+      Studies of Patient with given <i>Patient ID</i> and
+      <i>Issuer of Patient ID</i> to <i>role</i>. Returns number of new granted
+      Study Permissions.]]>
+      </description>
+      <name>grantForPatient</name>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Issuer of Patient ID</description>
+        <name>issuer</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Comma separated list of actions</description>
+        <name>actions</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description><![CDATA[Revoke permission for <i>actions</i> on all existing
+      Studies of Patient with given primary key to <i>role</i>. Returns number
+      of revoked Study Permissions.]]>
+      </description>
+      <name>revokeForPatient</name>
+      <parameter>
+        <description>Patient Primary Key</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <parameter>
+        <description>Comma separated list of actions</description>
+        <name>actions</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description><![CDATA[Revoke permission for <i>actions</i> on all existing
+      Studies of Patient with given <i>Patient ID</i> and
+      <i>Issuer of Patient ID</i> to <i>role</i>. Returns number of revoked
+      Study Permissions.]]>
+      </description>
+      <name>revokeForPatient</name>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Issuer of Patient ID</description>
+        <name>issuer</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Actions</description>
+        <name>actions</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>Role</description>
+        <name>role</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description><![CDATA[Return total number of studies for given patient.]]>
+      </description>
+      <name>countStudiesOfPatient</name>
+      <parameter>
+        <description>Patient Pk</description>
+        <name>patPk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>int</return-type>
+   </operation>   
+   
+</mbean>
+    

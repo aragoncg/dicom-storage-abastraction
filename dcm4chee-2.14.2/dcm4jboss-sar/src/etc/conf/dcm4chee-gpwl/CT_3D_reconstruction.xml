@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dataset [
+<!ELEMENT dataset (attr*)>
+<!ELEMENT attr (#PCDATA | item)*>
+<!ELEMENT item (#PCDATA | attr)*>
+<!ATTLIST attr tag CDATA #REQUIRED>
+]>
+<dataset>
+<!-- Specific Character Set -->
+  <attr tag="00080005">ISO_IR 100</attr>
+<!-- General Purpose Scheduled Procedure Step Status -->
+  <attr tag="00404001">SCHEDULED</attr>
+<!-- General Purpose Scheduled Procedure Step Priority -->
+  <attr tag="00404003">MEDIUM</attr>
+<!-- Scheduled Processing Applications Code Sequence -->
+  <attr tag="00404004"/>
+<!-- Multiple Copies Flag -->
+  <attr tag="00404006">N</attr>
+<!-- Scheduled Workitem Code Sequence -->
+  <attr tag="00404018">
+    <item>
+<!-- Code Value -->
+      <attr tag="00080100">X102_3DRECON</attr>
+<!-- Coding Scheme Designator -->
+      <attr tag="00080102">IHEDEMO</attr>
+<!-- Code Meaning -->
+      <attr tag="00080104">CT 3D reconstruction</attr>
+    </item>
+  </attr>
+<!-- Input Availability Flag -->
+  <attr tag="00404020">COMPLETE</attr>
+<!-- Scheduled Station Name Code Sequence -->
+  <attr tag="00404025">
+    <item>
+<!-- Code Value -->
+      <attr tag="00080100">CT_3DRECON1</attr>
+<!-- Coding Scheme Designator -->
+      <attr tag="00080102">IHEDEMO</attr>
+<!-- Code Meaning -->
+      <attr tag="00080104">CT 3D reconstruction Station 1</attr>
+    </item>
+  </attr>
+<!-- Scheduled Station Class Code Sequence -->
+  <attr tag="00404026">
+    <item>
+<!-- Code Value -->
+      <attr tag="00080100">CT_3DRECON</attr>
+<!-- Coding Scheme Designator -->
+      <attr tag="00080102">IHEDEMO</attr>
+<!-- Code Meaning -->
+      <attr tag="00080104">CT 3D reconstruction Station</attr>
+    </item>
+  </attr>
+<!-- Scheduled Station Geographic Location Code Sequence -->
+  <attr tag="00404027">
+    <item>
+<!-- Code Value -->
+      <attr tag="00080100">East</attr>
+<!-- Coding Scheme Designator -->
+      <attr tag="00080102">IHEDEMO</attr>
+<!-- Code Meaning -->
+      <attr tag="00080104">East</attr>
+    </item>
+  </attr>
+<!-- Scheduled Human Performers Sequence -->
+  <attr tag="00404034">
+    <item>
+<!-- Human Performer Code Sequence -->
+      <attr tag="00404009">
+        <item>
+<!-- Code Value -->
+          <attr tag="00080100">8020</attr>
+<!-- Coding Scheme Designator -->
+          <attr tag="00080102">IHEDEMO</attr>
+<!-- Code Meaning -->
+          <attr tag="00080104">Radiologist^Jane</attr>
+        </item>
+      </attr>
+<!-- Human Performer's Organization -->
+      <attr tag="00404036">Mesa Test Hospital</attr>
+<!-- Human Performer's Name -->
+      <attr tag="00404037">Radiologist^Jane</attr>
+    </item>
+  </attr>
+</dataset>

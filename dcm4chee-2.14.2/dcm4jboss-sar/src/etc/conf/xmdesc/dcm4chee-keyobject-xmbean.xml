@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Service for generating Key Objects.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.KeyObjectService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>KeyObjectService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCompositeSopClassUIDs"
+      setMethod="setCompositeSopClassUIDs">
+      <description><![CDATA[List of composite SOP Classes. <br/> 
+      				Instances with a Class UID of this list are marked with <i>Value Type</i> <b>COMPOSITE</b>.  ]]>
+      </description>
+      <name>CompositeSopClassUIDs</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getWaveformSopClassUIDs"
+      setMethod="setWaveformSopClassUIDs">
+      <description><![CDATA[List of Waveform SOP Classes. <br/> 
+      				Instances with a Class UID of this list are marked with <i>Value Type</i> <b>WAVEFORM</b>.  ]]>
+      </description>
+      <name>WaveformSopClassUIDs</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Creates a KeyObject Dataset for given list of Instance UIDs.</description>
+      <name>getKeyObject</name>
+      <parameter>
+        <description>List of SOP Instance UIDs separated with ',' or '|'</description>
+        <name>iuids</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Creates a KeyObject Dataset for given list of Instance UIDs.</description>
+      <name>getKeyObject</name>
+      <parameter>
+        <description>List of SOP Instance UIDs</description>
+        <name>iuids</name>
+        <type>java.util.Collection</type>
+      </parameter>
+      <parameter>
+        <description>Dataset with Attributes of Key object root node. (e.g. Concept Name Code Sequence for title)</description>
+        <name>rootInfo</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <description>List of Items for Content Sequence</description>
+        <name>contentItems</name>
+        <type>java.util.Collection</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+   
+</mbean>

@@ -1,0 +1,350 @@
+-- Update DB from dcm4chee-2.13.x to dcm4chee-2.14.x
+
+DROP INDEX pat_id;
+CREATE INDEX pat_id ON patient(pat_id, pat_id_issuer);
+
+CREATE INDEX mpps_drcode_fk ON mpps(drcode_fk);
+
+DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value,code_designator,code_version);
+
+ALTER TABLE gppps DROP pps_status;
+ALTER TABLE gppps ADD pps_status INTEGER NOT NULL;
+
+-- MODIFY patient.pat_birthdate from DATE to VARCHAR
+ALTER TABLE patient ADD pat_birthdate_varchar VARCHAR(255);
+UPDATE patient SET pat_birthdate_varchar = CAST(pat_birthdate AS VARCHAR(255))
+  WHERE pat_birthdate IS NOT NULL;
+UPDATE patient SET pat_birthdate_varchar = 
+  SUBSTRING(pat_birthdate_varchar FROM 1 FOR 4) ||
+  SUBSTRING(pat_birthdate_varchar FROM 6 FOR 2) ||
+  SUBSTRING(pat_birthdate_varchar FROM 9 FOR 2)
+  WHERE pat_birthdate_varchar IS NOT NULL;
+DROP INDEX pat_birthdate;
+ALTER TABLE patient DROP pat_birthdate;
+ALTER TABLE patient ALTER COLUMN pat_birthdate_varchar TO pat_birthdate;
+CREATE INDEX pat_birthdate ON patient(pat_birthdate);
+
+ALTER TABLE study ADD cuids_in_study VARCHAR(255);
+
+--
+-- Emulate ALTER TABLE ae
+--   ALTER port TYPE INTEGER NOT NULL;
+--
+ALTER TABLE ae
+  ADD port_int INTEGER NOT NULL;
+UPDATE ae SET
+  port_int = port;
+ALTER TABLE ae
+  DROP port;
+ALTER TABLE ae
+  ALTER port_int TO port;
+ALTER TABLE ae ADD wado_url VARCHAR(255);
+
+--
+-- Emulate ALTER TABLE study
+--   ALTER num_series TYPE INTEGER NOT NULL,
+--   ALTER num_instances TYPE INTEGER NOT NULL,
+--   ALTER availability TYPE INTEGER NOT NULL,
+--   ALTER study_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX study_status;
+ALTER TABLE study
+  ADD num_series_int INTEGER NOT NULL,
+  ADD num_instances_int INTEGER NOT NULL,
+  ADD availability_int INTEGER NOT NULL,
+  ADD study_status_int INTEGER NOT NULL;
+UPDATE study SET
+  num_series_int = num_series,
+  num_instances_int = num_instances,
+  availability_int = availability,
+  study_status_int = study_status;
+ALTER TABLE study
+  DROP num_series,
+  DROP num_instances,
+  DROP availability,
+  DROP study_status;
+ALTER TABLE study
+  ALTER num_series_int TO num_series,
+  ALTER num_instances_int TO num_instances,
+  ALTER availability_int TO availability,
+  ALTER study_status_int TO study_status;
+COMMIT;
+CREATE INDEX study_status ON study(study_status);
+
+--
+-- Emulate ALTER TABLE mpps
+--   ALTER mpps_status TYPE INTEGER NOT NULL;
+--
+ALTER TABLE mpps
+  ADD mpps_status_int INTEGER NOT NULL;
+UPDATE mpps SET
+  mpps_status_int = mpps_status;
+ALTER TABLE mpps
+  DROP mpps_status;
+ALTER TABLE mpps
+  ALTER mpps_status_int TO mpps_status;
+
+--
+-- Emulate ALTER TABLE series
+--   ALTER num_instances TYPE INTEGER NOT NULL,
+--   ALTER availability TYPE INTEGER NOT NULL,
+--   ALTER series_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX series_status;
+ALTER TABLE series
+  ADD num_instances_int INTEGER NOT NULL,
+  ADD availability_int INTEGER NOT NULL,
+  ADD series_status_int INTEGER NOT NULL;
+UPDATE series SET
+  num_instances_int = num_instances,
+  availability_int = availability,
+  series_status_int = series_status;
+ALTER TABLE series
+  DROP num_instances,
+  DROP availability,
+  DROP series_status;
+ALTER TABLE series
+  ALTER num_instances_int TO num_instances,
+  ALTER availability_int TO availability,
+  ALTER series_status_int TO series_status;
+COMMIT;
+CREATE INDEX series_status ON series(series_status);
+
+--
+-- Emulate ALTER TABLE media
+--   ALTER media_status_int TYPE INTEGER NOT NULL;
+--
+DROP INDEX media_status;
+ALTER TABLE media ADD media_status_int INTEGER NOT NULL;
+UPDATE media SET media_status_int = media_status;
+ALTER TABLE media DROP media_status;
+ALTER TABLE media ALTER media_status_int TO media_status; 
+COMMIT;
+CREATE INDEX media_status ON media(media_status);
+
+--
+-- Emulate ALTER TABLE instance
+--   ALTER availability TYPE INTEGER NOT NULL,
+--   ALTER inst_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX inst_status;
+ALTER TABLE instance
+  ADD availability_int INTEGER NOT NULL,
+  ADD inst_status_int INTEGER NOT NULL;
+UPDATE instance SET
+  availability_int = availability,
+  inst_status_int = inst_status;
+ALTER TABLE instance
+  DROP availability,
+  DROP inst_status;
+ALTER TABLE instance
+  ALTER availability_int TO availability,
+  ALTER inst_status_int TO inst_status;
+COMMIT;
+CREATE INDEX inst_status ON instance(inst_status);
+
+--
+-- Emulate ALTER TABLE filesystem
+--   ALTER availability TYPE INTEGER NOT NULL,
+--   ALTER fs_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX fs_availability;
+DROP INDEX fs_status;
+ALTER TABLE filesystem
+  ADD availability_int INTEGER NOT NULL,
+  ADD fs_status_int INTEGER NOT NULL;
+UPDATE filesystem SET
+  availability_int = availability,
+  fs_status_int = fs_status;
+ALTER TABLE filesystem
+  DROP availability,
+  DROP fs_status;
+ALTER TABLE filesystem
+  ALTER availability_int TO availability,
+  ALTER fs_status_int TO fs_status;
+COMMIT;
+CREATE INDEX fs_availability ON filesystem(availability);
+CREATE INDEX fs_status ON filesystem(fs_status);
+
+--
+-- Emulate ALTER TABLE files
+--   ALTER file_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX file_status;
+ALTER TABLE files
+  ADD file_status_int INTEGER NOT NULL;
+UPDATE files SET
+  file_status_int = file_status;
+ALTER TABLE files
+  DROP file_status;
+ALTER TABLE files
+  ALTER file_status_int TO file_status;
+COMMIT;
+CREATE INDEX file_status ON files(file_status);
+
+--
+-- Emulate ALTER TABLE mwl_item
+--   ALTER sps_status TYPE INTEGER NOT NULL;
+--
+DROP INDEX sps_status;
+ALTER TABLE mwl_item
+  ADD sps_status_int INTEGER NOT NULL;
+UPDATE mwl_item SET
+  sps_status_int = sps_status;
+ALTER TABLE mwl_item
+  DROP sps_status;
+ALTER TABLE mwl_item
+  ALTER sps_status_int TO sps_status;
+COMMIT;
+CREATE INDEX sps_status ON mwl_item(sps_status);
+
+--
+-- Emulate ALTER TABLE gpsps
+--   ALTER gpsps_status TYPE INTEGER NOT NULL,
+--   ALTER gpsps_prior TYPE INTEGER NOT NULL,
+--   ALTER in_availability TYPE INTEGER NOT NULL;
+--
+DROP INDEX gpsps_status;
+DROP INDEX gpsps_prior;
+DROP INDEX in_availability;
+ALTER TABLE gpsps
+  ADD gpsps_status_int INTEGER NOT NULL,
+  ADD gpsps_prior_int INTEGER NOT NULL,
+  ADD in_availability_int INTEGER NOT NULL;
+UPDATE gpsps SET
+  gpsps_status_int = gpsps_status,
+  gpsps_prior_int = gpsps_prior,
+  in_availability_int = in_availability;
+ALTER TABLE gpsps
+  DROP gpsps_status,
+  DROP gpsps_prior,
+  DROP in_availability;
+ALTER TABLE gpsps
+  ALTER gpsps_status_int TO gpsps_status,
+  ALTER gpsps_prior_int TO gpsps_prior,
+  ALTER in_availability_int TO in_availability;
+COMMIT;
+CREATE INDEX gpsps_status ON gpsps(gpsps_status);
+CREATE INDEX gpsps_prior ON gpsps(gpsps_prior);
+CREATE INDEX in_availability ON gpsps(in_availability);
+
+--
+-- Emulate ALTER TABLE gppps
+--   ALTER pps_status TYPE INTEGER NOT NULL;
+--
+ALTER TABLE gppps
+  ADD pps_status_int INTEGER NOT NULL;
+UPDATE gppps SET
+  pps_status_int = pps_status;
+ALTER TABLE gppps
+  DROP pps_status;
+ALTER TABLE gppps
+  ALTER pps_status_int TO pps_status;
+
+--
+-- Emulate ALTER TABLE hp
+--   ALTER hp_level TYPE INTEGER NOT NULL,
+--   ALTER num_priors TYPE INTEGER NOT NULL,
+--   ALTER num_screens TYPE INTEGER NOT NULL;
+--
+DROP INDEX hp_level;
+DROP INDEX num_priors;
+DROP INDEX num_screens;
+ALTER TABLE hp
+  ADD hp_level_int INTEGER NOT NULL,
+  ADD num_priors_int INTEGER NOT NULL,
+  ADD num_screens_int INTEGER NOT NULL;
+UPDATE hp SET
+  hp_level_int = hp_level,
+  num_priors_int = num_priors,
+  num_screens_int = num_screens;
+ALTER TABLE hp
+  DROP hp_level,
+  DROP num_priors,
+  DROP num_screens;
+ALTER TABLE hp
+  ALTER hp_level_int TO hp_level,
+  ALTER num_priors_int TO num_priors,
+  ALTER num_screens_int TO num_screens;
+COMMIT;
+CREATE INDEX hp_level ON hp(hp_level);
+CREATE INDEX num_priors ON hp(num_priors);
+CREATE INDEX num_screens ON hp(num_screens);
+
+--
+-- Emulate ALTER TABLE priv_patient
+--   ALTER priv_type TYPE INTEGER NOT NULL;
+--
+DROP INDEX priv_pat_type;
+ALTER TABLE priv_patient
+  ADD priv_type_int INTEGER NOT NULL;
+UPDATE priv_patient SET
+  priv_type_int = priv_type;
+ALTER TABLE priv_patient
+  DROP priv_type;
+ALTER TABLE priv_patient
+  ALTER priv_type_int TO priv_type;
+COMMIT;
+CREATE INDEX priv_pat_type ON priv_patient(priv_type);
+
+--
+-- Emulate ALTER TABLE priv_study
+--   ALTER priv_type TYPE INTEGER NOT NULL;
+--
+DROP INDEX priv_study_type;
+ALTER TABLE priv_study
+  ADD priv_type_int INTEGER NOT NULL;
+UPDATE priv_study SET
+  priv_type_int = priv_type;
+ALTER TABLE priv_study
+  DROP priv_type;
+ALTER TABLE priv_study
+  ALTER priv_type_int TO priv_type;
+COMMIT;
+CREATE INDEX priv_study_type ON priv_study(priv_type);
+
+--
+-- Emulate ALTER TABLE priv_series
+--   ALTER priv_type TYPE INTEGER NOT NULL;
+--
+DROP INDEX priv_series_type;
+ALTER TABLE priv_series
+  ADD priv_type_int INTEGER NOT NULL;
+UPDATE priv_series SET
+  priv_type_int = priv_type;
+ALTER TABLE priv_series
+  DROP priv_type;
+ALTER TABLE priv_series
+  ALTER priv_type_int TO priv_type;
+COMMIT;
+CREATE INDEX priv_series_type ON priv_series(priv_type);
+
+--
+-- Emulate ALTER TABLE priv_instance
+--   ALTER priv_type TYPE INTEGER NOT NULL;
+--
+DROP INDEX priv_inst_type;
+ALTER TABLE priv_instance
+  ADD priv_type_int INTEGER NOT NULL;
+UPDATE priv_instance SET
+  priv_type_int = priv_type;
+ALTER TABLE priv_instance
+  DROP priv_type;
+ALTER TABLE priv_instance
+  ALTER priv_type_int TO priv_type;
+COMMIT;
+CREATE INDEX priv_inst_type ON priv_instance(priv_type);
+
+--
+-- Emulate ALTER TABLE priv_file
+--   ALTER file_status TYPE INTEGER NOT NULL;
+--
+ALTER TABLE priv_file
+  ADD file_status_int INTEGER NOT NULL;
+UPDATE priv_file SET
+  file_status_int = file_status;
+ALTER TABLE priv_file
+  DROP file_status;
+ALTER TABLE priv_file
+  ALTER file_status_int TO file_status;

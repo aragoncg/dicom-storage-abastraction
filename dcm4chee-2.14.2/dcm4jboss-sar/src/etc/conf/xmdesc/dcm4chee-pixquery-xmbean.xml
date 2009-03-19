@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[The <b>PIX Query Service</b> is used to find out the
+   identification of a patient in different Patient Identifier Domains by
+   query the data base for Patients linked by Other Patient IDs or by sending a
+   HL7 v2.5 QBP^Q23 message to the specified <i>Patient Identifier
+   Cross-reference (PIX) Manager</i> and evaluating the returned HL7 RSP^K23
+   message.]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.PIXQueryService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>PIXQueryService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getPIXManager"
+      setMethod="setPIXManager">
+      <description><![CDATA[External PIX Manager &lt;Application&gt;^&lt;Facility&gt;
+      or <code>LOCAL</code> (=> query data base for Patients linked by Other Patient IDs)]]>
+      </description>
+      <name>PIXManager</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="LOCAL" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="isPIXManagerLocal">
+      <description><![CDATA[<code>true</code>, if <i>PIXManger</i>=<code>LOCAL</code>]]>
+      </description>
+      <name>PIXManagerLocal</name>
+      <type>boolean</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPIXQueryName"
+      setMethod="setPIXQueryName">
+      <description><![CDATA[Message Query Name (QPD-1) used in PIX Query for 
+        Corresponding Patient IDs.
+        Only effective if <i>PIXManger</i>!=<code>LOCAL</code>.]]>
+      </description>
+      <name>PIXQueryName</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="IHE PIX Query" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getIssuersOfOnlyOtherPatientIDs"
+      setMethod="setIssuersOfOnlyOtherPatientIDs">
+      <description><![CDATA[Comma separated list of Issuers/Authorities,
+      which only qualifies Other Patient IDs - and NOT primary Patient IDs.
+      Used to optimize data base queries.
+      Only effective if <i>PIXManger</i>=<code>LOCAL</code>.]]>
+      </description>
+      <name>IssuersOfOnlyOtherPatientIDs</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="SSN" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getIssuersOfOnlyPrimaryPatientIDs"
+      setMethod="setIssuersOfOnlyPrimaryPatientIDs">
+      <description><![CDATA[Comma separated list of Issuers/Authorities,
+      which only qualifies primary Patient IDs - and NOT Other Patient IDs.
+      Used to optimize data base queries.
+      Only effective if <i>PIXManger</i>=<code>LOCAL</code>.]]>
+      </description>
+      <name>IssuersOfOnlyPrimaryPatientIDs</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMockResponse"
+      setMethod="setMockResponse">
+      <description><![CDATA[If specified (!= '-'), return list of Patient IDs 
+      (&lt;ID&gt;^^^&lt;namespace ID&gt;&&lt;universal ID&gt;&&lt;universal ID type&gt;)
+      separated by '~'. Useful for debugging service clients.]]>
+      </description>
+      <name>MockResponse</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="-" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHL7SendServiceName"
+      setMethod="setHL7SendServiceName">
+      <description>Used internally - do NOT modify.
+      </description>
+      <name>HL7SendServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Show corresponding Patient IDs of all domains.</description>
+      <name>showCorrespondingPIDs</name>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+       <description>Issuer Of Patient ID/Assigning Authority</description>
+        <name>authority</name>
+        <type>java.lang.String</type>
+      </parameter>
+       <return-type>java.lang.String</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Query PIX Manger for corresponding Patient IDs of specific domain(s).</description>
+      <name>queryCorrespondingPIDs</name>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+       <description>Issuer Of Patient ID/Assigning Authority</description>
+        <name>authority</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>List of returned domains (What domains returned).
+        </description>
+        <name>domains</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+       <return-type>java.util.List</return-type>
+   </operation>
+   
+</mbean>
+    

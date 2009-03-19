@@ -1,0 +1,235 @@
+STRONG {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : bold;
+}
+
+H1 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+	font-weight : bold;
+	letter-spacing : 3px;
+}
+H2 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : bold;
+	letter-spacing : 2px;
+	text-decoration : none;
+}
+
+H3 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : normal;
+	letter-spacing : 2px;
+	color : Red;
+	font-position: center center;
+}
+
+H4 {
+	font : normal 9px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color : 666666;
+	vertical-align: middle;
+
+}
+
+P {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 9px;
+	vertical-align: middle;
+}
+
+table {
+	background : transparent;
+	font : normal 11px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	text-decoration : none;
+}
+
+table.dcm4chee_header {
+	background : #dddddd;
+	border : 0;
+	padding : 0;
+}
+
+table.folder_header {
+	background : #eeeeee;
+}
+
+table.folder_search {
+	background : #eeeeee;
+}
+
+table.folder_overview {
+	background : #eeeeee;
+	color : #335533;
+}
+table.patient_line {
+	background : #99bbaa;
+} 
+table.study_line {
+	background : #ccddcc;
+} 
+table.series_line {
+	background : #cecece;
+} 
+table.instance_line {
+	background : #dddddd;
+} 
+table.file_line {
+	background : #ffffff;
+} 
+table.error_line {
+	background : #ff3f3f;
+	color : #000000;
+} 
+
+table.xds_docs {
+	background : #eeeeee;
+	color : #000000;
+} 
+table.xds_show {
+	background : #eeeeee;
+	color : #000000;
+	border-style: inset;
+	border-color: #aaaaaa;
+} 
+
+td.xds_docs_nav {
+	color : #000000;
+	background : #bbbbbb;
+	border-style: inset;
+	border-color: #aaaaaa;
+	vertical-align: middle;
+	text-align: left;
+}
+td.xds_show_header {
+	color : #000000;
+	padding: 6;
+	background : #cccccc;
+	border-style: inset;
+	border-color: #aaaaaa;
+	vertical-align: middle;
+	text-align: center;
+}
+td.xds_show_title {
+	color : #000000;
+	background : #cccccc;
+	border-style: inset;
+	border-color: #aaaaaa;
+	vertical-align: middle;
+	text-align: left;
+}
+td.xds_show_line {
+	color : #000000;
+	background : #cccccc;
+	vertical-align: middle;
+	text-align: left;
+}
+
+td.tab {
+	background : #cccccc;
+	border-style: none none outset none;
+} 
+
+td.tab-selected {
+	background : #eeeeee;
+	border-style: inset inset none inset;
+} 
+
+td.patient_mark {
+	background : #99bbaa;
+	color : black;
+} 
+td.study_mark {
+	background : #ccddcc;
+	color : black;
+} 
+td.series_mark {
+	background : #cecece;
+	color : black;
+} 
+td.instance_mark {
+	background : #dddddd;
+	color : black;
+} 
+
+td.logo {
+	color : blue;
+}
+
+td.mppsLinkMode {
+	background : #cccccc;
+	padding: 6;
+	border-style: inset;
+	border-color: #ff0000;
+	vertical-align: middle;
+	text-align: center;
+}
+
+td.xds_doc_header {
+	vertical-align: middle;
+}
+
+a.tab {
+	color : #335533;
+}
+
+img.logo {	
+	background : #dddddd;
+}
+
+.xdsiField {
+	width : 300px; 
+}
+
+.xdsiListSelection {
+	background-color : #ccddcc;
+	width : 300px; 
+	border : 6px solid #ccddcc;
+}
+
+BODY {
+	color : #666666;
+}
+
+
+P {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+}
+
+A       {text-decoration: none; font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px; color : #335533}
+A:hover {text-decoration: underline; color: #335533}
+
+UL, LI {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	list-style : disc;
+	list-style-position : inside;
+}
+
+B {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font : bold;
+}
+
+HR {
+	color : Silver;
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+}
+
+BLOCKQUOTE {
+	color : Red;
+	font : BankGothic Md BT;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-style : normal;
+	font-variant : small-caps;
+	font-weight : bold;
+	letter-spacing : 2px;
+	text-transform : none;
+}

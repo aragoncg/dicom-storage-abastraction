@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>Move SCU Service to process move orders. Invokes DICOM 
+   Retrieve requests, typically from the archive's own DICOM
+   Query/Retrieve Service (SCP).</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate" />
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.movescu.MoveScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MoveSCUService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCallingAET"
+      setMethod="setCallingAET">
+      <description>Calling AE title of the Move SCU.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCalledAET"
+      setMethod="setCalledAET">
+      <description>AE title of the default Move SCP. Only effective, if a
+      Move order does not specify a Retrieve AE title or the ForceCalledAET
+      flag is set to true.
+      </description>
+      <name>CalledAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isForceCalledAET"
+      setMethod="setForceCalledAET">
+      <description><![CDATA[Specifies whether to ALWAYS use the Called AET 
+      defined in the Move SCU.  If false, the Retrieve AET of the move 
+      order, if specified, will be used.]]>
+      </description>
+      <name>ForceCalledAET</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getRetryIntervalls"
+      setMethod="setRetryIntervalls">
+      <description><![CDATA[Number and interval of retries made for
+      failed Move Requests.
+      <br>Format:
+      <br>Comma separated list of <i>number</i>x<i>interval</i> pairs or NEVER to disable retry for any destinations.
+      <br>The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      <br/>Optional: Individual settings for specific Destination AETs. e.g. [AET1]3x1m,5x1h
+      <br/>Several AET settings can be seperated with new line or ';'. 
+      A entry without AET will be treated as default for AETs not listed here.
+      <br/>Example: 
+      <br/>5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      <br/>Example: 
+      <br/>[AET1]2x1m,3x10m 
+      <br/>[AET2] 
+      <br/>5x1m,10x10m 
+      <br/>means: for destination AET1 retry a total of 2 times, one minute
+      apart for each retry; then retry a total of 3 times, 10 minutes 
+      apart for each retry.
+      <br/>Retries are disabled for destination AET2!
+      <br/>for all other destinations retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.
+      ]]>
+      </description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getConcurrency"
+      setMethod="setConcurrency">
+      <description>Maximum number of concurrent invoked Move Requests.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1" />
+      </descriptors>
+   </attribute>
+   
+   &defaultSCUAttributes;
+
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Schedule Retrieve</description>
+      <name>scheduleMove</name>
+      <parameter>
+        <description>Retieve AE Title</description>
+        <name>retrieveAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Move Destination</description>
+        <name>destAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>DICOM Priority (0 = MEDIUM, 1 = HIGH, 2 = LOW)</description>
+        <name>priority</name>
+        <type>int</type>
+      </parameter>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Study Instance UID</description>
+        <name>studyIUID</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Series Instance UID</description>
+        <name>seriesIUID</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>SOP Instance UIDs</description>
+        <name>sopIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>Scheduled Time in ms from 1970-01-01 00:00</description>
+        <name>scheduledTime</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>   
+
+   <operation impact="ACTION">
+      <description>Schedule Retrieve</description>
+      <name>scheduleMove</name>
+      <parameter>
+        <description>Retieve AE Title</description>
+        <name>retrieveAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Move Destination</description>
+        <name>destAET</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>DICOM Priority (0 = MEDIUM, 1 = HIGH, 2 = LOW)</description>
+        <name>priority</name>
+        <type>int</type>
+      </parameter>
+      <parameter>
+        <description>Patient ID</description>
+        <name>pid</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Study Instance UIDs</description>
+        <name>studyIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>Series Instance UIDs</description>
+        <name>seriesIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>SOP Instance UIDs</description>
+        <name>sopIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>Scheduled Time in ms from 1970-01-01 00:00</description>
+        <name>scheduledTime</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>   
+   
+</mbean>

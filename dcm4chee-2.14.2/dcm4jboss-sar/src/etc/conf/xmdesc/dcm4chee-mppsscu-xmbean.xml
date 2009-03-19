@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description>DICOM Modality Performed Procedure Step SCU Service. Used  to forward MPPS messages received by
+   the MPPS SCP Service.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.mppsscu.MPPSScuService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MPPSScuServic</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getForwardingRules" setMethod="setForwardingRules">
+      <description><![CDATA[List of forwarding rules, dependent upon which
+        application - identified by the Calling AE title - sent the MPPS.
+        The comma separated list of AE titles after the (optional) condition 
+        defines the forwarding destination (the other MPPS SCP) by its Called
+        AE Title.
+        <br><br>Syntax:
+        <br> rules = ( rule { newline  rule } | 'NONE' ) (* 'NONE' = no forwarding *)
+        <br> rule = ['[' 'calling' ['!'] '=' from ']'] to
+        <br> from = aet { '|'  aet } (* calling AE titles *)
+        <br> to = aet { ',' aet } (* destination AE titles *)
+        <br><br>Example: [calling!=ORDER_FILLER]ORDER_FILLER
+        <br>=> Forwards received MPPS to ORDER_FILLER, except MPPS received
+        from ORDER_FILLER]]>
+      </description>
+      <name>ForwardingRules</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>Calling AE Ttle used in the Association Request.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getConcurrency" setMethod="setConcurrency">
+      <description>Maximum number of concurrent forwarded MPPS messages.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getRetryIntervalls" setMethod="setRetryIntervalls">
+      <description>Number and intervals of retries for failed 
+      MPPS forward requests. &lt;br&gt;Format:
+      &lt;br&gt;Comma separated list of &lt;i&gt;number&lt;/i&gt;x&lt;i&gt;interval&lt;/i&gt; pairs.
+      &lt;br&gt;The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      &lt;br&gt;Example: 
+      &lt;br&gt;5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.</description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d"/>
+      </descriptors>
+   </attribute>
+   
+   &defaultSCUAttributes;
+   
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Send MPPS to Application Entity specified by AET.</description>
+      <name>sendMPPS</name>
+      <parameter>
+        <description>if true, send N-CREATE, otherwise N-SET MPPS message.</description>
+        <name>create</name>
+        <type>boolean</type>
+      </parameter>
+      <parameter>
+        <description>MPPS Dataset</description>
+        <name>mpps</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <description>Application Entity Title</description>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>   
+   
+</mbean>

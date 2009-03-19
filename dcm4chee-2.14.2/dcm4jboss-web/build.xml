@@ -1,0 +1,162 @@
+<project name="dcm4chee-web" default="war">
+
+	<property file="build.properties"/>
+	<property file="../build.properties"/>
+
+	<property name="javac.debug" value="on"/>
+	<property name="javac.deprecation" value="off"/>
+	<property name="javac.optimize" value="on"/>
+	<property name="javac.source" value="1.5"/>
+	<property name="javac.target" value="1.5"/>
+
+	<property name="version" value="2.14.2"/>
+	<property name="vendor" value="Agfa Healthcare"/>
+
+	<!-- Override with your JBoss dist location -->
+	<property name="jboss.home" value="${user.home}/jboss-4.2.3.GA" />
+	<property name="jboss.lib" value="${jboss.home}/lib"/>
+	<property name="jboss.server.lib" value="${jboss.home}/server/default/lib"/>
+    <property name="jboss.ws.dir" value="${jboss.home}/server/default/deploy/jbossws.sar"/>
+
+    <property name="jboss.jaxb-api.jar" value="${jboss.ws.dir}/jaxb-api.jar"/>
+
+
+	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="maverick.jar" value="${lib.dir}/maverick.jar"/>
+	<property name="jdom.jar" value="${lib.dir}/jdom.jar"/>
+	<property name="commons-beanutils.jar" value="${lib.dir}/commons-beanutils.jar"/>
+
+    <!-- Override with your dcm4che-1.4.x source dist location -->
+    <property name="dcm4che14.home"
+      value="${user.home}/dcm4che14/build/dcm4che-1.4.22"/>
+    <property name="dcm4che.jar" value="${dcm4che14.home}/lib/dcm4che.jar"/>
+
+	<!-- Override with your dcm4chee-ejb working directory -->
+	<property name="dcm4chee-ejb.home" value="../dcm4jboss-ejb"/>		
+	<property name="dcm4chee-ejb.target" value="${dcm4chee-ejb.home}/target"/>		
+	<property name="dcm4chee-ejb-client.jar" value="${dcm4chee-ejb.target}/common/lib/dcm4chee-ejb-client.jar" />
+	<!-- TODO dependence should be eliminated -->
+	<property name="dcm4chee-jdbc-hsql.jar" value="${dcm4chee-ejb.target}/hsql/lib/dcm4chee-jdbc-hsql.jar" />
+
+	<!-- Override with your dcm4chee-sar working directory -->
+	<property name="dcm4chee-sar.home" value="../dcm4jboss-sar" />
+	<property name="dcm4chee.jar" value="${dcm4chee-sar.home}/target/lib/dcm4chee.jar" />
+	
+	<!-- Override with your dcm4chee-hl7 working directory -->
+	<property name="dcm4chee-hl7.home" value="../dcm4jboss-hl7" />
+	<property name="dcm4chee-hl7.jar" value="${dcm4chee-hl7.home}/target/lib/dcm4chee-hl7.jar" />
+	
+    <!-- Override with your local Maven2 repository location -->
+    <property name="infoset-version" value="0.0.2"/>
+    <property name="m2.repos" value="${user.home}/.m2/repository"/>
+    <property name="dcm4chee-xds-infoset-v30.lib" 
+        value="${m2.repos}/dcm4che/dcm4chee-xds-infoset-v30/${infoset-version}"/>
+	
+	<property name="deploy.root" value="${jboss.home}/server/pacs"/>
+	<property name="war.deploy.dir" value="${deploy.root}/deploy"/>
+	<property name="conf.deploy.dir" value="${deploy.root}/conf"/>
+	
+	<property name="target.dir" value="target"/>
+	<property name="file" value="${ant.project.name}.war"/>
+	<property name="product" value="${target.dir}/deploy/${file}"/>
+
+	<property name="javasrc.dir" value="src/java"/>
+	<property name="classes.dir" value="${target.dir}/classes"/>
+	<property name="target.lib.dir" value="${target.dir}/lib"/>
+	<property name="web.dir" value="src/web"/>
+	<property name="etc.dir" value="src/etc"/>
+
+	<path id="class.path">
+		<pathelement location="${maverick.jar}"/>
+		<pathelement location="${jdom.jar}"/>
+		<pathelement location="${commons-beanutils.jar}"/>
+		<pathelement location="${dcm4che.jar}"/>
+		<pathelement location="${dcm4chee-ejb-client.jar}"/>
+		<pathelement location="${dcm4chee.jar}"/>
+		<pathelement location="${dcm4chee-hl7.jar}"/>
+		<pathelement location="${jboss.jaxb-api.jar}"/>
+		<fileset dir="${jboss.lib}">
+			<include name="*.jar"/>
+		</fileset>
+        <fileset dir="${jboss.server.lib}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${dcm4chee-xds-infoset-v30.lib}">
+            <include name="*.jar"/>
+        </fileset>
+	<!-- TODO dependence should be eliminated -->
+		<pathelement location="${dcm4chee-jdbc-hsql.jar}"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${target.dir}"/>
+	</target>
+
+ 	<target name="compile">
+		<mkdir dir="${classes.dir}"/>
+		
+		<javac
+			destdir="${classes.dir}"
+			srcdir="${javasrc.dir}"
+			classpathref="class.path"
+			debug="${javac.debug}"
+			deprecation="${javac.deprecation}"
+			optimize="${javac.optimize}"
+			source="${javac.source}"
+			target="${javac.target}"
+		>
+		</javac>
+	</target>
+
+   	<target name="jar" depends="compile">
+   		<mkdir dir="${target.lib.dir}"/>
+   		<tstamp>
+            <format property="TODAY" pattern="dd.MM.yyyy"/>
+        </tstamp>
+        <jar jarfile="${target.lib.dir}/dcm4chee-web.jar">
+        	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee"/>
+				<attribute name="Implementation-Version" value="Version:${version} (${TODAY})"/> 
+				<attribute name="Implementation-Vendor" value="Agfa Healthcare"/>
+        	</manifest>
+        	<fileset dir="${classes.dir}" />
+        </jar>
+    </target>
+	
+	<target name="war" depends="jar">
+		<mkdir dir="${target.dir}/deploy/"/>
+		<war warfile="${product}" webxml="${web.dir}/WEB-INF/web.xml">
+	     	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-wado"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="${vendor}"/>
+	     	</manifest>
+			<fileset dir="${web.dir}">
+				<exclude name="WEB-INF/web.xml" />
+			</fileset>
+			<lib dir="${lib.dir}">
+				<include name="maverick.jar" />
+				<include name="commons-beanutils.jar" />
+				<include name="jdom.jar" />
+				<include name="domify.jar" />
+				<include name="opt-domify.jar" />
+			</lib>
+			<lib dir="${target.lib.dir}">
+				<include name="dcm4chee-web.jar" />
+			</lib>
+		</war>
+	</target>
+
+	<target name="deploy" depends="war,deploy-only,deploy-conf"/>
+	
+	<target name="deploy-only">
+		<copy file="${product}" todir="${war.deploy.dir}" />
+	</target>
+	<target name="deploy-conf">
+		<copy todir="${conf.deploy.dir}" >
+			<fileset dir="${etc.dir}/conf" includes="**" />
+		</copy>
+	</target>
+
+	
+</project>

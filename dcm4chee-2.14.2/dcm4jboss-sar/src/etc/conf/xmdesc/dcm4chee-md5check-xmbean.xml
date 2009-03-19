@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>MD5 Check Service. Used to check if the MD5 sum of the new object differs
+      from the MD5 sum of the existing file. If the MD5 sum does not match, the files may be corrupted.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.MD5CheckService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MD5CheckService</name>
+   </constructor>
+
+   <!-- Attributes -->
+     <attribute access="read-write"
+      getMethod="getTaskInterval"
+      setMethod="setTaskInterval">
+      <description><![CDATA[Interval in which the File sum is checked for local files.
+         <br>Format: 
+		 <br><i>interval</i>!<i>from</i>-<i>to</i> or NEVER
+         <br><i>interval</i> = ##s (in seconds), ##m (in minutes), ##h (in hours).
+         <br><i>from</i> = start hour (0-23) when no MD5 check should be performed
+         <br><i>to</i> = end hour (0-23) when no MD5 check should be performed
+         <br>NEVER = disable MD5 checking<br>Example:<br>10s!9-17 means every 10 seconds,
+         check the MD5 sum of local files, except between the hours of 9:00am and 5:00pm.
+         By setting this type of TaskInterval, you can perform MD5 checks outside of peak hours.
+         ]]>
+      </description>
+      <name>TaskInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getMaxCheckedBefore" setMethod="setMaxCheckedBefore">
+      <description>Maximum amount of time from last check, in
+      		##w (in weeks), ##d (in days), ##h (in hours).</description>
+      <name>MaxCheckedBefore</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1w"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getLimitNumberOfFilesPerTask" setMethod="setLimitNumberOfFilesPerTask">
+      <description>Maximum number of files that are checked in one task.
+      </description>
+      <name>NumberOfFilesPerCheck</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getBufferSize"
+      setMethod="setBufferSize">
+      <description>Size of read byte buffer.
+      </description>
+      <name>BufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="8192"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckMD5"
+      setMethod="setTimerIDCheckMD5">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckMD5</name>
+      <type>java.lang.String</type>
+   </attribute>   
+
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>  
+   
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+
+   <operation impact="ACTION">
+      <description>Check the MD5 sum of files.</description>
+      <name>check</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+
+</mbean>
+    

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-mppsscp-service.xml 3323 2007-05-08 13:04:04Z javawilli $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.mppsscp.MPPSScpService"
+    name="dcm4chee.archive:service=MPPSScp"
+    xmbean-dd="xmdesc/dcm4chee-mppsscp-xmbean.xml">
+    <depends optional-attribute-name="AEServiceName"
+      >dcm4chee.archive:service=AE</depends>
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="DcmServerName"
+      >dcm4chee.archive:service=DcmServer</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+  </mbean>
+</server>

@@ -1,0 +1,415 @@
+-- Update DB from dcm4chee-2.13.x to dcm4chee-2.14.x
+
+ALTER TABLE patient DROP INDEX pat_id;
+CREATE INDEX pat_id ON patient(pat_id(64), pat_id_issuer(64));
+
+CREATE INDEX mpps_drcode_fk ON mpps(drcode_fk);
+
+ALTER TABLE code DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value(64),code_designator(64),code_version(64));
+
+-- MODIFY patient.pat_birthdate from DATE to VARCHAR
+ALTER TABLE patient ADD pat_birthdate_varchar VARCHAR(250) BINARY;
+UPDATE patient SET pat_birthdate_varchar = DATE_FORMAT(pat_birthdate,'%Y%m%d') WHERE pat_birthdate IS NOT NULL;
+ALTER TABLE patient DROP INDEX pat_birthdate;
+ALTER TABLE patient DROP COLUMN pat_birthdate;
+ALTER TABLE patient CHANGE COLUMN pat_birthdate_varchar pat_birthdate VARCHAR(250) BINARY;
+CREATE INDEX pat_birthdate ON patient(pat_birthdate(8));
+
+ALTER TABLE study ADD cuids_in_study VARCHAR(250) BINARY;
+
+ALTER TABLE ae ADD wado_url VARCHAR(250) BINARY;
+
+ALTER TABLE instance
+  MODIFY all_attrs BIT NOT NULL,
+  MODIFY commitment BIT NOT NULL;
+
+ALTER TABLE files
+  DROP FOREIGN KEY files_ibfk_1,
+  DROP FOREIGN KEY files_ibfk_2;
+
+ALTER TABLE filesystem
+  DROP FOREIGN KEY filesystem_ibfk_1;
+
+ALTER TABLE gppps
+  DROP FOREIGN KEY gppps_ibfk_1;
+
+ALTER TABLE gpsps
+  DROP FOREIGN KEY gpsps_ibfk_1,
+  DROP FOREIGN KEY gpsps_ibfk_2;
+
+ALTER TABLE gpsps_perf
+  DROP FOREIGN KEY gpsps_perf_ibfk_1,
+  DROP FOREIGN KEY gpsps_perf_ibfk_2;
+
+ALTER TABLE gpsps_req
+  DROP FOREIGN KEY gpsps_req_ibfk_1;
+
+ALTER TABLE hp
+  DROP FOREIGN KEY hp_ibfk_1;
+
+ALTER TABLE hpdef
+  DROP FOREIGN KEY hpdef_ibfk_1;
+
+ALTER TABLE instance
+  DROP FOREIGN KEY instance_ibfk_1,
+  DROP FOREIGN KEY instance_ibfk_2,
+  DROP FOREIGN KEY instance_ibfk_3;
+
+ALTER TABLE mpps
+  DROP FOREIGN KEY mpps_ibfk_1,
+  DROP FOREIGN KEY mpps_ibfk_2;
+
+ALTER TABLE mwl_item
+  DROP FOREIGN KEY mwl_item_ibfk_1;
+
+ALTER TABLE patient
+  DROP FOREIGN KEY patient_ibfk_1;
+
+ALTER TABLE priv_file
+  DROP FOREIGN KEY priv_file_ibfk_1,
+  DROP FOREIGN KEY priv_file_ibfk_2;
+
+ALTER TABLE priv_instance
+  DROP FOREIGN KEY priv_instance_ibfk_1;
+
+ALTER TABLE priv_series
+  DROP FOREIGN KEY priv_series_ibfk_1;
+
+ALTER TABLE priv_study
+  DROP FOREIGN KEY priv_study_ibfk_1;
+
+ALTER TABLE rel_dev_proto
+  DROP FOREIGN KEY rel_dev_proto_ibfk_1,
+  DROP FOREIGN KEY rel_dev_proto_ibfk_2;
+
+ALTER TABLE rel_gpsps_appcode
+  DROP FOREIGN KEY rel_gpsps_appcode_ibfk_1,
+  DROP FOREIGN KEY rel_gpsps_appcode_ibfk_2;
+
+ALTER TABLE rel_gpsps_devclass
+  DROP FOREIGN KEY rel_gpsps_devclass_ibfk_1,
+  DROP FOREIGN KEY rel_gpsps_devclass_ibfk_2;
+
+ALTER TABLE rel_gpsps_devloc
+  DROP FOREIGN KEY rel_gpsps_devloc_ibfk_1,
+  DROP FOREIGN KEY rel_gpsps_devloc_ibfk_2;
+
+ALTER TABLE rel_gpsps_devname
+  DROP FOREIGN KEY rel_gpsps_devname_ibfk_1,
+  DROP FOREIGN KEY rel_gpsps_devname_ibfk_2;
+
+ALTER TABLE rel_gpsps_gppps
+  DROP FOREIGN KEY rel_gpsps_gppps_ibfk_1,
+  DROP FOREIGN KEY rel_gpsps_gppps_ibfk_2;
+
+ALTER TABLE rel_hpdef_proc
+  DROP FOREIGN KEY rel_hpdef_proc_ibfk_1,
+  DROP FOREIGN KEY rel_hpdef_proc_ibfk_2;
+
+ALTER TABLE rel_hpdef_reason
+  DROP FOREIGN KEY rel_hpdef_reason_ibfk_1,
+  DROP FOREIGN KEY rel_hpdef_reason_ibfk_2;
+
+ALTER TABLE rel_hpdef_region
+  DROP FOREIGN KEY rel_hpdef_region_ibfk_1,
+  DROP FOREIGN KEY rel_hpdef_region_ibfk_2;
+
+ALTER TABLE rel_pat_other_pid
+  DROP FOREIGN KEY rel_pat_other_pid_ibfk_1,
+  DROP FOREIGN KEY rel_pat_other_pid_ibfk_2;
+
+ALTER TABLE rel_study_pcode
+  DROP FOREIGN KEY rel_study_pcode_ibfk_1,
+  DROP FOREIGN KEY rel_study_pcode_ibfk_2;
+
+ALTER TABLE series
+  DROP FOREIGN KEY series_ibfk_1,
+  DROP FOREIGN KEY series_ibfk_2;
+
+ALTER TABLE series_req
+  DROP FOREIGN KEY series_req_ibfk_1;
+
+ALTER TABLE study
+  DROP FOREIGN KEY study_ibfk_1;
+
+ALTER TABLE study_on_fs
+  DROP FOREIGN KEY study_on_fs_ibfk_1,
+  DROP FOREIGN KEY study_on_fs_ibfk_2;
+
+ALTER TABLE verify_observer
+  DROP FOREIGN KEY verify_observer_ibfk_1;
+
+ALTER TABLE ae
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE code
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE patient
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY merge_fk BIGINT;
+
+ALTER TABLE other_pid
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE rel_pat_other_pid
+  MODIFY patient_fk BIGINT,
+  MODIFY other_pid_fk BIGINT;
+
+ALTER TABLE study
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT;
+
+ALTER TABLE rel_study_pcode
+  MODIFY study_fk BIGINT,
+  MODIFY pcode_fk BIGINT;
+
+ALTER TABLE study_permission
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE mpps
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT,
+  MODIFY drcode_fk BIGINT;
+
+ALTER TABLE series
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY study_fk BIGINT,
+  MODIFY mpps_fk BIGINT;
+
+ALTER TABLE series_req
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY series_fk BIGINT;
+
+ALTER TABLE media
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE instance
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY series_fk BIGINT,
+  MODIFY srcode_fk BIGINT,
+  MODIFY media_fk BIGINT;
+
+ALTER TABLE verify_observer
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY instance_fk BIGINT;
+
+ALTER TABLE filesystem
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY next_fk BIGINT;
+
+ALTER TABLE files
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY instance_fk BIGINT,
+  MODIFY filesystem_fk BIGINT;
+
+ALTER TABLE study_on_fs
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY study_fk BIGINT,
+  MODIFY filesystem_fk BIGINT;
+
+ALTER TABLE mwl_item
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT;
+
+ALTER TABLE gpsps
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT,
+  MODIFY code_fk BIGINT;
+
+ALTER TABLE rel_gpsps_appcode
+  MODIFY gpsps_fk BIGINT,
+  MODIFY appcode_fk BIGINT;
+
+ALTER TABLE rel_gpsps_devname
+  MODIFY gpsps_fk BIGINT,
+  MODIFY devname_fk BIGINT;
+
+ALTER TABLE rel_gpsps_devclass
+  MODIFY gpsps_fk BIGINT,
+  MODIFY devclass_fk BIGINT;
+
+ALTER TABLE rel_gpsps_devloc
+  MODIFY gpsps_fk BIGINT,
+  MODIFY devloc_fk BIGINT;
+
+ALTER TABLE gpsps_perf
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY gpsps_fk BIGINT,
+  MODIFY code_fk BIGINT;
+
+ALTER TABLE gpsps_req
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY gpsps_fk BIGINT;
+
+ALTER TABLE gppps
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT;
+
+ALTER TABLE rel_gpsps_gppps
+  MODIFY gpsps_fk BIGINT,
+  MODIFY gppps_fk BIGINT;
+
+ALTER TABLE hp
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY user_fk BIGINT;
+
+ALTER TABLE hpdef
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY hp_fk BIGINT;
+
+ALTER TABLE rel_hpdef_region
+  MODIFY hpdef_fk BIGINT,
+  MODIFY region_fk BIGINT;
+
+ALTER TABLE rel_hpdef_proc
+  MODIFY hpdef_fk BIGINT,
+  MODIFY proc_fk BIGINT;
+
+ALTER TABLE rel_hpdef_reason
+  MODIFY hpdef_fk BIGINT,
+  MODIFY reason_fk BIGINT;
+
+ALTER TABLE priv_patient
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE priv_study
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY patient_fk BIGINT;
+
+ALTER TABLE priv_series
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY study_fk BIGINT;
+
+ALTER TABLE priv_instance
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY series_fk BIGINT;
+
+ALTER TABLE priv_file
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT,
+  MODIFY instance_fk BIGINT,
+  MODIFY filesystem_fk BIGINT;
+
+ALTER TABLE device
+  MODIFY pk BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE rel_dev_proto
+  MODIFY device_fk BIGINT,
+  MODIFY prcode_fk BIGINT;
+
+ALTER TABLE files
+  ADD FOREIGN KEY(instance_fk) REFERENCES instance(pk),
+  ADD FOREIGN KEY(filesystem_fk) REFERENCES filesystem(pk);
+
+ALTER TABLE filesystem
+  ADD FOREIGN KEY(next_fk) REFERENCES filesystem(pk);
+
+ALTER TABLE gppps
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk);
+
+ALTER TABLE gpsps
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk),
+  ADD FOREIGN KEY(code_fk) REFERENCES code(pk);
+
+ALTER TABLE gpsps_perf
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(code_fk) REFERENCES code(pk);
+
+ALTER TABLE gpsps_req
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk);
+
+ALTER TABLE hp
+  ADD FOREIGN KEY(user_fk) REFERENCES code(pk);
+
+ALTER TABLE hpdef
+  ADD FOREIGN KEY(hp_fk) REFERENCES hp(pk);
+
+ALTER TABLE instance
+  ADD FOREIGN KEY(series_fk) REFERENCES series(pk),
+  ADD FOREIGN KEY(srcode_fk) REFERENCES code(pk),
+  ADD FOREIGN KEY(media_fk) REFERENCES media(pk);
+
+ALTER TABLE mpps
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk),
+  ADD FOREIGN KEY(drcode_fk) REFERENCES code(pk);
+
+ALTER TABLE mwl_item
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk);
+
+ALTER TABLE patient
+  ADD FOREIGN KEY(merge_fk) REFERENCES patient(pk);
+
+ALTER TABLE priv_file
+  ADD FOREIGN KEY(instance_fk) REFERENCES priv_instance(pk),
+  ADD FOREIGN KEY(filesystem_fk) REFERENCES filesystem(pk);
+
+ALTER TABLE priv_instance
+  ADD FOREIGN KEY(series_fk) REFERENCES priv_series(pk);
+
+ALTER TABLE priv_series
+  ADD FOREIGN KEY(study_fk) REFERENCES priv_study(pk);
+
+ALTER TABLE priv_study
+  ADD FOREIGN KEY(patient_fk) REFERENCES priv_patient(pk);
+
+ALTER TABLE rel_dev_proto
+  ADD FOREIGN KEY(device_fk) REFERENCES device(pk),
+  ADD FOREIGN KEY(prcode_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_gpsps_appcode
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(appcode_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_gpsps_devclass
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(devclass_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_gpsps_devloc
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(devloc_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_gpsps_devname
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(devname_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_gpsps_gppps
+  ADD FOREIGN KEY(gpsps_fk) REFERENCES gpsps(pk),
+  ADD FOREIGN KEY(gppps_fk) REFERENCES gppps(pk);
+
+ALTER TABLE rel_hpdef_proc
+  ADD FOREIGN KEY(hpdef_fk) REFERENCES hpdef(pk),
+  ADD FOREIGN KEY(proc_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_hpdef_reason
+  ADD FOREIGN KEY(hpdef_fk) REFERENCES hpdef(pk),
+  ADD FOREIGN KEY(reason_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_hpdef_region
+  ADD FOREIGN KEY(hpdef_fk) REFERENCES hpdef(pk),
+  ADD FOREIGN KEY(region_fk) REFERENCES code(pk);
+
+ALTER TABLE rel_pat_other_pid
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk),
+  ADD FOREIGN KEY(other_pid_fk) REFERENCES other_pid(pk);
+
+ALTER TABLE rel_study_pcode
+  ADD FOREIGN KEY(study_fk) REFERENCES study(pk),
+  ADD FOREIGN KEY(pcode_fk) REFERENCES code(pk);
+
+ALTER TABLE series
+  ADD FOREIGN KEY(study_fk) REFERENCES study(pk),
+  ADD FOREIGN KEY(mpps_fk) REFERENCES mpps(pk);
+
+ALTER TABLE series_req
+  ADD FOREIGN KEY(series_fk) REFERENCES series(pk);
+
+ALTER TABLE study
+  ADD FOREIGN KEY(patient_fk) REFERENCES patient(pk);
+
+ALTER TABLE study_on_fs
+  ADD FOREIGN KEY(study_fk) REFERENCES study(pk),
+  ADD FOREIGN KEY(filesystem_fk) REFERENCES filesystem(pk);
+
+ALTER TABLE verify_observer
+  ADD FOREIGN KEY(instance_fk) REFERENCES instance(pk);

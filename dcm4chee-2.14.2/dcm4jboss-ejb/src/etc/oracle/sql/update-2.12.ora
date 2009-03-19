@@ -1,0 +1,17 @@
+-- Update DB from dcm4chee-2.11.x to dcm4chee-2.12.x
+
+ALTER TABLE patient MODIFY pat_id VARCHAR2(255);
+
+ALTER TABLE ae ADD (user_id VARCHAR2(255),
+                    passwd VARCHAR2(255));
+
+ALTER TABLE series ADD station_name VARCHAR2(255);
+
+DROP INDEX station_name;
+CREATE INDEX station_name ON series(station_name);
+CREATE UNIQUE INDEX dev_station_name ON device(station_name);
+
+ALTER TABLE series_req ADD study_iuid VARCHAR2(255);
+CREATE INDEX ser_rq_study_iuid ON series_req(study_iuid);
+
+CREATE INDEX study_updated ON study(updated_time);

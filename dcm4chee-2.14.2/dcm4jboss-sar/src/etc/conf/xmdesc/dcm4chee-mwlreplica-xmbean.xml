@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description><![CDATA[<b>Modality Worklist Replication Service</b><br/>
+		Provides a Service to replicate a MWL SCP with DCM4CHEE Modality worklist.<br/>.
+		You can use XSL Templates to change MWL C-FIND Request for MWL SCPs.<br/>
+		Therefore put either mwl-replica-rq.xsl and/or mwl-replica-rsp.xsl in conf/dcm4chee-aet/[AET].
+		]]> </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.tool.mwlreplica.MwlReplicaService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MwlReplicaService</name>
+   </constructor>
+
+   <attribute access="read-write" getMethod="getCalledAET" setMethod="setCalledAET">
+      <description><![CDATA[The AE title(s) of the Modality Worklist SCP to query for replication.<br/>
+      				Multible AET's must be separated by \(backslash). For example, MWL_SCP1\MWL_SCP2.]]>
+      </description>
+      <name>CalledAET</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MWL_SCP"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>Calling AET.
+      </description>
+      <name>CallingAET</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getTaskInterval" setMethod="setTaskInterval">
+      <description><![CDATA[Interval in which to replicate local Modality Work List with remote MWL SCP.<br/>
+          Format: interval (##s (in seconds), ##m (in minutes), ##h (in hours) or NEVER]]>
+	  </description>
+      <name>TaskInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getTimeBefore" setMethod="setTimeBefore">
+      <description><![CDATA[Time interval to calculate left border of time range.<br/>
+          Format: interval (##s (in seconds), ##m (in minutes), ##h (in hours) or NONE.<br/> 
+          NONE means either no (time) left border or, if TimeAfter is also NONE the whole day.<br/>
+          E.g.: TimeBefore = 1h, TimeAfter = 2h, current time is 13:00 -> search for all MWL with start date between 12:00 and 15:00.<br/>
+          TimeBefore = 1h, TimeAfter = NONE, current time is 13:00 -> search for all MWL with start date between 12:00 and 23:59.59.<br/>
+          TimeBefore = NONE, TimeAfter = 2h, current time is 13:00 -> search for all MWL with start date before 15:00.<br/>
+          TimeBefore = NONE, TimeAfter = NONE, current time is 13:00 -> search for all MWL for current date.<br/>
+          ]]></description>
+      <name>TimeBefore</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getTimeAfter" setMethod="setTimeAfter">
+      <description><![CDATA[Time interval to calculate left border of time range.<br/>
+          Format: interval (##s (in seconds), ##m (in minutes), ##h (in hours) or NONE.<br/>
+          NONE means either no (time) right border or, if TimeBefore is also NONE the whole day.
+          ]]></description>
+      <name>TimeAfter</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getIssuerOfPatient" setMethod="setIssuerOfPatient">
+      <description>Default Issuer Of Patient ID to coerce empty IssuerOfPatient attribute in MWL results. Use NONE to disable coercion.
+      </description>
+      <name>IssuerOfPatient</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isForceIssuerCoercion" setMethod="setForceIssuerCoercion">
+      <description>Force coercion of IssuerOfPatient attribute in MWL results even when result contains IssuerOfPatient.
+      </description>
+      <name>ForceIssuerCoercion</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isDebugMode" setMethod="setDebugMode">
+      <description>Enable DEBUG mode. No MWL query will be performed but the Query Dataset will be logged!
+      </description>
+      <name>DebugMode</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+
+   &defaultSCUAttributes;
+
+   <attribute access="read-write" getMethod="getPriority" setMethod="setPriority">
+      <description>Priority for C-Find requests. Enumerated Values: LOW, MEDIUM, HIGH.
+        Only effective for queries of a remote Modality Worlist SCP which actual
+        interprets the priority attribute in the DICOM C-FIND request.
+      </description>
+      <name>Priority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+      <descriptors>
+         <value value="dcm4chee.archive:service=TLSConfig"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>   
+
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>  
+   <attribute access="read-write"
+      getMethod="getTimerIDMwlReplica"
+      setMethod="setTimerIDMwlReplica">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TimerIDMwlReplica"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-only" getMethod="getErrorCount" >
+      <description>ErrorCount since last reset.
+      </description>
+      <name>ErrorCount</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-only" getMethod="getTotalErrorCount" >
+      <description>ErrorCount since service start.
+      </description>
+      <name>TotalErrorCount</name>
+      <type>int</type>
+   </attribute>
+
+   <!-- Operations -->
+
+   <operation impact="ACTION">
+      <description>Replicate modality worklist entries for given date.
+      </description>
+      <name>replicateMWLEntriesForDate</name>
+      <parameter>
+        <description>AET of MWL SCP to query. (null means configured calledAET - must be configured in AE Managment!)</description>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Date for which MWL items should be replicated. Use yyyy/MM/dd or null for current date.</description>
+        <name>Date</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+ 
+   <operation impact="ACTION">
+      <description>Replicate modality worklist entries for given date.
+      </description>
+      <name>replicateMWLEntriesForDateRange</name>
+      <parameter>
+        <description>AET of MWL SCP to query. (null means configured calledAET - must be configured in AE Managment!)</description>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Start Date/Time for which MWL items should be replicated. Use 'yyyy/MM/dd hh:mm' or null for current date.</description>
+        <name>StartDate</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>End Date/Time for which MWL items should be replicated. Use 'yyyy/MM/dd hh:mm' or null for current date.</description>
+        <name>EndDate</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>Replicate modality worklist entries of aet for given queryDS.
+                   (MWL C-FIND Request Dataset)
+      </description>
+      <name>replicateMWLEntries</name>
+      <parameter>
+        <description>AET of MWL SCP to query. (must be configured in AE Managment!)</description>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description><![CDATA[Dataset for MWL C-Find. <br/>
+			Use <null> to use a Search Dataset with almost all 
+			MWL attributes as return attributes, and matching SPS Start Date 
+			for current date.
+		]]></description>
+        <name>queryDS</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Show error history.
+      </description>
+      <name>showErrorHistory</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Clear error history.
+      </description>
+      <name>resetErrorHistory</name>
+      <return-type>void</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>The start lifecycle operation.
+      </description>
+      <name>start</name>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>The stop lifecycle operation.
+      </description>
+      <name>stop</name>
+      <return-type>void</return-type>
+   </operation>
+</mbean>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>DICOM General Purpose Worklist related Service Class Providers</description>
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.gpwlscp.GPWLScpService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>GPWLScpService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getCalledAETs" setMethod="setCalledAETs">
+      <description>List of accepted called AE titles, separated by \(backslash). 
+      For example, DCM4CHEE\DCM4CHEE2.
+      </description>
+      <name>CalledAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAETs" setMethod="setCallingAETs">
+      <description><![CDATA[
+      	List of accepted calling AE titles, separated by \(backslash).<br/>
+      	ANY = accept any. <br/>
+      	CONFIGURED_AETS = accept any configured AE Title.
+      	]]>       
+      </description>
+      <name>CallingAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getGeneratePatientID"
+      setMethod="setGeneratePatientID">
+      <description><![CDATA[Generate a patient ID from a hash of the 
+          patient name and birth date and/or study instance uid, if
+          the received GP-PPS N-CREATE message contains no patient ID.
+          <br>Use ### and/or $$$ as a placeholder for the decimal hash value of
+          patient name and/or study instance uid.
+          For example, PACS-##########.
+          <br>NONE = do not generate patient IDs..]]>
+      </description>
+      <name>GeneratePatientID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="PACS-##########"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getIssuerOfGeneratedPatientID"
+      setMethod="setIssuerOfGeneratedPatientID">
+      <description><![CDATA[Value for Issuer Of Patient ID if the patient ID is
+      generated according configured <i>GeneratePatientID<i>.
+      <br>NONE = do not set Issuer Of Patient ID for generated patient IDs.]]>
+      </description>
+      <name>IssuerOfPatientIDGeneratedPatientID</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isSupplementIssuerOfPatientID"
+      setMethod="setSupplementIssuerOfPatientID">
+      <description><![CDATA[Supplement received GP-PPS N-CREATE message containing
+          a <i>Patient ID</i>, but no <i>Issuer Of Patient ID</i>, with a value
+          for <i>Issuer Of Patient ID</i>, if such is associated with the
+          GP-PPS SCU AE by its AE Configuration entry.]]>
+      </description>
+      <name>SupplementIssuerOfPatientID</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedSOPClasses"
+      setMethod="setAcceptedSOPClasses">
+      <description><![CDATA[
+        List of accepted GPWL related SOP Classes. Use either the SOP Class 
+        UID value, or following defined symbolic names:
+        GeneralPurposeWorklistInformationModelFIND,
+        GeneralPurposeScheduledProcedureStepSOPClass,
+        GeneralPurposePerformedProcedureStepSOPClass,
+        GeneralPurposeWorklistManagementMetaSOPClass,
+        ]]>
+      </description>
+      <name>AcceptedSOPClasses</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+            GeneralPurposeWorklistInformationModelFIND
+            GeneralPurposeScheduledProcedureStepSOPClass
+            GeneralPurposePerformedProcedureStepSOPClass
+            GeneralPurposeWorklistManagementMetaSOPClass
+           "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedTransferSyntax"
+      setMethod="setAcceptedTransferSyntax">
+      <description><![CDATA[
+        List of accepted Transfer Syntaxes. Order defines selection preference.
+        Use either the  Transfer Syntaxes UID value or following defined
+        symbolic names: 
+        ImplicitVRLittleEndian,
+        ExplicitVRLittleEndian,
+        DeflatedExplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]]>
+      </description>
+      <name>AcceptedTransferSyntax</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           ExplicitVRLittleEndian
+           ImplicitVRLittleEndian
+         "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum protocol data unit (PDU) package length for receiving PDUs.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsInvoked"
+      setMethod="setMaxOpsInvoked">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to invoke asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsInvoked</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsPerformed"
+      setMethod="setMaxOpsPerformed">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to perform asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsPerformed</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAccessBlobAsLongVarBinary"
+      setMethod="setAccessBlobAsLongVarBinary">
+      <description>Change JDBC binding for Oracle BLOB's to LONGVARBINARY for
+      accessing attributes stored in BLOB columns of DB records.
+      </description>
+      <name>AccessBlobAsLongVarBinary</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTransactionIsolationLevel"
+      setMethod="setTransactionIsolationLevel">
+      <description>Transaction isolation level for queries. Values can be one of: 
+      DEFAULT|READ_UNCOMMITTED|READ_COMMITTED|REPEATABLE_READ|SERIALIZABLE.
+      </description>
+      <name>TransactionIsolationLevel</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DEFAULT"/>
+      </descriptors>
+   </attribute>
+      <attribute access="read-write"
+      getMethod="getDcmServerName"
+      setMethod="setDcmServerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DcmServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.      
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAEServiceName"
+      setMethod="setAEServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AEServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+   <!-- Notifications -->
+   
+</mbean>
+

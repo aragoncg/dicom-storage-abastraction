@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<!--
+	$Id: web.xml 7572 2008-10-16 08:31:58Z gunterze $
+	$Source$
+-->
+
+<web-app>
+	<display-name>dcm4chee WADO</display-name>
+
+	<servlet>
+		<servlet-name>wado</servlet-name>
+		<display-name>WADO - Web Access to DICOM Persistent Objects</display-name>
+		<servlet-class>org.dcm4chex.wado.web.WADOServlet</servlet-class>
+
+		<!--
+			The configuration base for WADO service.
+		-->
+		
+		<init-param>
+			<param-name>wadoServiceName</param-name>
+			<param-value>dcm4chee.archive:service=WADOService</param-value>
+		</init-param>
+		
+		<!-- 
+		 Enable/Disable StudyPermissionCheck for WADO retrieve
+		 true: restrict WADO retrieve of objects according Study Read permission of remote user. 
+		         denied access if no remote user information is associated with the request
+		 false: no restriction.
+		-->
+		 <init-param>
+		  <param-name>enableStudyPermissionCheck</param-name>
+		  <param-value>false</param-value>
+		 </init-param>
+		<!-- 
+		 Disable StudyPermissionCheck for dedicated user(s).
+		 List of users (seperated by ',') for which Study Read permissions are not checked on WADO retrieve,
+		 even if enableStudyPermissionCheck=true.
+		 default: admin
+		-->
+		 <init-param>
+		  <param-name>disableStudyPermissionCheckForUser</param-name>
+		  <param-value>admin</param-value>
+		 </init-param>
+
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>wado</servlet-name>
+		<url-pattern>*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+
+   <!-- A security constraint that restricts access to the
+   	WADO service to users with the role WebAdmin.
+   -->
+<!--
+   <security-constraint>
+     <web-resource-collection>
+       <web-resource-name>wado</web-resource-name>
+       <description>Only allows users with the role WebAdmin
+       		to access the Archive Web Administration pages
+       </description>
+       <url-pattern>/*</url-pattern>
+       <http-method>GET</http-method>
+       <http-method>POST</http-method>
+     </web-resource-collection>
+     <auth-constraint>
+       <role-name>WebUser</role-name>
+     </auth-constraint>
+   </security-constraint>
+
+   <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>Archive Web Admin</realm-name>
+   </login-config>
+
+   <security-role>
+      <role-name>WebUser</role-name>
+   </security-role>
+ -->  
+
+</web-app>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>GPWL Feed Service. Used by dcm4chee-web to add entries to the General Purpose Worklist.
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.gpwlscp.GPWLFeedService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>GPWLFeedService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getTemplatePath"
+      setMethod="setTemplatePath">
+      <description>URL to the directory of worklist entry templates.
+      </description>
+      <name>TemplatePath</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-gpwl"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getHumanPerformer"
+      setMethod="setHumanPerformer">
+      <description>List of human performers for a worklist entry.
+      </description>
+      <name>HumanPerformerList</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="doc1^DCM4CHEE^Dr. Allis,doc2^HUGO^Dr. Suse"/>
+      </descriptors>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+    <operation impact="ACTION">
+      <description>Add a new general purpose worklist entry.
+      </description>
+      <name>addWorklistItem</name>
+      <parameter>
+        <description>study pk</description>
+        <name>studyPk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <parameter>
+        <description>name of template file</description>
+        <name>templateFile</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>human performer</description>
+        <name>humanPerformer</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>scheduled date</description>
+        <name>scheduleDate</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+
+   <operation impact="ACTION">
+      <description>List of templates for worklist entries. (List of all files in TemplateURL)
+      </description>
+      <name>listTemplates</name>
+      <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Clear cached list of templates for worklist entries.
+      </description>
+      <name>clearTemplateList</name>
+      <return-type>void</return-type>
+   </operation>
+
+   &defaultOperations;
+   
+</mbean>

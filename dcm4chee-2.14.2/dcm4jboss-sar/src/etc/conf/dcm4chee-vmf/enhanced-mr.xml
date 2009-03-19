@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <!--Specific Character Set-->
+  <attr tag="00080005" vr="CS"/>
+  <!--Image Type-->
+  <attr tag="00080008" vr="CS"/>
+  <!--SOP Class UID-->
+  <attr tag="00080016" vr="UI">1.2.840.10008.5.1.4.1.1.2.1</attr>
+  <!--Study Date-->
+  <attr tag="00080020" vr="DA"/>
+  <!--Series Date-->
+  <attr tag="00080021" vr="DA"/>
+  <!--Acquisition Date-->
+  <attr tag="00080022" vr="DA"/>
+  <!--Content Date-->
+  <attr tag="00080023" vr="DA"/>
+  <!--Series Time-->
+  <attr tag="00080031" vr="TM"/>
+  <!--Acquisition Time-->
+  <attr tag="00080032" vr="TM"/>
+  <!--Content Time-->
+  <attr tag="00080033" vr="TM"/>
+  <!--Accession Number-->
+  <attr tag="00080050" vr="SH"/>
+  <!--Modality-->
+  <attr tag="00080060" vr="CS"/>
+  <!--Manufacturer-->
+  <attr tag="00080070" vr="LO"/>
+  <!--Institution Name-->
+  <attr tag="00080080" vr="LO"/>
+  <!--Referring Physician's Name-->
+  <attr tag="00080090" vr="PN"/>
+  <!--Timezone Offset From UTC-->
+  <attr tag="00080201" vr="SH"/>
+  <!--Station Name-->
+  <attr tag="00081010" vr="SH"/>
+  <!--Study Description-->
+  <attr tag="00081030" vr="LO"/>
+  <!--Series Description-->
+  <attr tag="0008103E" vr="LO"/>
+  <!--Performing Physician's Name-->
+  <attr tag="00081050" vr="PN"/>
+  <!--Name of Physician(s) Reading Study-->
+  <attr tag="00081060" vr="PN"/>
+  <!--Operators' Name-->
+  <attr tag="00081070" vr="PN"/>
+  <!--Manufacturer's Model Name-->
+  <attr tag="00081090" vr="LO"/>
+  <!--Pixel Presentation-->
+  <attr tag="00089205" vr="CS">MONOCHROME</attr>
+  <!--Patient's Name-->
+  <attr tag="00100010" vr="PN"/>
+  <!--Patient ID-->
+  <attr tag="00100020" vr="LO"/>
+  <!--Patient's Birth Date-->
+  <attr tag="00100030" vr="DA"/>
+  <!--Patient's Sex-->
+  <attr tag="00100040" vr="CS"/>
+  <!--Patient's Age-->
+  <attr tag="00101010" vr="AS"/>
+  <!--Patient's Size-->
+  <attr tag="00101020" vr="DS"/>
+  <!--Patient's Weight-->
+  <attr tag="00101030" vr="DS"/>
+  <!--Patient Comments-->
+  <attr tag="00104000" vr="LT"/>
+  <!--Contrast/Bolus Agent-->
+  <attr tag="00180010" vr="LO"/>
+  <!--Contrast/Bolus Agent Sequence-->
+  <attr tag="00180012" vr="SQ"/>
+  <!--MR Acquisition Type-->
+  <attr tag="00180023" vr="CS"/>
+  <!--Magnetic Field Strength-->
+  <attr tag="00180087" vr="DS"/>
+  <!--Device Serial Number-->
+  <attr tag="00181000" vr="LO"/>
+  <!--Software Version(s)-->
+  <attr tag="00181020" vr="LO"/>
+  <!--Protocol Name-->
+  <attr tag="00181030" vr="LO"/>
+  <!--Patient Position-->
+  <attr tag="00185100" vr="CS"/>
+  <!--Date of Last Calibration-->
+  <attr tag="00181200" vr="DA"/>
+  <!--Time of Last Calibration-->
+  <attr tag="00181201" vr="TM"/>
+  <!--Study Instance UID-->
+  <attr tag="0020000D" vr="UI"/>
+  <!--Series Instance UID-->
+  <attr tag="0020000E" vr="UI"/>
+  <!--Study ID-->
+  <attr tag="00200010" vr="SH"/>
+  <!--Series Number-->
+  <attr tag="00200011" vr="IS"/>
+  <!--Acquisition Number-->
+  <attr tag="00200012" vr="IS"/>
+  <!--Instance Number-->
+  <attr tag="00200013" vr="IS"/>
+  <!--Frame of Reference UID-->
+  <attr tag="00200052" vr="UI"/>
+  <!--Position Reference Indicator-->
+  <attr tag="00201040" vr="LO"/>
+  <!--Samples per Pixel-->
+  <attr tag="00280002" vr="US"/>
+  <!--Photometric Interpretation-->
+  <attr tag="00280004" vr="CS"/>
+  <!--Rows-->
+  <attr tag="00280010" vr="US"/>
+  <!--Columns-->
+  <attr tag="00280011" vr="US"/>
+  <!--Bits Allocated-->
+  <attr tag="00280100" vr="US"/>
+  <!--Bits Stored-->
+  <attr tag="00280101" vr="US"/>
+  <!--High Bit-->
+  <attr tag="00280102" vr="US"/>
+  <!--Pixel Representation-->
+  <attr tag="00280103" vr="US"/>
+  <!--Lossy Image Compression-->
+  <attr tag="00282110" vr="CS"/>
+  <!--Presentation LUT Shape-->
+  <attr tag="20500020" vr="CS">IDENTITY</attr>
+  <!--Shared Functional Groups Sequence-->
+  <attr tag="52009229" vr="SQ">
+    <item>
+      <!--MR Imaging Modifier Sequence-->
+      <attr tag="00189006" vr="SQ">
+        <item>
+          <!--Pixel Bandwidth-->
+          <attr tag="00180095" vr="DS"/>
+        </item>
+      </attr>
+      <!--MR Receive Coil Sequence-->
+      <attr tag="00189042" vr="SQ">
+        <item off="3032">
+          <!--Receive Coil Name-->
+          <attr tag="00181250" vr="SH"/>
+        </item>
+      </attr>
+      <!--MR Transmit Coil Sequence-->
+      <attr tag="00189049" vr="SQ">
+        <item>
+          <!--Transmit Coil Name-->
+          <attr tag="00181251" vr="SH"/>
+        </item>
+      </attr>
+      <!--MR Timing and Related Parameters Sequence-->
+      <attr tag="00189112" vr="SQ">
+        <item>
+          <!--Repetition Time-->
+          <attr tag="00180080" vr="DS"/>
+          <!--Echo Train Length-->
+          <attr tag="00180091" vr="IS"/>
+          <!--Flip Angle-->
+          <attr tag="00181314" vr="DS"/>
+        </item>
+      </attr>
+      <!--MR Echo Sequence-->
+      <attr tag="00189114" vr="SQ">
+        <item>
+          <!--Echo Time-->
+          <attr tag="00180081" vr="DS"/>
+        </item>
+      </attr>
+      <!--MR Averages Sequence-->
+      <attr tag="00189119" vr="SQ">
+        <item>
+          <!--Number of Averages-->
+          <attr tag="00180083" vr="DS"/>
+        </item>
+      </attr>
+      <!--MR FOV/Geometry Sequence-->
+      <attr tag="00189125" vr="SQ">
+        <item>
+          <!--Percent Sampling-->
+          <attr tag="00180093" vr="DS"/>
+          <!--Percent Phase Field of View-->
+          <attr tag="00180094" vr="DS"/>
+          <!--In-plane Phase Encoding Direction-->
+          <attr tag="00181312" vr="CS"/>
+        </item>
+      </attr>
+      <!--Plane Orientation Sequence-->
+      <attr tag="00209116" vr="SQ">
+        <item>
+          <!--Image Orientation (Patient)-->
+          <attr tag="00200037" vr="DS"/>
+        </item>
+      </attr>
+      <!--Pixel Measures Sequence-->
+      <attr tag="00289110" vr="SQ">
+        <item off="4344">
+          <!--Slice Thickness-->
+          <attr tag="00180050" vr="DS"/>
+          <!--Pixel Spacing-->
+          <attr tag="00280030" vr="DS"/>
+        </item>
+      </attr>
+      <!--Pixel Value Transformation Sequence-->
+      <attr tag="00289145" vr="SQ">
+        <item>
+          <!--Rescale Intercept-->
+          <attr tag="00281052" vr="DS"/>
+          <!--Rescale Slope-->
+          <attr tag="00281053" vr="DS"/>
+          <!--Rescale Type-->
+          <attr tag="00281054" vr="LO"/>
+        </item>
+      </attr>
+      <!--Frame Content Sequence-->
+      <attr tag="00209111" vr="SQ">
+        <item>
+          <!--Acquisition Date-->
+          <attr tag="00080022" vr="DA"/>
+          <!--Content Date-->
+          <attr tag="00080023" vr="DA"/>
+          <!--Acquisition Time-->
+          <attr tag="00080032" vr="TM"/>
+          <!--Content Time-->
+          <attr tag="00080033" vr="DA"/>
+          <!--Acquisition Number-->
+          <attr tag="00200012" vr="IS"/>
+          <!--Instance Number-->
+          <attr tag="00200013" vr="IS"/>
+        </item>
+      </attr>
+      <!--Plane Position Sequence-->
+      <attr tag="00209113" vr="SQ">
+        <item>
+          <!--Image Position (Patient)-->
+          <attr tag="00200032" vr="DS"/>
+        </item>
+      </attr>
+      <!--Frame VOI LUT Sequence-->
+      <attr tag="00289132" vr="SQ">
+        <item>
+          <!--Window Center-->
+          <attr tag="00281050" vr="DS"/>
+          <!--Window Width-->
+          <attr tag="00281051" vr="DS"/>
+        </item>
+      </attr>
+    </item>
+  </attr>
+</dataset>

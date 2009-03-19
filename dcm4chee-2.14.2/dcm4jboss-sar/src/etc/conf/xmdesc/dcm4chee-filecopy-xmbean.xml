@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>File Copy Service.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hsm.FileCopyService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>FileCopyService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" 
+     getMethod="getDestination" 
+     setMethod="setDestination">
+      <description><![CDATA[Destination file system or NONE to disable the
+        service. The file system name can be suffixed by 
+        '!'<i>from</i>'-'<i>to</i> to defer copying outside a particular time
+        interval, and/or prefixed by a condition 
+        '[calling'['!']'='<i>aeTitle</i>['|'..]']' to limit/exclude copying 
+        to/of series received from modalities with specified AE title(s).
+        If the file system name is a tar URI (tar:<Directory/Mount Point>),
+        instances of one series are packed into one tarball. Otherwise
+        instance files are copied individually to the destination file system.
+        If an external command is used for the copy of tarballs to the destination,
+        the destination name (after the "tar:" prefix) need not follow the syntax
+        of a directory path (e.g.: tar:ftp://user@pass/service).
+        <p><b>Attention:</b> The file system must have already been configured
+        by invoking operation <code>File System Management
+        Service#addNearlineFileSystem()</code>. Otherwise the copy task will
+        fail! If you configured a tar URI as destination file system, the name
+        of the configured file system has to match that URI, and not only the
+        <Directory/Mount Point> part!
+        ]]>
+      </description>
+      <name>DestinationFileSystem</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getTarCopyCommand" 
+     setMethod="setTarCopyCommand">
+      <description><![CDATA[External command to copy tarballs to the destination,
+      with
+         <br>%p will be replaced by the path of tarball to copy,
+         <br>%d will be replaced by the destination file system name,
+         <br>%f will be replaced by the destination TAR file path.
+         <br>NONE = write tarball on local accessable file system.
+      Only effective, if the destination file system name is a tar URI.
+       ]]>
+      </description>
+      <name>TarCopyCommand</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getTarOutgoingDir" 
+     setMethod="setTarOutgoingDir">
+      <description><![CDATA[Directory from which tarballs shall be copied
+      by external <b>TarCopyCommand</b>. A relative path name is resolved
+      relative to <i>archive-install-directory</i>/server/default/.
+      Not effective if TarCopyCommand=<code>NONE<code>]]>
+      </description>
+      <name>TarOutgoingDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="tar-outgoing"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getFileStatus"
+      setMethod="setFileStatus">
+      <description>Status of copied file. Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED
+      </description>
+      <name>FileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TO_ARCHIVE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isVerifyCopy" setMethod="setVerifyCopy">
+      <description>Verify MD5 sum of copied file.
+      </description>
+      <name>VerifyCopy</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getRetryIntervalls"
+      setMethod="setRetryIntervalls">
+      <description><![CDATA[Number and interval of retries made for
+      failed Copy Requests.
+      <br>Format:
+      <br>Comma separated list of <i>number</i>x<i>interval</i> pairs.
+      <br>The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      <br>Example: 
+      <br>5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.]]>
+      </description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getConcurrency"
+      setMethod="setConcurrency">
+      <description>Maximum number of concurrent invoked Copy Requests.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getBufferSize"
+      setMethod="setBufferSize">
+      <description>Size of write byte buffer.
+      </description>
+      <name>BufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="8192"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getQueryRetrieveScpServiceName"
+      setMethod="setQueryRetrieveScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueryRetrieveScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+   <operation impact="ACTION">
+      <description>Copy files of given study</description>
+      <name>copyFilesOfStudy</name>
+     <parameter>
+       <description>Study Instance UID</description>
+       <name>studyIUID</name>
+       <type>java.lang.String</type>
+     </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Copy files of given series</description>
+      <name>copyFilesOfSeries</name>
+     <parameter>
+       <description>Series Instance UID</description>
+       <name>seriesIUID</name>
+       <type>java.lang.String</type>
+     </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+   
+</mbean>
+

@@ -1,0 +1,21 @@
+#javac options
+javac.debug=on
+javac.deprecation=off
+javac.optimize=on
+javac.source=1.5
+javac.target=1.5
+
+#Override with your dcm4che-1.4.x dist location
+dcm4che14.home=${user.home}/dcm4che14/build/dcm4che-1.4.22
+
+#Override with your dcm4chee-ejb working directory
+dcm4chee-ejb.home=../dcm4jboss-ejb
+
+#Override with your dcm4chee-sar working directory
+dcm4chee-sar.home=../dcm4jboss-sar
+
+#Override with your dcm4chee-sar working directory
+dcm4chee-hl7.home=../dcm4jboss-hl7
+
+#Override with your JBoss dist location
+jboss.home=${user.home}/jboss-4.2.3.GA

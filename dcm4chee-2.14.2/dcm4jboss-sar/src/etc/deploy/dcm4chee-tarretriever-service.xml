@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-tarretriever-service.xml 2814 2006-09-30 23:04:03Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.hsm.TarRetrieverService"
+    name="dcm4chee.archive:service=TarRetriever"
+    xmbean-dd="xmdesc/dcm4chee-tarretriever-xmbean.xml">
+  </mbean>
+</server>

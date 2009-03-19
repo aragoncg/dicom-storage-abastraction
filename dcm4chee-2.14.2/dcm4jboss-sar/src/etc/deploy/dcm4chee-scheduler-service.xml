@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+<!-- $Id: dcm4chee-scheduler-service.xml 2829 2006-10-03 09:52:50Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.SchedulerService" 
+	name="dcm4chee.archive:service=Scheduler"
+	xmbean-dd="xmdesc/dcm4chee-scheduler-xmbean.xml">	
+  </mbean>
+</server>

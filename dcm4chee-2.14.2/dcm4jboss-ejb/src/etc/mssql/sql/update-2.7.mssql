@@ -1,0 +1,91 @@
+-- Update DB from dcm4chee-2.6.x to dcm4chee-2.7.x
+ALTER TABLE patient DROP COLUMN hidden;
+ALTER TABLE study DROP COLUMN hidden;
+ALTER TABLE series DROP COLUMN hidden;
+ALTER TABLE instance DROP COLUMN hidden;
+
+ALTER TABLE study ADD study_status_id VARCHAR(255);
+ALTER TABLE study ADD study_desc VARCHAR(255);
+
+CREATE INDEX study_desc ON study(study_desc);
+CREATE INDEX study_status_id ON study(study_status_id);
+
+ALTER TABLE series ADD institution VARCHAR(255);
+ALTER TABLE series ADD department VARCHAR(255);
+
+CREATE INDEX institution ON series(institution);
+CREATE INDEX department ON series(department);
+
+CREATE TABLE rel_study_pcode (
+	study_fk       INTEGER,
+	pcode_fk       INTEGER,
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (pcode_fk) REFERENCES code(pk)
+);
+CREATE INDEX pcode_study_fk ON rel_study_pcode(study_fk);
+CREATE INDEX study_pcode_fk ON rel_study_pcode(pcode_fk);
+
+ALTER TABLE mwl_item ADD study_iuid VARCHAR(255);
+CREATE INDEX mwl_study_iuid ON mwl_item(study_iuid);
+
+CREATE TABLE priv_patient (
+	pk          	INTEGER IDENTITY(1,1) PRIMARY KEY,
+	priv_type		INTEGER NOT NULL,
+	pat_id         	VARCHAR(255),
+	pat_id_issuer  	VARCHAR(255),
+	pat_attrs		IMAGE
+);
+CREATE INDEX priv_pat_id ON priv_patient(pat_id, pat_id_issuer);
+CREATE INDEX priv_pat_type ON priv_patient(priv_type);
+
+CREATE TABLE priv_study (
+	pk              INTEGER IDENTITY(1,1) PRIMARY KEY,
+	patient_fk      INTEGER,
+	priv_type		INTEGER NOT NULL,
+	study_iuid      VARCHAR(255) NOT NULL,
+	study_attrs		IMAGE,
+FOREIGN KEY (patient_fk) REFERENCES priv_patient(pk)
+);
+CREATE INDEX priv_patient_fk ON priv_study(patient_fk);
+CREATE INDEX priv_study_type ON priv_study(priv_type);
+CREATE INDEX priv_study_iuid ON priv_study(study_iuid);
+
+CREATE TABLE priv_series (
+	pk              INTEGER IDENTITY(1,1) PRIMARY KEY,
+	study_fk		INTEGER,
+	priv_type		INTEGER NOT NULL,
+	series_iuid     VARCHAR(255) NOT NULL,
+	series_attrs	IMAGE,
+FOREIGN KEY (study_fk) REFERENCES priv_study(pk)
+);
+CREATE INDEX priv_study_fk ON priv_series(study_fk);
+CREATE INDEX priv_series_type ON priv_series(priv_type);
+CREATE INDEX priv_series_iuid ON priv_series(series_iuid);
+
+
+CREATE TABLE priv_instance (
+	pk             	INTEGER IDENTITY(1,1) PRIMARY KEY,
+	series_fk		INTEGER,
+	priv_type		INTEGER NOT NULL,
+	sop_iuid		VARCHAR(255) NOT NULL,
+	inst_attrs		IMAGE,
+FOREIGN KEY (series_fk) REFERENCES priv_series(pk)
+);
+CREATE INDEX priv_series_fk ON priv_instance(series_fk);
+CREATE INDEX priv_inst_type ON priv_instance(priv_type);
+CREATE INDEX priv_sop_iuid ON priv_instance(sop_iuid);
+
+CREATE TABLE priv_file (
+	pk              INTEGER IDENTITY(1,1) PRIMARY KEY,
+	instance_fk     INTEGER,
+	filesystem_fk   INTEGER,
+	filepath		VARCHAR(255) NOT NULL,
+	file_tsuid      VARCHAR(255) NOT NULL,
+	file_md5        VARCHAR(255),
+	file_size       INTEGER,
+	file_status     INTEGER,
+FOREIGN KEY (instance_fk)	REFERENCES priv_instance(pk),
+FOREIGN KEY (filesystem_fk)	REFERENCES filesystem(pk)
+);
+CREATE INDEX priv_instance_fk ON priv_file(instance_fk);
+CREATE INDEX priv_fs_fk ON priv_file(filesystem_fk);

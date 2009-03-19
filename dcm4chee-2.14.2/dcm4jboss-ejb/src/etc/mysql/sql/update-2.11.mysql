@@ -1,0 +1,103 @@
+-- Update DB from dcm4chee-2.10.x to dcm4chee-2.11.x
+
+ALTER TABLE ae ADD (pat_id_issuer VARCHAR(250) BINARY,
+                    ae_desc VARCHAR(250) BINARY);
+
+ALTER TABLE patient ADD (pat_custom1 VARCHAR(250) BINARY,
+                         pat_custom2 VARCHAR(250) BINARY,
+                         pat_custom3 VARCHAR(250) BINARY);
+
+CREATE INDEX pat_custom1 ON patient(pat_custom1(64));
+CREATE INDEX pat_custom2 ON patient(pat_custom2(64));
+CREATE INDEX pat_custom3 ON patient(pat_custom3(64));
+
+ALTER TABLE study ADD (study_custom1 VARCHAR(250) BINARY,
+                       study_custom2 VARCHAR(250) BINARY,
+                       study_custom3 VARCHAR(250) BINARY);
+
+CREATE INDEX study_custom1 ON study(study_custom1(64));
+CREATE INDEX study_custom2 ON study(study_custom2(64));
+CREATE INDEX study_custom3 ON study(study_custom3(64));
+
+ALTER TABLE series ADD (body_part VARCHAR(250) BINARY,
+                        laterality VARCHAR(250) BINARY,
+                        series_desc VARCHAR(250) BINARY,
+                        series_custom1 VARCHAR(250) BINARY,
+                        series_custom2 VARCHAR(250) BINARY,
+                        series_custom3 VARCHAR(250) BINARY);
+
+CREATE INDEX body_part ON series(body_part);
+CREATE INDEX laterality ON series(laterality);
+CREATE INDEX series_desc ON series(series_desc);
+CREATE INDEX series_custom1 ON series(series_custom1(64));
+CREATE INDEX series_custom2 ON series(series_custom2(64));
+CREATE INDEX series_custom3 ON series(series_custom3(64));
+
+ALTER TABLE instance ADD (inst_custom1 VARCHAR(250) BINARY,
+                          inst_custom2 VARCHAR(250) BINARY,
+                          inst_custom3 VARCHAR(250) BINARY);
+CREATE INDEX inst_custom1 ON instance(inst_custom1(64));
+CREATE INDEX inst_custom2 ON instance(inst_custom2(64));
+CREATE INDEX inst_custom3 ON instance(inst_custom3(64));
+
+CREATE TABLE verify_observer (
+	pk              INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	instance_fk     INTEGER,
+	verify_datetime DATETIME,
+	observer_name   VARCHAR(250) BINARY,
+	observer_i_name VARCHAR(250) BINARY,
+	observer_p_name VARCHAR(250) BINARY,
+FOREIGN KEY (instance_fk) REFERENCES instance(pk)
+);
+CREATE INDEX observer_inst_fk ON verify_observer(instance_fk);
+CREATE INDEX verify_datetime ON verify_observer(verify_datetime);
+CREATE INDEX observer_name ON verify_observer(observer_name(64));
+CREATE INDEX observer_i_name ON verify_observer(observer_i_name(64));
+CREATE INDEX observer_p_name ON verify_observer(observer_p_name(64));
+
+ALTER TABLE filesystem ADD fs_group_id VARCHAR(250) BINARY;
+UPDATE filesystem SET fs_group_id='ONLINE_STORAGE' WHERE availability=0;
+UPDATE filesystem SET fs_group_id='NEARLINE_STORAGE' WHERE availability=1;
+ALTER TABLE filesystem MODIFY fs_group_id VARCHAR(250) BINARY NOT NULL;
+CREATE INDEX fs_group_id ON filesystem(fs_group_id(16));
+
+ALTER TABLE mwl_item ADD station_name VARCHAR(250) BINARY;
+CREATE INDEX mwl_station_name ON mwl_item (station_name(16));
+DROP INDEX mwl_sps_id ON mwl_item;
+CREATE UNIQUE INDEX mwl_sps_id ON mwl_item(sps_id(16),req_proc_id(16));
+
+CREATE TABLE other_pid (
+	pk          	INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	pat_id         	VARCHAR(250) BINARY NOT NULL,
+	pat_id_issuer  	VARCHAR(250) BINARY NOT NULL
+);
+CREATE UNIQUE INDEX other_pat_id ON other_pid(pat_id(64), pat_id_issuer(64));
+
+CREATE TABLE rel_pat_other_pid (
+	patient_fk      INTEGER,
+	other_pid_fk    INTEGER,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (other_pid_fk) REFERENCES other_pid(pk)
+);
+CREATE INDEX other_pid_pat_fk ON rel_pat_other_pid(patient_fk);
+CREATE INDEX pat_other_pid_fk ON rel_pat_other_pid(other_pid_fk);
+
+CREATE TABLE study_permission (
+	pk              INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_fk        INTEGER,
+	action          VARCHAR(250) BINARY NOT NULL,
+	roles           VARCHAR(250) BINARY NOT NULL,
+	valid_from      DATETIME NOT NULL,
+	valid_until     DATETIME NOT NULL,
+FOREIGN KEY (study_fk) REFERENCES study(pk)
+);
+CREATE INDEX sty_perm_study_fk ON study_permission(study_fk);
+CREATE INDEX sty_perm_action ON study_permission(action(1));
+CREATE INDEX sty_perm_roles ON study_permission(roles(16));
+CREATE INDEX sty_perm_from ON study_permission(valid_from);
+CREATE INDEX sty_perm_until ON study_permission(valid_until);
+
+-- convert cascaded merge relation to one direct relation:
+-- repeat following statement, until no row is affected! 
+UPDATE patient a, patient b SET a.merge_fk=b.merge_fk 
+    WHERE a.merge_fk = b.pk AND b.merge_fk IS NOT NULL;

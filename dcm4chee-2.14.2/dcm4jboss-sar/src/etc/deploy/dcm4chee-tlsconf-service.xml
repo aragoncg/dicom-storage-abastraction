@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-tlsconf-service.xml 3310 2007-05-06 23:42:06Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.TLSConfigService"
+    name="dcm4chee.archive:service=TLSConfig"
+    xmbean-dd="xmdesc/dcm4chee-tlsconf-xmbean.xml">
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+  </mbean>
+</server>

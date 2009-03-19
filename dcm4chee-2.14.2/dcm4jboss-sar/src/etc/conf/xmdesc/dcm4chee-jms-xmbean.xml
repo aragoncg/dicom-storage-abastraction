@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[JMS Service used by other Services to register and
+   unregister JMS Message Listeners on JMS Queues and to schedule JMS messages]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="Never"/>
+      <!--persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/-->
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.JMSService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>JMSService</name>
+   </constructor>
+
+   <!-- Attributes -->
+    &defaultAttributes;
+
+   <!-- Operations -->
+   <operation impact="ACTION">
+     <description>Register MessageListener on JMS Queue</description>
+     <name>startListening</name>
+     <parameter>
+       <description>Queue Name</description>
+       <name>name</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Message Listner</description>
+       <name>listener</name>
+       <type>javax.jms.MessageListener</type>
+     </parameter>
+     <parameter>
+       <description>Receiver count</description>
+       <name>receiverCount</name>
+       <type>int</type>
+     </parameter>
+     <return-type>void</return-type>
+	 </operation>
+
+   <operation impact="ACTION">
+     <description>Unregister MessageListener from JMS Queue</description>
+     <name>stopListening</name>
+     <parameter>
+       <description>Queue Name</description>
+       <name>name</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>void</return-type>
+ 	 </operation>
+
+   <operation impact="ACTION">
+     <description>Send Message to JMS Queue</description>
+     <name>queue</name>
+     <parameter>
+       <description>Queue Name</description>
+       <name>name</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Message Object</description>
+       <name>obj</name>
+       <type>java.io.Serializable</type>
+     </parameter>
+     <parameter>
+       <description>JMS Priority</description>
+       <name>priority</name>
+       <type>int</type>
+     </parameter>
+     <parameter>
+       <description>Scheduled Delivery Time</description>
+       <name>scheduledTime</name>
+       <type>long</type>
+     </parameter>
+     <return-type>void</return-type>
+	 </operation>
+	
+   &defaultOperations;
+</mbean>
+

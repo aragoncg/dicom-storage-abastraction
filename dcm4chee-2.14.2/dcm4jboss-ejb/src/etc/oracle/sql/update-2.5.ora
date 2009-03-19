@@ -1,0 +1,89 @@
+-- Update DB from dcm4chee-2.4.x to dcm4chee-2.5.x
+
+ALTER TABLE patient ADD created_time TIMESTAMP;
+ALTER TABLE patient ADD updated_time TIMESTAMP;
+ALTER TABLE instance ADD created_time TIMESTAMP;
+ALTER TABLE instance ADD updated_time TIMESTAMP;
+ALTER TABLE mpps ADD created_time TIMESTAMP;
+ALTER TABLE mpps ADD updated_time TIMESTAMP;
+ALTER TABLE mwl_item ADD created_time TIMESTAMP;
+ALTER TABLE mwl_item ADD updated_time TIMESTAMP;
+ALTER TABLE patient ADD hidden NUMBER(1);
+ALTER TABLE study ADD hidden NUMBER(1);
+ALTER TABLE instance ADD hidden NUMBER(1);
+UPDATE patient SET hidden=0;
+UPDATE study SET hidden=0;
+UPDATE instance SET hidden=0;
+CREATE INDEX pat_hidden ON patient(hidden);
+CREATE INDEX study_hidden ON study(hidden);
+CREATE INDEX series_hidden ON series(hidden);
+CREATE INDEX inst_hidden ON instance(hidden);
+DROP INDEX i_study_on_fs;
+CREATE INDEX i_study_on_fs ON study_on_fs(study_fk);
+CREATE INDEX fs_of_study ON study_on_fs(filesystem_fk);
+CREATE INDEX access_time ON study_on_fs(access_time);
+
+CREATE SEQUENCE hp_pk_seq;
+CREATE TABLE hp (
+	pk              NUMBER PRIMARY KEY,
+	user_fk         INTEGER,
+	hp_iuid         VARCHAR2(255) NOT NULL,
+	hp_cuid         VARCHAR2(255),
+	hp_name         VARCHAR2(255),
+	hp_group        VARCHAR2(255),
+	hp_level        INTEGER,
+	num_priors      INTEGER,
+	num_screens     INTEGER,
+	hp_attrs        BLOB,
+FOREIGN KEY (user_fk) REFERENCES code(pk)
+);
+CREATE INDEX hp_user_fk ON hp(user_fk);
+CREATE UNIQUE INDEX hp_iuid ON hp(hp_iuid);
+CREATE INDEX hp_cuid ON hp(hp_cuid);
+CREATE INDEX hp_name ON hp(hp_name);
+CREATE INDEX hp_level ON hp(hp_level);
+CREATE INDEX num_priors ON hp(num_priors);
+CREATE INDEX num_screens ON hp(num_screens);
+
+CREATE SEQUENCE hpdef_pk_seq;
+CREATE TABLE hpdef (
+	pk              NUMBER PRIMARY KEY,
+	hp_fk           INTEGER,
+	modality        VARCHAR2(255),
+	laterality      VARCHAR2(255),
+FOREIGN KEY (hp_fk) REFERENCES hp(pk)
+);
+CREATE INDEX hp_fk ON hpdef(hp_fk);
+CREATE INDEX hpdef_modality ON hpdef(modality);
+CREATE INDEX hpdef_laterality ON hpdef(laterality);
+
+CREATE TABLE rel_hpdef_region (
+	hpdef_fk        INTEGER,
+	region_fk       INTEGER,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (region_fk) REFERENCES code(pk)
+);
+CREATE INDEX region_hpdef_fk ON rel_hpdef_region(hpdef_fk);
+CREATE INDEX hpdef_region_fk ON rel_hpdef_region(region_fk);
+
+CREATE TABLE rel_hpdef_proc (
+	hpdef_fk        INTEGER,
+	proc_fk         INTEGER,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (proc_fk) REFERENCES code(pk)
+);
+CREATE INDEX proc_hpdef_fk ON rel_hpdef_proc(hpdef_fk);
+CREATE INDEX hpdef_proc_fk ON rel_hpdef_proc(proc_fk);
+
+CREATE TABLE rel_hpdef_reason (
+	hpdef_fk        INTEGER,
+	reason_fk       INTEGER,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (reason_fk) REFERENCES code(pk)
+);
+CREATE INDEX reason_hpdef_fk ON rel_hpdef_reason(hpdef_fk);
+CREATE INDEX hpdef_reason_fk ON rel_hpdef_reason(reason_fk);
+
+
+INSERT INTO roles VALUES('admin','McmUser');
+INSERT INTO roles VALUES('user','McmUser');

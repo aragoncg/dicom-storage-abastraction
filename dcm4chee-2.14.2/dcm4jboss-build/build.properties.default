@@ -1,0 +1,11 @@
+#Override with your dcm4che-1.4.x dist location
+dcm4che14.home=${user.home}/dcm4che14/build/dcm4che-1.4.22
+
+#Override with your local Maven2 repository
+m2.repos=${user.home}/.m2/repository
+
+#Override with your JBoss dist location
+jboss.home=${user.home}/jboss-4.2.3.GA
+
+#Override with your FOP dist location
+fop.home=${user.home}/fop-0.20.5

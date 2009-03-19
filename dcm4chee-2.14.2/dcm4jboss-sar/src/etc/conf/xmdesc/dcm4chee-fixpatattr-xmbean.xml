@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>FixPatientAttributes Service. Remove 'none patient attributes' in patient record.(e.g. no study attributes).</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.FixPatientAttributesService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>FixPatientAttributesService</name>
+   </constructor>
+
+   <!-- Attributes -->
+
+   <attribute access="read-write" getMethod="getLimitNumberOfPatientsPerTask" setMethod="setLimitNumberOfPatientsPerTask">
+      <description>Maximum number of patient that are checked in one task.
+      </description>
+      <name>LimitNumberOfPatientsPerTask</name>
+      <type>int</type>
+      <descriptors>
+         <value value="500"/>
+      </descriptors>
+   </attribute>
+
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+
+   <operation impact="ACTION">
+      <description>Check all patients if attributes contains only patient relevant attributes.</description>
+      <name>check</name>
+      <return-type>int</return-type>
+   </operation>
+   
+   <operation impact="ACTION">
+      <description>Fix patient attributes. Return number of updated patients</description>
+      <name>repair</name>
+      <return-type>int</return-type>
+   </operation>
+
+</mbean>
+    

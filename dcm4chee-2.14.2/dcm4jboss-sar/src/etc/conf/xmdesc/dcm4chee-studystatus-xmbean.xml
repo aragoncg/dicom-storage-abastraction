@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Study Status Service to update Study Status triggered by receive
+     of General Purpose Performed Procedure Step N-CREATE-RQ with particular
+     Performed Work Item Code by General Purpose Performed Procedure Step SCP.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.StudyStatusService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>StudyStatusService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+     getMethod="getStatusUpdateRules"
+     setMethod="setStatusUpdateRules">
+      <description><![CDATA[
+      Maps Performed Work Item Codes in received General Purpose
+      Performed Procedure Step N-CREATE-RQ to Study Status IDs.
+      Format: CODE_VALUE^CODING_SCHEMEDESIGNATOR:STUDY_STATUS_ID 
+      (e.g.: 110005^DCM:READ).
+      Multiple mappings can be specified, separated by new line (or semicolon).
+      NONE = no update of Study Status.
+      ]]>
+      </description>
+      <name>StatusUpdateRules</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="110001^DCM:COMPLETED;110005^DCM:READ"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getGpwlScpServiceName"
+      setMethod="setGpwlScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>GpwlScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>

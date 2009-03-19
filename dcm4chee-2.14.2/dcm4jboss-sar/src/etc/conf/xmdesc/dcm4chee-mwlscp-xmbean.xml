@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>DICOM Modality Worklist SCP</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.mwlscp.MWLScpService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>MWLScpService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCalledAETs"
+      setMethod="setCalledAETs">
+      <description>Accepted called AE titles, separated by \ (backslash). 
+       
+      </description>
+      <name>CalledAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCallingAETs"
+      setMethod="setCallingAETs">
+      <description><![CDATA[
+      	List of accepted calling AE titles, separated by \(backslash).<br/>
+      	ANY = accept any. <br/>
+      	CONFIGURED_AETS = accept any configured AE Title.
+      	]]>       
+      </description>
+      <name>CallingAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ANY"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAcceptedTransferSyntax"
+      setMethod="setAcceptedTransferSyntax">
+      <description><![CDATA[
+        List of accepted Transfer Syntaxes. Order defines selection preference.
+        Use either the  Transfer Syntaxes UID value or following defined
+        symbolic names: 
+        ImplicitVRLittleEndian,
+        ExplicitVRLittleEndian,
+        DeflatedExplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]]>
+      </description>
+      <name>AcceptedTransferSyntax</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+           ExplicitVRLittleEndian
+           ImplicitVRLittleEndian
+         "/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isUseProxy"
+      setMethod="setUseProxy">
+      <description>Enable proxy C-FIND to remote MWL SCP. 
+      	Proxy MWL SCP is configured in MWL SCU Service.      
+      </description>
+      <name>UseProxy</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isCheckMatchingKeySupported"
+      setMethod="setCheckMatchingKeySupported">
+      <description>Enable check if unsupported matching key(s) are used in C-FIND. 
+      	In this case the C-FIND PENDING status is changed from 0xff00 to 0xff01.
+      	(Not used if proxy is enabled!)      
+      </description>
+      <name>CheckMatchingKeySupported</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true"/>
+      </descriptors>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum protocol data unit (PDU) package length for receiving PDUs.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsInvoked"
+      setMethod="setMaxOpsInvoked">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to invoke asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsInvoked</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxOpsPerformed"
+      setMethod="setMaxOpsPerformed">
+      <description>The maximum number of outstanding operations and/or
+      sub-operations it allows the Association-requester to perform asynchronously.
+      A value of zero indicates an unlimited number of outstanding operations.
+      Attention: This property should be set to equal values for all DICOM SCP
+      services with same called AE Title(s)! Otherwise it is non-deterministic,
+      which configured value is effective! 
+      </description>
+      <name>MaximumOperationsPerformed</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLogCallingAETs"
+      setMethod="setLogCallingAETs">
+      <description><![CDATA[List of the AE titles for the MWL SCUs for which XMLized
+      query and result attributes are logged into files 
+      <i>AET</i>/<i>timestamp</i>-mwl-cfindrq.xml and 
+      <i>AET</i>/<i>timestamp</i>-mwl-cfindrsp.xml in the log directory.
+      Useful for creation of XSL stylesheets for query/result attribute coercion.
+      Separate multiple values by \(backslash).
+      NONE = no calling AE titles.]]>  
+      </description>
+      <name>LogAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCoerceConfigDir"
+      setMethod="setCoerceConfigDir">
+      <description><![CDATA[Directory where configuration files for query/result
+      attribute coercion are located: if XSL stylesheet "mwl-cfindrq.xsl" or 
+      "mwl-cfindrsp.xsl" exists in this directory or in a sub-directory equal
+      to the AE Title of a MWL SCU, query/result attributes from/to this SCU
+      will be coerced according these stylesheets. A relative path name is 
+      resolved relative to <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>CoerceConfigDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-ae"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isWriteCoercionXmlLog"
+      setMethod="setWriteCoercionXmlLog">
+      <description><![CDATA[Enable logging of coercions in separate log files.<br/>
+      	FileName: &lt;LOG_DIR&gt;/coercion/&lt;timestamp&gt;.&lt;xsl file&gt;.[in]|[out]<br/>
+      	Coercion logs are only written for Calling AETs specified in LogAETitles!]]>
+      </description>
+      <name>WriteCoercionXmlLog</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDcmServerName"
+      setMethod="setDcmServerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DcmServerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getMwlScuServiceName"
+      setMethod="setMwlScuServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>MwlScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAEServiceName"
+      setMethod="setAEServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AEServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;  
+   
+   <!-- Notifications -->
+</mbean>
+

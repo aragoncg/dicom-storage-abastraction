@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dcm4chee-attribute-filter SYSTEM "dcm4chee-attribute-filter.dtd">
+<dcm4chee-attribute-filter>
+    <patient>
+        <attr tag="00080005"/> <!-- Specific Character Set -->
+        <attr tag="00100010"/> <!--  Patient's Name -->
+        <attr tag="00100020"/> <!--  Patient ID -->
+    </patient>
+    <study>
+        <attr tag="00080005"/> <!-- Specific Character Set -->
+        <attr tag="00080020"/> <!-- Study Date -->
+        <attr tag="00080030"/> <!-- Study Time -->
+        <attr tag="00080050"/> <!-- Accession Number -->
+        <attr tag="0020000D" coerce="false"/> <!-- Study Instance UID -->
+        <attr tag="00200010"/> <!-- Study ID -->
+    </study>
+    <series>
+        <attr tag="00080060"/> <!-- Modality -->
+        <attr tag="0020000E" coerce="false"/> <!-- Series Instance UID -->
+        <attr tag="00200011"/> <!-- Series Number -->
+    </series>
+    <instance>
+        <attr tag="00080018"/> <!-- SOP Instance UID -->
+        <attr tag="00200013"/> <!-- Instance Number -->
+    </instance>
+</dcm4chee-attribute-filter>

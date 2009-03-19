@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Scheduler Service used by other Services to register
+   callbacks for periodical invocation by the JMX Timer Service]]>
+   </description>
+   <descriptors>
+      <persistence persistPolicy="Never"/>
+      <!--persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/-->
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.SchedulerService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>SchedulerService</name>
+   </constructor>
+
+   <!-- Attributes -->
+    &defaultAttributes;
+
+   <!-- Operations -->
+   <operation impact="ACTION">
+     <description>Register callback, return Scheduler ID</description>
+     <name>startScheduler</name>
+     <parameter>
+       <description>Scheduler Name</description>
+       <name>name</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Period in ms</description>
+       <name>period</name>
+       <type>long</type>
+     </parameter>
+     <parameter>
+       <description>Callback</description>
+       <name>listener</name>
+       <type>javax.management.NotificationListener</type>
+     </parameter>
+     <return-type>java.lang.Integer</return-type>
+	</operation>
+   <operation impact="ACTION">
+     <description>Unregister callback</description>
+     <name>stopScheduler</name>
+     <parameter>
+       <description>Scheduler Name</description>
+       <name>name</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Scheduler ID</description>
+       <name>id</name>
+       <type>java.lang.Integer</type>
+     </parameter>
+     <parameter>
+       <description>Callback</description>
+       <name>listener</name>
+       <type>javax.management.NotificationListener</type>
+     </parameter>
+     <return-type>void</return-type>
+	</operation>
+   &defaultOperations;
+</mbean>
+

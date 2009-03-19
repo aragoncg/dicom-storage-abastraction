@@ -1,0 +1,5 @@
+# ContentTypeCodes 
+hct_1^Healthcare Type 1
+hct_2^Healthcare Type 2
+hct_3^Healthcare Type 3
+hct_4^Healthcare Type 4

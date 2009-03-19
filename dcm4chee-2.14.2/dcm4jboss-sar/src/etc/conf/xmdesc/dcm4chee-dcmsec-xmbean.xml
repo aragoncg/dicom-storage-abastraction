@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+	<description><![CDATA[DICOM Security Service. Performs JAAS login with
+		user information provided in the Association Request or AE configuration
+		for the calling AE and make returned information about user roles
+		(<code>javax.security.auth.Subject</code>) available for invoked DICOM
+		services by association property <code>"user"</code>.]]>
+	</description>
+	<descriptors>
+		<persistence persistPolicy="OnUpdate" />
+		<persistence-manager
+			value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+	</descriptors>
+
+	<class>org.dcm4chex.archive.mbean.DicomSecurityService</class>
+
+	<constructor>
+		<description>The default constructor</description>
+		<name>DicomSecurityService</name>
+	</constructor>
+
+	<!-- Attributes -->
+	<attribute access="read-write" getMethod="getSecurityDomain"
+		setMethod="setSecurityDomain">
+		<description><![CDATA[
+Name of security domain specified in <code>conf/login-config.xml</code>,
+which defines authentication parameters and roles associated to user names.]]>
+		</description>
+		<name>SecurityDomain</name>
+		<type>java.lang.String</type>
+		<descriptors>
+			<value value="dcm4chee-dicom" />
+		</descriptors>
+	</attribute>
+
+	<attribute access="read-write" getMethod="isRejectIfNoUserIdentity"
+		setMethod="setRejectIfNoUserIdentity">
+		<description><![CDATA[
+			Defines if Association Request w/o User Identity information from
+			remote AEs with no default User Identity specified by the AE
+			configuration shall be rejected!]]>
+		</description>
+		<name>RejectIfNoUserIdentity</name>
+		<type>boolean</type>
+		<descriptors>
+			<value value="false" />
+		</descriptors>
+	</attribute>
+
+	<attribute access="read-write" getMethod="getDefaultUserID"
+		setMethod="setDefaultUserID">
+		<description><![CDATA[
+			Default user name associated with an Assocation, if no User
+			Identity information is provided neither in the Assocation
+			Request nor in the AE configuration for the Calling AE. Only
+			effective if <i>RejectIfNoUserIdentity</i> is <code>false</code>.
+			Use '-' (hypen) for specifying no default User ID. Then no
+			<code>javax.security.auth.Subject</code> will be associated
+			with the association in that case.
+			]]>
+		</description>
+		<name>DefaultUserID</name>
+		<type>java.lang.String</type>
+		<descriptors>
+			<value value="-" />
+		</descriptors>
+	</attribute>
+	<attribute access="read-write" getMethod="getDefaultPassword"
+		setMethod="setDefaultPassword">
+		<description><![CDATA[
+			Password for user specified in <i>DefaultUserID</i>. Only
+			effective if <i>DefaultUserID</i> is not '-' and 
+			<i>RejectIfNoUserIdentity</i> is <code>false</code>.
+			Use '-' (hypen) for no password.
+			]]>
+		</description>
+		<name>DefaultPassword</name>
+		<type>java.lang.String</type>
+		<descriptors>
+			<value value="-" />
+		</descriptors>
+	</attribute>
+
+	&defaultAttributes;
+
+	<!-- Operations -->
+	<operation impact="INFO">
+		<description>get UserIdentityNegotiator</description>
+		<name>userIdentityNegotiator</name>
+		<return-type>
+			org.dcm4che.net.UserIdentityNegotiator
+		</return-type>
+	</operation>
+	<operation impact="INFO">
+		<description>Validate password for user and populate subject</description>
+		<name>isValid</name>
+     <parameter>
+       <name>userID</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <name>password</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <name>subject</name>
+       <type>javax.security.auth.Subject</type>
+     </parameter>
+     <return-type>boolean</return-type>
+	</operation>
+
+	&defaultOperations;
+</mbean>
+

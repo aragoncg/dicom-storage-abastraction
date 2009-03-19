@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Forward Service.<br>
+		Provides auto-routing of DICOM objects that are received by the DICOM Storage Service 
+		to remote DICOM applications.
+		<p>Forwarding Rules can be defined in one or several XSLT stylesheets
+		under the configuration directory (s.attribute <b>ConfigDirectory</b>). 
+]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.movescu.ForwardService2</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>ForwardService2</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getConfigDir"
+      setMethod="setConfigDir">
+      <description><![CDATA[Directory where configuration files defining
+      forwarding rules are located: if XSL stylesheet "forward.xsl" exists in
+      this directory or in a sub-directory equal to the AE Title of the
+      Storage SCU, received Series will be forwarded to one or several
+      destinations according the forwarding rules in the stylesheet.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>ConfigDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-ae"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getForwardOnInstanceLevelFromAETs"
+      setMethod="setForwardOnInstanceLevelFromAETs">
+      <description><![CDATA[Comma separated list of AE titles of Storage SCUs
+      from which objects are forwarded by an Instance level retrieve request.
+      Objects received from other Storage SCUs are forwarded on Series level,
+      which may cause to multiple forwarding of objects, if the Storage SCU
+      sends instances of a single series in multiple associations in succession.
+      <br>ALL = Forward objects on Instance level received from any Storage SCUs.
+      <br>NONE = Forward objects on Series level received from any Storage SCUs.
+      <br>Exception: if only one object is received in the association,
+      the object will be forwarded by an Instance level retrieve request, even
+      if the AE title of the sending Storage SCU is not listed.
+      ]]>
+      </description>
+      <name>ForwardOnInstanceLevelFromAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getMoveScuServiceName"
+      setMethod="setMoveScuServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>MoveScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+</mbean>
+

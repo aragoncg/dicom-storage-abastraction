@@ -1,0 +1,432 @@
+<?xml version="1.0"?>
+<!--
+    $Id: maverick.xml 6149 2008-03-31 19:28:34Z javawilli $
+    $Source$
+-->
+<maverick version="2.0" default-view-type="domify"
+default-transform-type="xslt">
+  <modules>
+    <view-factory type="domify" provider="org.infohazard.maverick.opt.view.DomifyViewFactory" />
+	<shunt-factory provider="org.dcm4chex.archive.web.maverick.shunt.LanguageShuntFactory"/>
+  </modules>
+
+  <views>
+    <view id="folder" name="folder">
+      <transform path="folder.xsl" />
+    </view>
+    <view id="trash" name="trash">
+      <transform path="trash.xsl" />
+    </view>
+    <view id="echoresult" name="echoresult">
+      <transform path="ae_echo.xsl" />
+    </view>
+    <view id="error" name="error">
+   	  <transform path="error.xsl" />
+    </view>
+    <view id="logout" name="logout">
+      <transform path="logout.xsl" />
+    </view>
+  </views>
+  <views mode="de">
+    <view id="folder" name="folder">
+      <transform path="de/folder.xsl" />
+    </view>
+    <view id="trash" name="trash">
+      <transform path="de/trash.xsl" />
+    </view>
+  </views>
+  <views mode="fr">
+    <view id="folder" name="folder">
+      <transform path="fr/folder.xsl" />
+    </view>
+    <view id="trash" name="trash">
+      <transform path="fr/trash.xsl" />
+    </view>
+  </views>
+
+  <commands>
+    <command name="folder">
+      <controller class="org.dcm4chex.archive.web.maverick.FolderCtrl" />
+      <view ref="folder" />
+      <view ref="logout" />
+    </command>
+
+    <command name="foldersubmit">
+      	<controller	class="org.dcm4chex.archive.web.maverick.FolderSubmitCtrl" />
+      	<view ref="folder" />
+	    <view id="merge" name="merge">
+	      <transform path="patient_merge.xsl" />
+	    </view>
+	    <view id="worklist" name="worklist">
+	      <transform path="addWorklist.xsl" />
+	    </view>
+      <view ref="logout" />
+	  <view name="exportSelector" type="redirect" path="tfSelector.m"/>
+	  <view name="xdsi_export" type="redirect" path="xdsiExport.m"/>
+    </command>
+
+
+    <command name="expandPat">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.ExpandPatientCtrl" />
+
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+
+    <command name="expandStudy">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.ExpandStudyCtrl" />
+
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+
+    <command name="expandSeries">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.ExpandSeriesCtrl" />
+
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+
+    <command name="expandInstance">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.ExpandInstanceCtrl" />
+
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+
+    <command name="expandXDS">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.xdsi.ExpandXDSCtrl" />
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+    <command name="xdsQuery">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.xdsi.XDSQueryCtrl" />
+	  <view name="success" type="redirect" path="folder.m"/>
+    </command>
+
+    <command name="patientEdit">
+        <controller class="org.dcm4chex.archive.web.maverick.PatientEditCtrl" />    
+	    <view name="success">
+    	  <transform path="patient_edit.xsl" />
+	    </view>
+     </command>
+
+    <command name="patientUpdate">
+        <controller class="org.dcm4chex.archive.web.maverick.PatientUpdateCtrl" />    
+	    <view type="redirect" path="folder.m" name="success"/>        
+	  <view name="error" type="redirect" path="patientEdit.m?pk=-1"/>
+     </command>
+
+    <command name="patientMerge">
+        <controller class="org.dcm4chex.archive.web.maverick.PatientMergeCtrl" />    
+	    <view type="redirect" path="foldersubmit.m?filter=" name="success"/>        
+	    <view type="redirect" path="mpps_console.m?filter.x=1" name="mpps_link"/>        
+	    <view ref="error" />
+     </command>
+
+    <command name="studyEdit">
+        <controller class="org.dcm4chex.archive.web.maverick.StudyEditCtrl" />    
+	    <view name="success">
+    	  <transform path="study_edit.xsl" />
+	    </view>
+	    <view name="view">
+    	  <transform path="study_view.xsl" />
+	    </view>
+     </command>
+ 
+     <command name="addWorklist">
+        <controller class="org.dcm4chex.archive.web.maverick.AddWorklistCtrl" />    
+	    <view name="success">
+    	  <transform path="addWorklist.xsl" />
+	    </view>
+	    <view type="redirect" path="folder.m" name="cancel"/>        
+	    <view type="redirect" path="folder.m?popupMsg=New worklist item added!" name="folder"/>        
+     </command>
+     
+
+    <command name="studyUpdate">
+        <controller class="org.dcm4chex.archive.web.maverick.StudyUpdateCtrl" />    
+	    <view type="redirect" path="folder.m" name="success"/>
+     </command>
+
+    <command name="seriesEdit">
+        <controller class="org.dcm4chex.archive.web.maverick.SeriesEditCtrl" />    
+	    <view name="success">
+    	  <transform path="series_edit.xsl" />
+	    </view>
+	    <view name="view">
+    	  <transform path="series_view.xsl" />
+	    </view>
+     </command>
+
+    <command name="seriesUpdate">
+        <controller class="org.dcm4chex.archive.web.maverick.SeriesUpdateCtrl" />    
+	    <view type="redirect" path="folder.m" name="success"/>
+     </command>
+     
+    <command name="inspectDicomHeader">
+        <controller class="org.dcm4chex.archive.web.maverick.InspectDicomHeaderCtrl" />    
+	    <view name="inspect" type="redirect" path="dcmview.jsp"/>
+	    <view name="error" type="redirect" path="folder.m" />
+     </command>
+
+	<!-- ****** trashfolder related commands ******-->
+
+    <command name="trashfolder">
+      	<controller	class="org.dcm4chex.archive.web.maverick.trash.TrashFolderCtrl" />
+		<view ref="trash" />
+	  	<view name="folder" type="redirect" path="folder.m"/>
+      	<view ref="logout" />
+    </command>
+
+    <command name="expandTrashPatient">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.trash.ExpandTrashPatientCtrl" />
+
+	  <view name="success" type="redirect" path="trashfolder.m"/>
+    </command>
+
+    <command name="expandTrashStudy">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.trash.ExpandTrashStudyCtrl" />
+
+	  <view name="success" type="redirect" path="trashfolder.m"/>
+    </command>
+
+    <command name="expandTrashSeries">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.trash.ExpandTrashSeriesCtrl" />
+
+	  <view name="success" type="redirect" path="trashfolder.m"/>
+    </command>
+    
+    <command name="expandTrashInstance">
+      <controller
+      class="org.dcm4chex.archive.web.maverick.trash.ExpandTrashInstanceCtrl" />
+
+	  <view name="success" type="redirect" path="trashfolder.m"/>
+    </command>
+
+	<!-- ****** AE related commands ******-->
+
+    <command name="ae">
+        <controller class="org.dcm4chex.archive.web.maverick.ae.AEListCtrl" />    
+	    <view name="success">
+    	  <transform path="ae_list.xsl" />
+	    </view>
+     </command>
+
+    <command name="aeedit">
+        <controller class="org.dcm4chex.archive.web.maverick.ae.AEEditCtrl" />    
+	    <view name="success">
+    	  <transform path="ae_edit.xsl" />
+	    </view>
+	    <view name="failed" type="redirect" path="ae.m"/>
+      <view ref="error" />
+     </command>
+
+    <command name="aeeditsubmit">
+        <controller class="org.dcm4chex.archive.web.maverick.ae.AEEditSubmitCtrl" />    
+	    <view name="success" type="redirect" path="ae.m"/>
+	    <view name="failed" type="redirect" path="aeedit.m"/>
+        <view ref="error" />
+     </command>
+     
+    <command name="aenew">
+    	<controller class="org.dcm4chex.archive.web.maverick.ae.AENewCtrl" />    
+	    <view name="success">
+    	  <transform path="ae_new.xsl" />
+	    </view>
+	    <view name="failed" type="redirect" path="ae.m"/>
+      <view ref="error" />
+     </command>
+
+    <command name="aenewsubmit">
+        <controller class="org.dcm4chex.archive.web.maverick.ae.AENewSubmitCtrl" />    
+        <view name="success" type="redirect" path="ae.m"/>
+	    <view name="failed" type="redirect" path="aeedit.m"/>
+      <view ref="error" />
+     </command>
+
+    <command name="aedelete">
+    	<controller class="org.dcm4chex.archive.web.maverick.ae.AEDeleteCtrl" />    
+	    <view name="success" type="redirect" path="ae.m"/>
+	    <view ref="error" />
+     </command>
+     
+    <command name="aeecho">
+    	<controller class="org.dcm4chex.archive.web.maverick.ae.AEEchoCtrl" />    
+    <view id="echoresult" name="echoresult">
+      <transform path="ae_echo.xsl" />
+    </view>
+	    <view ref="error" />
+     </command>
+     
+	<!-- ****** END AE related commands ******-->
+ 
+	<!-- ****** Media Creation Manager Console (MCMConsole) related commands ******-->
+
+    <command name="mcm_console">
+        <controller class="org.dcm4chex.archive.web.maverick.mcmc.MCMConsoleCtrl" />    
+	    <view name="success">
+    	  <transform path="mcmc/mcm_console.xsl" />
+	    </view>
+     </command>
+
+	<!-- ****** Modality Worklist Console (MWLConsole) related commands ******-->
+
+    <command name="mwl_console">
+        <controller class="org.dcm4chex.archive.web.maverick.mwl.MWLConsoleCtrl" />    
+	    <view name="success">
+    	  <transform path="mwlc/mwl_console.xsl" />
+	    </view>
+	    <view name="cancelLink" type="redirect" path="mpps_console.m?filter.x=1"/>
+	    <view name="linkDone" type="redirect" path="mpps_console.m?action=linkDone"/>
+	    <view name="mergePatient">
+    	  <!-- <transform path="mwlc/merge_confirm.xsl" /> -->
+	      <transform path="patient_merge.xsl" />
+	    </view>
+	    <view name="inspect" type="redirect" path="dcmview.jsp"/>
+     </command>
+
+	<!-- ****** Modality Performed Procedure Step Console (MPPSConsole) related commands ******-->
+
+    <command name="mpps_console">
+        <controller class="org.dcm4chex.archive.web.maverick.mpps.MPPSConsoleCtrl" />    
+	    <view name="success">
+    	  <transform path="mppsc/mpps_console.xsl" />
+	    </view>
+	    <view name="error">
+    	  <transform path="mppsc/mpps_console.xsl" />
+	    </view>
+	    <view name="link" type="redirect" path="mwl_console.m?action=link"/>
+	    <view name="inspect" type="redirect" path="dcmview.jsp"/>
+     </command>
+     
+	<!-- ****** General Purpose Worklist Console (GPWLConsole) related commands ******-->
+
+    <command name="gpwl_console">
+        <controller class="org.dcm4chex.archive.web.maverick.gpwl.GPWLConsoleCtrl" />    
+	    <view name="success">
+    	  <transform path="gpwlc/gpwl_console.xsl" />
+	    </view>
+	    <view name="linkDone" type="redirect" path="gppps_console.m?action=linkDone"/>
+	    <view name="inspect" type="redirect" path="dcmview.jsp"/>
+     </command>
+	<!-- ****** General Purpose Performed Procedure Step Console (GPPPSConsole) related commands ******-->
+
+    <command name="gppps_console">
+        <controller class="org.dcm4chex.archive.web.maverick.gppps.GPPPSConsoleCtrl" />    
+	    <view name="success">
+    	  <transform path="gpppsc/gppps_console.xsl" />
+	    </view>
+	    <view name="link" type="redirect" path="gpwl_console.m?action=link"/>
+	    <view name="inspect" type="redirect" path="dcmview.jsp"/>
+     </command>
+
+	<!-- ****** User admin related commands ******-->
+
+    <command name="useradmin_console">
+        <controller class="org.dcm4chex.archive.web.maverick.admin.UserAdminConsoleCtrl" />    
+	    <view name="userlist" type="redirect" path="user_list.m"/>
+	    <view name="chgpwd" type="redirect" path="user_chgpwd.m"/>
+     </command>
+     
+    <command name="user_list">
+        <controller class="org.dcm4chex.archive.web.maverick.admin.UserListCtrl" />    
+	    <view name="success">
+    	  <transform path="admin/user_list.xsl" />
+	    </view>
+     </command>
+ 
+    <command name="user_chgpwd">
+        <controller class="org.dcm4chex.archive.web.maverick.admin.UserChgPwdCtrl" />    
+	    <view name="success">
+    	  <transform path="admin/user_chgpwd.xsl" />
+	    </view>
+     </command>
+
+    <command name="user_chgpwdsubmit">
+        <controller class="org.dcm4chex.archive.web.maverick.admin.UserChgPwdSubmitCtrl" />    
+	    <view name="success" type="redirect" path="folder.m"/>
+	    <view name="chgpwd_error" type="redirect" path="user_chgpwd.m"/>
+        <view ref="error" />
+     </command>
+ 
+    <command name="user_editsubmit">
+        <controller class="org.dcm4chex.archive.web.maverick.admin.UserEditSubmitCtrl" />    
+	    <view name="success" type="redirect" path="useradmin_console.m"/>
+	    <view name="passwd_mismatch" type="redirect" path="user_new.m"/>
+        <view ref="error" />
+     </command>
+     
+    <command name="user_new">
+    	<controller class="org.dcm4chex.archive.web.maverick.admin.UserNewCtrl" />    
+	    <view name="success">
+    	  <transform path="admin/user_new.xsl" />
+	    </view>
+      <view ref="error" />
+     </command>
+
+	<!-- ****** Teaching file related commands ******-->
+
+    <command name="tfSelector">
+        <controller class="org.dcm4chex.archive.web.maverick.tf.TFSelectorCtrl" />    
+	    <view name="tfselect">
+    	  <transform path="tf/tf_selector.xsl" />
+	    </view>
+	    <view name="error">
+    	  <transform path="tf/tf_selector.xsl" />
+	    </view>
+	    <view name="success" type="redirect" path="foldersubmit.m?popupMsg=Export of Teaching File done!&amp;filter.x=1" />        
+	    <view name="cancel" type="redirect" path="folder.m" />        
+     </command>
+    
+	<!-- ****** XDSI related commands ******-->
+
+    <command name="xdsiExport">
+        <controller class="org.dcm4chex.archive.web.maverick.xdsi.XDSIExportCtrl" />    
+	    <view name="xdsi_export">
+    	  <transform path="xdsi/xdsi_export.xsl" />
+	    </view>
+	    <view name="error">
+    	  <transform path="xdsi/xdsi_export.xsl" />
+	    </view>
+	    <view name="success" type="redirect" path="foldersubmit.m?popupMsg=XDS-I Export done!&amp;filter.x=1" />        
+	    <view name="cancel" type="redirect" path="folder.m" />        
+     </command>
+    <command name="showManifest">
+        <controller class="org.dcm4chex.archive.web.maverick.xdsi.ShowManifestCtrl" />    
+	    <view name="success">
+    	  <transform path="xdsi/xdsi_showmanifest.xsl" />
+	    </view>
+	    <view name="error" type="redirect" path="folder.m" />        
+     </command>
+     
+     <!-- ******* ARR comands ******* -->
+     <command name="arr">
+        <controller class="org.dcm4chex.archive.web.maverick.arr.ArrCtrl" />    
+	    <view name="success">
+    	  <transform path="arr.xsl" />
+	    </view>
+     </command>
+
+    <!-- ****** Study Permission related commands ******-->
+
+    <command name="studyPermission">
+        <controller class="org.dcm4chex.archive.web.maverick.permission.StudyPermissionCtrl" />    
+	    <view name="success">
+    	  <transform path="permission/permission_list.xsl" />
+	    </view>
+	    <view name="cancel" type="redirect" path="foldersubmit.m?filter=true" />        
+     </command>
+    <command name="studyPermissionUpdate">
+        <controller class="org.dcm4chex.archive.web.maverick.permission.StudyPermissionUpdateCtrl" />    
+		<view name="success" type="redirect" path="studyPermission.m"/>
+		<view name="cancel" type="redirect" path="foldersubmit.m?filter=true"/>
+     </command>
+     
+  </commands>
+</maverick>
+

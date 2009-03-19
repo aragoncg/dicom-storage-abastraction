@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-hl7srv-service.xml 3308 2007-05-06 23:35:51Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+  <mbean code="org.dcm4chex.archive.hl7.HL7ServerService" 
+         name="dcm4chee.archive:service=HL7Server"
+         xmbean-dd="xmdesc/dcm4chee-hl7srv-xmbean.xml">
+    <!-- Delay start of HL7 server after deployment of EJBs
+         needed by ADTService and ORMService --> 
+    <depends>jboss.j2ee:service=EJB,jndiName=ejb/PatientUpdate</depends>
+    <depends>jboss.j2ee:service=EJB,jndiName=ejb/MWLManager</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+  </mbean>
+</server>

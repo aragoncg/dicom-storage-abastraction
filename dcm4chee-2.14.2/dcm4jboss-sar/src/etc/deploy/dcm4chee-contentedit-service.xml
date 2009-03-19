@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-contentedit-service.xml 7596 2008-10-16 14:53:05Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.ContentEditService"
+    name="dcm4chee.archive:service=ContentEditService"
+    xmbean-dd="xmdesc/dcm4chee-contentedit-xmbean.xml" >
+	  <depends optional-attribute-name="AuditLoggerName"
+	    >dcm4chee.archive:service=AuditLogger</depends>
+	  <depends optional-attribute-name="HL7SendServiceName"
+	     >dcm4chee.archive:service=HL7Send</depends>
+	  <depends optional-attribute-name="StudyMgtScuServiceName"
+	     >dcm4chee.archive:service=StudyMgtScu</depends>
+	  <depends optional-attribute-name="StoreScpServiceName"
+	     >dcm4chee.archive:service=StoreScp</depends>
+	  <depends optional-attribute-name="MppsScpServiceName"
+	     >dcm4chee.archive:service=MPPSScp</depends>
+  </mbean>
+</server>

@@ -1,0 +1,103 @@
+-- Update DB from dcm4chee-2.7.x to dcm4chee-2.8.x
+
+ALTER TABLE patient CHANGE pat_id pat_id VARCHAR(250) BINARY NOT NULL;
+
+UPDATE patient SET pat_name = UPPER(pat_name);
+UPDATE study SET ref_physician = UPPER(ref_physician);
+UPDATE series SET institution = UPPER(institution), department = UPPER(institution);
+UPDATE mwl_item SET perf_physician = UPPER(perf_physician);
+UPDATE gpsps_perf SET human_perf_name = UPPER(human_perf_name);
+UPDATE patient SET pat_name = CONCAT(pat_name,'^') WHERE pat_name IS NOT NULL AND pat_name NOT LIKE '%^%^%^%^%';
+UPDATE patient SET pat_name = CONCAT(pat_name,'^') WHERE pat_name IS NOT NULL AND pat_name NOT LIKE '%^%^%^%^%';
+UPDATE patient SET pat_name = CONCAT(pat_name,'^') WHERE pat_name IS NOT NULL AND pat_name NOT LIKE '%^%^%^%^%';
+UPDATE patient SET pat_name = CONCAT(pat_name,'^') WHERE pat_name IS NOT NULL AND pat_name NOT LIKE '%^%^%^%^%';
+UPDATE study SET ref_physician = CONCAT(ref_physician,'^') WHERE ref_physician IS NOT NULL AND ref_physician NOT LIKE '%^%^%^%^%';
+UPDATE study SET ref_physician = CONCAT(ref_physician,'^') WHERE ref_physician IS NOT NULL AND ref_physician NOT LIKE '%^%^%^%^%';
+UPDATE study SET ref_physician = CONCAT(ref_physician,'^') WHERE ref_physician IS NOT NULL AND ref_physician NOT LIKE '%^%^%^%^%';
+UPDATE study SET ref_physician = CONCAT(ref_physician,'^') WHERE ref_physician IS NOT NULL AND ref_physician NOT LIKE '%^%^%^%^%';
+UPDATE mwl_item SET perf_physician = CONCAT(perf_physician,'^') WHERE perf_physician IS NOT NULL AND perf_physician NOT LIKE '%^%^%^%^%';
+UPDATE mwl_item SET perf_physician = CONCAT(perf_physician,'^') WHERE perf_physician IS NOT NULL AND perf_physician NOT LIKE '%^%^%^%^%';
+UPDATE mwl_item SET perf_physician = CONCAT(perf_physician,'^') WHERE perf_physician IS NOT NULL AND perf_physician NOT LIKE '%^%^%^%^%';
+UPDATE mwl_item SET perf_physician = CONCAT(perf_physician,'^') WHERE perf_physician IS NOT NULL AND perf_physician NOT LIKE '%^%^%^%^%';
+UPDATE gpsps_perf SET human_perf_name = CONCAT(human_perf_name,'^') WHERE human_perf_name IS NOT NULL AND human_perf_name NOT LIKE '%^%^%^%^%';
+UPDATE gpsps_perf SET human_perf_name = CONCAT(human_perf_name,'^') WHERE human_perf_name IS NOT NULL AND human_perf_name NOT LIKE '%^%^%^%^%';
+UPDATE gpsps_perf SET human_perf_name = CONCAT(human_perf_name,'^') WHERE human_perf_name IS NOT NULL AND human_perf_name NOT LIKE '%^%^%^%^%';
+UPDATE gpsps_perf SET human_perf_name = CONCAT(human_perf_name,'^') WHERE human_perf_name IS NOT NULL AND human_perf_name NOT LIKE '%^%^%^%^%';
+
+DROP INDEX pat_id;
+CREATE UNIQUE INDEX pat_id ON patient(pat_id, pat_id_issuer);
+
+DROP INDEX i_study_on_fs;
+CREATE UNIQUE INDEX i_study_on_fs ON study_on_fs(study_fk, filesystem_fk);
+
+ALTER TABLE filesystem ADD next_fk INTEGER;
+ALTER TABLE filesystem ADD fs_status INTEGER;
+UPDATE filesystem SET fs_status=0;
+
+CREATE INDEX fs_availability ON filesystem(availability);
+CREATE INDEX fs_next_fk ON filesystem(next_fk);
+CREATE INDEX fs_status ON filesystem(fs_status);
+
+ALTER TABLE patient ADD pat_i_name VARCHAR(250) BINARY;
+ALTER TABLE patient ADD pat_p_name VARCHAR(250) BINARY;
+
+CREATE INDEX pat_i_name ON patient(pat_i_name);
+CREATE INDEX pat_p_name ON patient(pat_p_name);
+
+ALTER TABLE study ADD ref_phys_i_name VARCHAR(250) BINARY;
+ALTER TABLE study ADD ref_phys_p_name VARCHAR(250) BINARY;
+
+ALTER TABLE instance MODIFY inst_attrs LONGBLOB;
+
+CREATE INDEX ref_phys_i_name ON study(ref_phys_i_name);
+CREATE INDEX ref_phys_p_name ON study(ref_phys_p_name);
+
+ALTER TABLE mwl_item ADD perf_phys_i_name VARCHAR(250) BINARY;
+ALTER TABLE mwl_item ADD perf_phys_p_name VARCHAR(250) BINARY;
+
+CREATE INDEX mwl_perf_phys_i_nm ON mwl_item(perf_phys_i_name);
+CREATE INDEX mwl_perf_phys_p_nm ON mwl_item(perf_phys_p_name);
+
+ALTER TABLE gpsps_perf ADD hum_perf_i_name VARCHAR(250) BINARY;
+ALTER TABLE gpsps_perf ADD hum_perf_p_name VARCHAR(250) BINARY;
+
+CREATE INDEX gpsps_perf_i_name ON gpsps_perf(hum_perf_i_name);
+CREATE INDEX gpsps_perf_p_name ON gpsps_perf(hum_perf_p_name);
+
+CREATE TABLE gppps (
+	pk          		INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk			INTEGER,
+	pps_iuid			VARCHAR(250) BINARY NOT NULL,
+	pps_start			DATETIME,
+	pps_status			INTEGER NOT NULL,
+	created_time	    DATETIME,
+	updated_time	    DATETIME,
+	pps_attrs			BLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+);
+CREATE UNIQUE INDEX gppps_iuid ON gppps (pps_iuid);
+CREATE INDEX gppps_patient_fk ON gppps(patient_fk);
+CREATE INDEX gppps_pps_start ON gppps (pps_start);
+
+CREATE TABLE rel_gpsps_gppps (
+	gpsps_fk        INTEGER,
+	gppps_fk        INTEGER,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (gppps_fk) REFERENCES gppps(pk)
+);
+CREATE INDEX gppps_gpsps_fk ON rel_gpsps_gppps(gpsps_fk);
+CREATE INDEX gpsps_gppps_fk ON rel_gpsps_gppps(gppps_fk);
+
+CREATE TABLE assoc (
+	pk              INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	calling_aet    	VARCHAR(250) BINARY,
+	called_aet     	VARCHAR(250) BINARY,
+	retrieve_aet   	VARCHAR(250) BINARY,
+	pat_id         	VARCHAR(250) BINARY,
+	pat_name    	VARCHAR(250) BINARY,
+	accession_no	VARCHAR(250) BINARY,
+	created_time	DATETIME,
+	updated_time	DATETIME,
+	ian_attrs       BLOB
+);
+CREATE INDEX assoc_updated_time ON assoc(updated_time);

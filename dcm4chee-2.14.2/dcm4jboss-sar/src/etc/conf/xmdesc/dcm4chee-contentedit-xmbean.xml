@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Content Edit service. <br>
+   		 Identifies where patient information and study information updates are sent and received. <br>
+   		 Use the values in <tt>ReceivingApplication</tt> and <tt>ReceivingFacility</tt> attributes or the 
+         <tt>SendingApplication</tt> or <tt>SendingFacility</tt> attributes to configure specific
+         forwarding rules in the <b>HL7SendService</b> for patient information updates received from this
+         Content Edit Service. <br>
+         Use the values in the <tt>CalledAETitle</tt> and the <tt>CallingAETitle</tt> attributes to configure
+         specific forwarding rules in the <b>StudyMgtScu</b> Service for study information updates
+         received from this Content Edit Service.
+         <p>
+         The Content Edit Service sends also <tt>PatientUpdated</tt> and <tt>SeriesUpdated</tt> <b>JMX Notifications</b>.<br> 
+         This allows to forward instances to systems not supporting either StudyMgtScu or HL7 ADT patient updates.<br>
+         In this case the receiver must use the received instances for updating!<br>
+         Use the <b>ForwardService</b> to configure this forward option.
+         </p>]]>
+      </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.ContentEditService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>ContentEditService</name>
+   </constructor>
+
+   <attribute access="read-write" getMethod="getReceivingApplication" setMethod="setReceivingApplication">
+      <description>Identifies the Receiving Application in HL7 messages that are  directed to
+         the HL7SendService to notify other applications about patient information
+         updates. The values in the ReceivingApplication attribute may be used to configure specific
+         forwarding rules in the HL7SendService for HL7 messages that are  received from this
+         Content Edit Service.   
+      </description>
+      <name>ReceivingApplication</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getReceivingFacility" setMethod="setReceivingFacility">
+      <description>Identifies the Receiving Facility in HL7 messages that are directed to
+         the HL7SendService to notify other applications about patient information
+         updates.
+      The values in the ReceivingFacility attribute may be used to configure specific
+         forwarding rules in the HL7SendService for HL7 messages that are  received from this
+         Content Edit Service.</description>
+      <name>ReceivingFacility</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSendingApplication" setMethod="setSendingApplication">
+      <description>Identifies the Sending Application in HL7 messages that are  directed to
+         the HL7SendService to notify other applications about patient information
+         updates.
+      The values in the SendingApplication attribute may be used to configure specific
+         forwarding rules in the HL7SendService for HL7 messages that are  received from this
+         Content Edit Service.</description>
+      <name>SendingApplication</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSendingFacility" setMethod="setSendingFacility">
+      <description>Identifies the Sending Facility in HL7 messages that are directed to
+         HL7SendService to notify other applications about patient information
+         updates.
+      The values in the SendingFacility attribute may be used to configure specific
+         forwarding rules in the HL7SendService for HL7 messages that are  received from this
+         Content Edit Service.</description>
+      <name>SendingFacility</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCalledAET" setMethod="setCalledAET">
+      <description>Called AE title in DICOM messages that are directed to the StudyMgtScuService
+         to notify other applications about study information updates.
+         The CalledAETitle may be used to configure
+         specific forwarding rules in StudyMgtScu Service for DICOM messages
+         received from this Content Edit Service.
+      </description>
+      <name>CalledAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getCallingAET" setMethod="setCallingAET">
+      <description>Calling AET in DICOM message directed to StudyMgtScuService
+         to notify other Applications about Study Information Updates.
+      The CallingAETitle may be used to configure
+         specific forwarding rules in StudyMgtScu Service for DICOM messages
+         received from this Content Edit Service.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditEnabled"
+      setMethod="setAuditEnabled">
+      <description>Enable or disable emission of audit messages on
+      create/merge/move/update/delete of Patient/Study/Series/Instance entities.
+      </description>
+      <name>auditEnabled</name>
+      <type>boolean</type>
+      <descriptors>
+        <value value="true"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getHL7SendServiceName"
+      setMethod="setHL7SendServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>HL7SendServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStudyMgtScuServiceName"
+      setMethod="setStudyMgtScuServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StudyMgtScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMppsScpServiceName"
+      setMethod="setMppsScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>MppsScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+      <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+<!-- create -->
+   <operation impact="ACTION">
+      <description>create new patient.
+      </description>
+      <name>createPatient</name>
+      <parameter>
+        <description>Dataset with patient info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>create new study.
+      </description>
+      <name>createStudy</name>
+      <parameter>
+        <description>Dataset with study info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <description>Primary key of patient for the new study.</description>
+        <name>pk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>create new series.
+      </description>
+      <name>createSeries</name>
+      <parameter>
+        <description>Dataset with series info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <description>Primary key of study for the new series.</description>
+        <name>pk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+<!-- merge patient -->
+   <operation impact="ACTION">
+      <description>merge patient.
+      </description>
+      <name>mergePatients</name>
+      <parameter>
+        <description>Primary key of resulting patient</description>
+        <name>pk</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <parameter>
+        <description>Array of pks of patient to merge.</description>
+        <name>pks</name>
+        <type>[J</type>
+      </parameter>
+      <return-type>java.util.Map</return-type>
+   </operation>
+<!-- update -->  
+   <operation impact="ACTION">
+      <description>update patient.
+      </description>
+      <name>updatePatient</name>
+      <parameter>
+        <description>Dataset with patient info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>update study.
+      </description>
+      <name>updateStudy</name>
+      <parameter>
+        <description>Dataset with study info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>update series.
+      </description>
+      <name>updateSeries</name>
+      <parameter>
+        <description>Dataset with series info</description>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+<!-- move to trash -->
+   <operation impact="ACTION">
+      <description>Move patient to trash.
+      </description>
+      <name>movePatientToTrash</name>
+      <parameter>
+        <description>Primary key of patient.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Move study to trash.
+      </description>
+      <name>moveStudyToTrash</name>
+      <parameter>
+        <description>Primary key of study.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Move series to trash.
+      </description>
+      <name>moveSeriesToTrash</name>
+      <parameter>
+        <description>Primary key of series.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Move instance to trash.
+      </description>
+      <name>moveInstanceToTrash</name>
+      <parameter>
+        <description>Primary key of instance.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Move instances to trash.
+      </description>
+      <name>moveInstancesToTrash</name>
+      <parameter>
+        <description>Instance UIDs</description>
+        <name>iuids</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>
+<!-- undelete (recover from trash) -->
+   <operation impact="ACTION">
+      <description>Undelete patient.
+      </description>
+      <name>undeletePatient</name>
+      <parameter>
+        <description>Primary key of patient (PrivatePatient).</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Undelete study.
+      </description>
+      <name>undeleteStudy</name>
+      <parameter>
+        <description>Primary key of study (PrivateStudy).</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Undelete series.
+      </description>
+      <name>undeleteSeries</name>
+      <parameter>
+        <description>Primary key of series (PrivateSeries).</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Undelete instance.
+      </description>
+      <name>undeleteInstance</name>
+      <parameter>
+        <description>Primary key of instance.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>java.util.List</return-type>
+   </operation>
+
+<!-- delete (from trash) -->
+   <operation impact="ACTION">
+      <description>delete patient.
+      </description>
+      <name>deletePatient</name>
+      <parameter>
+        <description>Primary key of patient to delete.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>delete study.
+      </description>
+      <name>deleteStudy</name>
+      <parameter>
+        <description>Primary key of study to delete.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>delete series.
+      </description>
+      <name>deleteSeries</name>
+      <parameter>
+        <description>Primary key of series to delete.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>delete instance.
+      </description>
+      <name>deleteInstance</name>
+      <parameter>
+        <description>Primary key of instance to delete.</description>
+        <name>pk</name>
+        <type>long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Delete all entries from trash.
+      </description>
+      <name>emptyTrash</name>
+      <return-type>void</return-type>
+   </operation>
+<!-- move -->
+   <operation impact="ACTION">
+      <description>move study.
+      </description>
+      <name>moveStudies</name>
+      <parameter>
+        <description>Array of pks of studies to move.</description>
+        <name>pks</name>
+        <type>[J</type>
+      </parameter>
+      <parameter>
+        <description>Primary key of target patient</description>
+        <name>ds</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>move series.
+      </description>
+      <name>moveSeries</name>
+      <parameter>
+        <description>Array of pks of steries to move.</description>
+        <name>pks</name>
+        <type>[J</type>
+      </parameter>
+      <parameter>
+        <description>Primary key of target study</description>
+        <name>ds</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>move instances.
+      </description>
+      <name>moveInstances</name>
+      <parameter>
+        <description>Array of pks of instances to move.</description>
+        <name>pks</name>
+        <type>[J</type>
+      </parameter>
+      <parameter>
+        <description>Primary key of target series</description>
+        <name>ds</name>
+        <type>java.lang.Long</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+<!-- MPPS MWL link -->
+   <operation impact="ACTION">
+      <description>Link MPPS to MWL entries (LOCAL Modality Worklist).</description>
+      <name>linkMppsToMwl</name>
+      <parameter>
+        <description>List of Scheduled Procedure Step IDs</description>
+        <name>spsIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>List of MPPS SOP Instance UIDs</description>
+        <name>mppsIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>java.util.Map</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Link MPPS to MWL entries of external Modality worklist.</description>
+      <name>linkMppsToMwl</name>
+      <parameter>
+        <description>List of Scheduled Procedure Step Attributes</description>
+        <name>spsAttrs</name>
+        <type>[Lorg.dcm4che.data.Dataset;</type>
+      </parameter>
+      <parameter>
+        <description>List of MPPS SOP Instance UIDs</description>
+        <name>mppsIUIDs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>java.util.Map</return-type>
+   </operation>   
+   
+</mbean>

@@ -1,0 +1,61 @@
+-- Update DB from dcm4chee-0.7.x/0.8.x to dcm4chee-0.9.x
+DROP TABLE move_order;
+
+DROP TABLE mwl_item;
+CREATE TABLE mwl_item (
+	pk          	SERIAL PRIMARY KEY,
+	patient_fk      INTEGER,
+	sps_id			TEXT NOT NULL,
+	start_datetime	TIMESTAMP NOT NULL,
+	station_aet     TEXT NOT NULL,
+	modality	    TEXT NOT NULL,
+	perf_physician  TEXT,
+	req_proc_id    	TEXT NOT NULL,
+	accession_no	TEXT,
+	item_attrs		BYTEA,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+);
+CREATE INDEX mwl_patient_fk ON mwl_item(patient_fk);
+CREATE UNIQUE INDEX mwl_sps_id ON mwl_item (sps_id);
+CREATE INDEX mwl_start_time ON mwl_item (start_datetime);
+CREATE INDEX mwl_station_aet ON mwl_item (station_aet);
+CREATE INDEX mwl_modality ON mwl_item (modality);
+CREATE INDEX mwl_perf_physician ON mwl_item (UPPER(perf_physician));
+CREATE INDEX mwl_req_proc_id ON mwl_item (req_proc_id);
+CREATE INDEX mwl_accession_no ON mwl_item (accession_no);
+
+ALTER TABLE study
+	ADD COLUMN created_time TIMESTAMP;
+ALTER TABLE study
+	ADD COLUMN updated_time TIMESTAMP;
+
+ALTER TABLE series
+	ADD COLUMN created_time TIMESTAMP;
+ALTER TABLE series
+	ADD COLUMN updated_time TIMESTAMP;
+
+CREATE TABLE filesystem (
+	pk          	SERIAL PRIMARY KEY,
+	dirpath			TEXT NOT NULL,
+	retrieve_aets	TEXT NOT NULL,
+	disk_usage		BIGINT DEFAULT 0 NOT NULL,
+	highwater_mark	BIGINT DEFAULT 0 NOT NULL
+);
+CREATE UNIQUE INDEX dirpath ON filesystem(dirpath);
+
+INSERT INTO filesystem (dirpath, retrieve_aets)
+	SELECT DISTINCT dirpath, retrieve_aets FROM files;
+
+ALTER TABLE files
+	ADD COLUMN filesystem_fk INTEGER;
+ALTER TABLE files 
+	ADD CONSTRAINT filesystem_fk FOREIGN KEY (filesystem_fk) REFERENCES filesystem(pk);
+
+CREATE INDEX filesystem_fk ON files(filesystem_fk);
+	
+UPDATE files SET filesystem_fk=filesystem.pk
+	FROM filesystem
+	WHERE files.dirpath=filesystem.dirpath;
+
+ALTER TABLE files DROP COLUMN dirpath;
+ALTER TABLE files DROP COLUMN retrieve_aets;

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+<!-- $Id$ -->
+<server>
+	<classpath codebase="lib" archives="dcm4chee.jar" />
+	<mbean
+		code="org.dcm4chex.archive.mbean.MigrateOldAuditRecordRepositoryService"
+		name="dcm4chee.arr:service=MigrateOldARR"
+		xmbean-dd="xmdesc/dcm4chee-migrateoldarr-xmbean.xml">
+	</mbean>
+</server>

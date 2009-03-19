@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-hl7oru-service.xml 3308 2007-05-06 23:35:51Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+  <mbean code="org.dcm4chex.archive.hl7.MDMService"
+    name="dcm4chee.archive:service=HL7Service,type=MDM"
+    xmbean-dd="xmdesc/dcm4chee-hl7mdm-xmbean.xml">
+    <depends optional-attribute-name="HL7ServerName"
+      >dcm4chee.archive:service=HL7Server</depends>
+    <depends optional-attribute-name="ExportManagerName"
+      >dcm4chee.archive:service=ExportManager</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+  </mbean>
+</server>

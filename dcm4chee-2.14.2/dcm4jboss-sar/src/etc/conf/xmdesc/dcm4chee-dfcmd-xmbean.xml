@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC 
+    "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" 
+    "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[df Command Service. Defines command used on *nix
+    operation systems to assess free available disk space on storage file
+    system(s). Has no effect on Windows operation systems.]]>
+  </description>
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+  <class>org.dcm4chex.archive.mbean.DFCommandService</class>
+  <constructor>
+    <description>The default constructor</description>
+    <name>DFCommandService</name>
+  </constructor>
+
+  <!-- Attributes -->
+  &defaultAttributes;
+
+   <attribute access="read-write" getMethod="getDFCommand"
+    setMethod="setDFCommand">
+    <description><![CDATA[<tt>df</tt> command used on *nix operation 
+      systems to assess free available disk space on storage file system(s).
+      You may change the default value to use a different version than the
+      first in the system PATH.<br/>
+      <p><b>Example:</b> <tt>/usr/xpg4/bin/df</tt><br/>
+      <p><b>Default:</b> <tt>df</tt>
+      ]]>
+    </description>
+    <name>DFCommand</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="df" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDFCommandOption"
+    setMethod="setDFCommandOption">
+    <description><![CDATA[<tt>df</tt> command option used on *nix operation
+      systems to assess free available disk space on storage file system(s).<br/>
+      If you change the default value for POSIX compliant output, a wrong
+      value for the free available disk space may be derived from the command
+      output.<br/>
+      => Always verify, if <i>freeDiskSpace()</i> of file system service(s)
+      (still) returns the correct value, after any modification of
+      <i>DFCommandOption</i> or <i>DFCommand</i>.<br/>
+      Example: <tt>-k</tt><br/>
+      Default Value: <tt>-P</tt>]]>
+    </description>
+    <name>DFCommandOption</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="-P" />
+    </descriptors>
+  </attribute>
+
+  <!-- Operations -->
+  &defaultOperations;
+
+   <operation impact="INFO">
+      <description>Get free space for given path.
+      </description>
+      <name>freeSpace</name>
+      <parameter>
+        <description>Path String</description>
+        <name>path</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>long</return-type>
+   </operation>
+
+</mbean>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>Simple SMTP Mail Sender. Use to send email messages through SMTP.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.SendMailService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>SendMailService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write" getMethod="getSmtpHost" setMethod="setSmtpHost">
+      <!-- Network -->
+      <description>The SMTP host name of your mail server.
+      </description>
+      <name>SmtpHost</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="localhost"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSmtpPort" setMethod="setSmtpPort">
+      <!-- Network -->
+      <description>The SMTP port of your mail server (default is 25).
+      </description>
+      <name>SmtpPort</name>
+      <type>int</type>
+      <descriptors>
+         <value value="25"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="isSmtpAuth" setMethod="setSmtpAuth">
+      <description>If true, attempt to authenticate the user using the AUTH command. Defaults to false.
+      </description>
+      <name>SmtpAuthentication</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getSmtpUser" setMethod="setSmtpUser">
+      <description>Optional - if you use authenticated SMTP to send email, enter your username.
+      </description>
+      <name>SmtpUser</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+   <attribute access="write-only" setMethod="setSmtpPassword">
+      <description>Optional - as above, enter your password if you use authenticated SMTP.
+      </description>
+      <name>SmtpPassword</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=""/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getRetryIntervalls" setMethod="setRetryIntervalls">
+      <description>Number and intervals of retries for a  failed 
+      email delivery. &lt;br&gt;Format:
+      &lt;br&gt;Comma separated list of &lt;i&gt;number&lt;/i&gt; x &lt;i&gt;interval&lt;/i&gt; pairs.
+      &lt;br&gt;The interval can be specified in seconds (##s),
+      minutes (##m), hours (##h) or days (##d).
+      &lt;br&gt;Example: 
+      &lt;br&gt;5x1m,10x10m means retry a total of 5 times, one minute
+      apart for each retry; then retry a total of 10 times, 10 minutes 
+      apart for each retry.</description>
+      <name>RetryIntervals</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="5x1m,12x5m,24x1h,7x1d"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>      
+   &defaultAttributes;
+   
+   <!-- Operations -->
+    <operation impact="ACTION">
+      <description>Send email.
+      </description>
+      <name>send</name>
+      <parameter>
+        <description>Subject</description>
+        <name>subject</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>from address</description>
+        <name>fromAddr</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>destination address</description>
+        <name>toAddr</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <description>Mail Body</description>
+        <name>body</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.lang.String</return-type>
+   </operation>
+   
+   &defaultOperations;
+</mbean>

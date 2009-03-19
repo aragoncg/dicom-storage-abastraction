@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>DICOM Server. Sends incoming service requests to registered DICOM services. When configuring, select the TCP listening port, the security protocol for communication, timeouts, and the maximum number of connected DICOM clients (SCUs).</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.DcmServerService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>DcmServerService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getPort"
+      setMethod="setPort">
+     <!-- Network -->
+      <description>Port that listens for TCP communication.
+      </description>
+      <name>TCPPort</name>
+      <type>int</type>
+      <descriptors>
+         <value value="11112" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getLocalAddress"
+      setMethod="setLocalAddress">
+      <description>Local interface IP address to listen for TCP communication.  0.0.0.0 indicates all active interfaces.
+      </description>
+      <name>LocalAddress</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="0.0.0.0" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getProtocolName"
+      setMethod="setProtocolName">
+     <!-- Security -->
+      <description><![CDATA[Enable Transport Security Layer (TLS) mode:
+      <br>
+      <b>dicom</b>&#8212;<br>
+      <b>dicom-tls</b>&#8212;accept TLS connections; offer AES or DES encryption<br>
+      <b>dicom-tls.aes</b>&#8212;accept TLS connections; force AES or DES encryption<br>
+      <b>dicom-tls.3des</b>&#8212;accept TLS connections; force DES encryption<br>
+      <b>dicom-tls.nodes</b>&#8212;accept TLS connections without encryption]]>
+      </description>
+      <name>SecurityProtocol</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="dicom" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDimseTimeout"
+      setMethod="setDimseTimeout">
+      <description>DIMSE message timeout in milliseconds. 0 = no timeout.
+      </description>
+      <name>DIMSETimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="600000" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getRqTimeout"
+      setMethod="setRqTimeout">
+      <description>Sets the DICOM A-Associate request timeout in milliseconds. 0 = no timeout.
+      </description>
+      <name>RequestTimeout</name>
+      <type>int</type>
+      <descriptors>
+         <value value="5000" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSoCloseDelay"
+      setMethod="setSoCloseDelay">
+      <description>Socket close delay in milliseconds after a Dicom A-Release response.
+      </description>
+      <name>SocketCloseDelay</name>
+      <type>int</type>
+      <descriptors>
+         <value value="50" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxPDULength"
+      setMethod="setMaxPDULength">
+      <description>Maximum Protocol Data Unit (PDU) package length for receiving PDUs.
+      </description>
+      <name>MaximumPDULength</name>
+      <type>int</type>
+      <descriptors>
+         <value value="16352" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isPackPDVs"
+      setMethod="setPackPDVs">
+      <description>Pack command and data PDVs in one PDU.
+      </description>
+      <name>PackPDVs</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="false" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="isTcpNoDelay"
+      setMethod="setTcpNoDelay">
+      <description>Send packets as quickly as possible (Disable Nagle's algorithmn).
+      </description>
+      <name>TcpNoDelay</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getSendBufferSize"
+      setMethod="setSendBufferSize">
+      <description>Buffer size used for socket output. 0 = use platform default.
+      </description>
+      <name>SendBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getReceiveBufferSize"
+      setMethod="setReceiveBufferSize">
+      <description>Buffer size used for socket input. 0 = use platform default.
+      </description>
+      <name>ReceiveBufferSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="0" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxClients"
+      setMethod="setMaxClients">
+      <description>Maximum number of DICOM clients that can simultaneously connect.
+      </description>
+      <name>MaximumDICOMClients</name>
+      <type>int</type>
+      <descriptors>
+         <value value="128" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getNumClients">
+      <description>Current number of connected DICOM clients.
+      </description>
+      <name>CurrentClients</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMaxIdleThreads"
+      setMethod="setMaxIdleThreads">
+      <description>Maximum number of idle threads.
+      </description>
+      <name>MaximumIdleThreads</name>
+      <type>int</type>
+      <descriptors>
+         <value value="5" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-only"
+      getMethod="getNumIdleThreads">
+      <description>Current number of idle threads.
+      </description>
+      <name>CurrentIdleThreads</name>
+      <type>int</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDicomSecurityServiceName"
+      setMethod="setDicomSecurityServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>DicomSecurityServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="INFO">
+      <description>Get DICOM Handler</description>
+      <name>dcmHandler</name>
+      <return-type>org.dcm4che.server.DcmHandler</return-type>
+   </operation>
+   <operation impact="INFO">
+      <description>Send CallingAET changed notification</description>
+      <name>notifyCallingAETchange</name>
+      <parameter>
+        <description>List of affected CalledAETs</description>
+        <name>calledAETs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <parameter>
+        <description>List of new CallingAETs</description>
+        <name>newCallingAETs</name>
+        <type>[Ljava.lang.String;</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>
+   
+   	<operation impact="INFO">
+		<description>get UserIdentityNegotiator</description>
+		<name>userIdentityNegotiator</name>
+		<return-type>
+			org.dcm4che.net.UserIdentityNegotiator
+		</return-type>
+	</operation>
+   
+</mbean>
+    

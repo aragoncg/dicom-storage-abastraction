@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Cache compiled XSL Stylesheets.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.TemplatesService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>TemplatesService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Get compiled stylesheet for specified XSL file.</description>
+      <name>getTemplates</name>
+      <parameter>
+        <name>xslfile</name>
+        <type>java.io.File</type>
+      </parameter>
+      <return-type>javax.xml.transform.Templates</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Get compiled stylesheet for specified AE title and file name.</description>
+      <name>getTemplatesForAET</name>
+      <parameter>
+        <name>configDirectory</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <name>aet</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <parameter>
+        <name>fileName</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>javax.xml.transform.Templates</return-type>
+   </operation>
+   <operation impact="ACTION">
+      <description>Clear cache to force recompile at next access.</description>
+      <name>clearCache</name>
+      <return-type>void</return-type>
+   </operation>
+</mbean>
+

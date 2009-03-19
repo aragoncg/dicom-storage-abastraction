@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-wado-service.xml 7571 2008-10-16 08:02:19Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.wado.mbean.WADOService"
+    name="dcm4chee.archive:service=WADOService"
+    xmbean-dd="xmdesc/dcm4chee-wado-xmbean.xml">
+    <depends optional-attribute-name="StoreScpServiceName"
+      >dcm4chee.archive:service=StoreScp</depends>
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="QueryRetrieveScpName"
+      >dcm4chee.archive:service=QueryRetrieveScp</depends>
+    <depends optional-attribute-name="SchedulerServiceName"
+      >dcm4chee.archive:service=Scheduler</depends>
+    <attribute name="TimerID">CheckFreeDiskSpaceWado</attribute>
+  </mbean>
+</server>

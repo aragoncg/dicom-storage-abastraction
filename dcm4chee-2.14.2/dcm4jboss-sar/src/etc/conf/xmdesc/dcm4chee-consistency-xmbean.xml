@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>Consistency Check Service. Sets up a schedule to automatically check the consistency of compressed images. You can set image compression rules in the Compression Service. You can also use the commands below to manually check the consistency of images.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.ConsistenceCheckService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>ConsistenceCheckService</name>
+   </constructor>
+
+   <!-- Attributes -->
+  <attribute access="read-write"
+    getMethod="getAvailabilityOfExternalRetrieveable"
+    setMethod="setAvailabilityOfExternalRetrieveable">
+    <description><![CDATA[Defines Instance Availability of studies which
+      becomes only external retrievable after deletion from file systems
+      accessable by this archive instance. Enumerated values: "ONLINE",
+      "NEARLINE", "OFFLINE", "UNAVAILABLE"]]>
+    </description>
+    <name>AvailabilityOfExternalRetrieveable</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NEARLINE" />
+    </descriptors>
+  </attribute>
+
+   <attribute access="read-write" getMethod="getTaskInterval" setMethod="setTaskInterval">
+      <description>Interval in which to  check for images for consistency.
+          &lt;br&gt;Format: 
+			 &lt;br&gt;&lt;i&gt;interval&lt;/i&gt;!&lt;i&gt;from&lt;/i&gt;-&lt;i&gt;to&lt;/i&gt; or NEVER
+          &lt;br&gt;&lt;i&gt;interval&lt;/i&gt; = ##s (in seconds), ##m (in minutes), ##h (in hours).
+          &lt;br&gt;&lt;i&gt;from&lt;/i&gt; = start hour (0-23) when no consistency check should be performed &lt;br&gt;&lt;i&gt;to&lt;/i&gt; = end hour (0-23) when no consistency check should be performed
+          &lt;br&gt;NEVER = disable automatic consistency checking &lt;br&gt;Example:10s!9-17 means every 10 seconds, poll the database and check image consistency, except between the hours of 9:00am and 5:00pm. By setting this type of TaskInterval, you can ensure checks occur outside of peak imaging hours. </description>
+      <name>TaskInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getMinStudyAge" setMethod="setMinStudyAge">
+      <description>Minimum age of a study that will be checked for consistency, in 
+      		##w (in weeks), ##d (in days), or ##h (in hours).</description>
+      <name>MinStudyAge</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1d"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getMaxStudyAge" setMethod="setMaxStudyAge">
+      <description>Maximum age of a study that will be checked for consistency, in 
+      		##w (in weeks), ##d (in days), or ##h (in hours).</description>
+      <name>MaxStudyAge</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="4w"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getMaxCheckedBefore" setMethod="setMaxCheckedBefore">
+      <description>Maximum amount of time from the last consistency check, in
+      		##w (in weeks), ##d (in days), or ##h (in hours).</description>
+      <name>MaxCheckedBefore</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1w"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write" getMethod="getLimitNumberOfStudiesPerTask" setMethod="setLimitNumberOfStudiesPerTask">
+      <description>Maximum number of studies that are checked in one task.
+      </description>
+      <name>LimitNumberOfStudiesPerTask</name>
+      <type>int</type>
+      <descriptors>
+         <value value="100"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>  
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckStudyConsistency"
+      setMethod="setTimerIDCheckStudyConsistency">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckStudyConsistency</name>
+      <type>java.lang.String</type>
+   </attribute>
+
+
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+
+   <operation impact="ACTION">
+      <description>Check consistency of studies.</description>
+      <name>check</name>
+      <return-type>java.lang.String</return-type>
+   </operation>
+
+</mbean>
+    

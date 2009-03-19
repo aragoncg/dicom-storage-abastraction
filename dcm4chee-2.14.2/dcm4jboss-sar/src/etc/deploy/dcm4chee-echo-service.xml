@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+<!-- $Id: dcm4chee-echo-service.xml 3340 2007-05-12 16:00:31Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.EchoService" 
+	name="dcm4chee.archive:service=ECHOService"
+	xmbean-dd="xmdesc/dcm4chee-echo-xmbean.xml">	
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+  </mbean>
+</server>

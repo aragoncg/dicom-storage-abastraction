@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-pixquery-service.xml 3398 2007-06-21 13:25:32Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+
+  <mbean code="org.dcm4chex.archive.mbean.PIXQueryService" 
+	     name="dcm4chee.archive:service=PIXQuery"
+	     xmbean-dd="xmdesc/dcm4chee-pixquery-xmbean.xml">
+    <depends>jboss.j2ee:service=EJB,jndiName=ejb/PIXQuery</depends>
+    <depends optional-attribute-name="HL7SendServiceName"
+      >dcm4chee.archive:service=HL7Send</depends>
+  </mbean>
+</server>

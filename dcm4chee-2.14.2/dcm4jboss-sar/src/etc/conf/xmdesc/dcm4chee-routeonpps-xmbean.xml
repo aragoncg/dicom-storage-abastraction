@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description><![CDATA[Route Studies triggered by receiving
+     General Purpose Performed Procedure Step N-CREATE-RQ with particular
+     Performed Work Item Code by General Purpose Performed Procedure Step SCP.]]>
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.movescu.RouteOnPPSService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>RouteOnPPSService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+     getMethod="getRoutingRules"
+     setMethod="setRoutingRules">
+      <description><![CDATA[
+      Maps Performed Work Item Codes in received General Purpose
+      Performed Procedure Step N-CREATE-RQ to destination AETs.
+      Format: CODE_VALUE^CODING_SCHEMEDESIGNATOR:AET1,AET2 
+      (e.g.: 110001^DCM:CENTRAL1,CENTRAL2).
+      Multiple mappings can be specified, separated by new line (or semicolon).
+      NONE = no routing of Studies.
+      ]]>
+      </description>
+      <name>RoutingRules</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write" getMethod="getRoutingPriority" setMethod="setRoutingPriority">
+      <description>Routing priority. Enumerated Values: LOW, MEDIUM, HIGH.
+      </description>
+      <name>RoutingPriority</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MEDIUM"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getGpwlScpServiceName"
+      setMethod="setGpwlScpServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>GpwlScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMoveScuServiceName"
+      setMethod="setMoveScuServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>MoveScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+     <description>Performs a test routing by handling a fake GPPPS Notification</description>
+     <name>testRouting</name>
+     <parameter>
+       <description>Code (Format:codeValue^designator)</description>
+       <name>code</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <parameter>
+       <description>Study Instance UID</description>
+       <name>studyUID</name>
+       <type>java.lang.String</type>
+     </parameter>
+     <return-type>void</return-type>
+	</operation>
+</mbean>

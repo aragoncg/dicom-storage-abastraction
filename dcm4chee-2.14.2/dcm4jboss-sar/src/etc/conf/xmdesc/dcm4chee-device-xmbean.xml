@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>Device Service. Use the commands in this service to import device mapping files, delete device mappings, delete a specific device, get a list of all devices for a specific protocol, and add the scheduled station name AE title, the name, and the modality to the given SPS items.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.mbean.DeviceService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>DeviceService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description>Import a device mapping file.</description>
+      <name>importDeviceMapping</name>
+      <parameter>
+        <name>importURL</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.lang.String</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Delete all device mappings. &lt;b&gt;Note:&lt;/b&gt; This deletes all devices and the corresponding protocol codes.</description>
+      <name>deleteMapping</name>
+      <return-type>java.lang.String</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Deletes the named device.</description>
+      <name>deleteDevice</name>
+      <parameter>
+      <description>Station name of the device</description>
+        <name>device</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.lang.String</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Get a list of devices for the specified protocol.</description>
+      <name>getDeviceList</name>
+      <parameter>
+        <name>protocol</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.util.Collection</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Add the scheduled station AE Title and the name and the modality to the given SPS items.</description>
+      <name>addScheduledStationInfo</name>
+      <parameter>
+        <name>ds</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <return-type>org.dcm4che.data.Dataset</return-type>
+   </operation>   
+   
+</mbean>
+    

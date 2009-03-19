@@ -1,0 +1,158 @@
+# CID 4 Anatomic Region
+#
+SNM3^T-04000^Breast, NOS
+SNM3^T-04002^Upper inner quadrant of breast, NOS
+SNM3^T-04003^Lower inner quadrant of breast, NOS
+SNM3^T-04004^Upper outer quadrant of breast, NOS
+SNM3^T-04005^Lower outer quadrant of breast, NOS
+SNM3^T-11218^Suprasternal notch
+SNM3^T-15200^Fontanel of skull, NOS
+SNM3^T-15460^Wrist joint, NOS
+SNM3^T-15750^Ankle joint, NOS
+SNM3^T-21000^Nose, NOS
+SNM3^T-23000^Nasopharynx, NOS
+SNM3^T-24100^Larynx, NOS
+SNM3^T-25000^Trachea, NOS
+SNM3^T-26000^Bronchus, NOS
+SNM3^T-28000^Lung, NOS
+SNM3^T-32000^Heart, NOS
+SNM3^T-32100^Atrium, NOS
+SNM3^T-32400^Ventricle, NOS
+SNM3^T-51000^Mouth, NOS
+SNM3^T-53000^Tongue, NOS
+SNM3^T-55000^Pharynx, NOS
+SNM3^T-55300^Hypopharynx, NOS
+SNM3^T-56000^Esophagus, NOS
+SNM3^T-57000^Stomach, NOS
+SNM3^T-58200^Duodenum, NOS
+SNM3^T-58400^Jejunum, NOS
+SNM3^T-58600^Ileum, NOS
+SNM3^T-59300^Colon, NOS
+SNM3^T-59600^Rectum, NOS
+SNM3^T-60610^Bile duct, NOS
+SNM3^T-62000^Liver, NOS
+SNM3^T-63000^Gallbladder, NOS
+SNM3^T-65000^Pancreas, NOS
+SNM3^T-65010^Pancreatic duct, NOS
+SNM3^T-71000^Kidney, NOS
+SNM3^T-72000^Renal pelvis, NOS
+SNM3^T-72100^Calyx, NOS
+SNM3^T-73000^Ureter, NOS
+SNM3^T-74000^Bladder, NOS
+SNM3^T-75000^Urethra, NOS
+SNM3^T-81000^Vulva, NOS
+SNM3^T-82000^Vagina, NOS
+SNM3^T-83000^Uterus, NOS
+SNM3^T-87000^Ovary, NOS
+SNM3^T-91000^Penis, NOS
+SNM3^T-94000^Testis, NOS
+SNM3^T-98000^Scrotum, NOS
+SNM3^T-A0100^Brain, NOS
+SNM3^T-A7010^Spinal cord, NOS
+SNM3^T-AA110^Sclera, NOS
+SNM3^T-AA200^Cornea, NOS
+SNM3^T-AA810^Eyelid, NOS
+SNM3^T-AB000^Ear, NOS
+SNM3^T-AB200^External auditory canal, NOS
+SNM3^T-B3000^Adrenal gland, NOS
+SNM3^T-B6000^Thyroid, NOS
+SNM3^T-B7000^Parathyroid, NOS
+SNM3^T-C3000^Spleen, NOS
+SNM3^T-D1100^Head, NOS
+SNM3^T-D1160^Scalp, NOS
+SNM3^T-D1200^Face, NOS
+SNM3^T-D1206^Buccal region of face
+SNM3^T-D1206^Cheek, NOS
+SNM3^T-D1212^Hypoglossal
+SNM3^T-D1600^Neck, NOS
+SNM3^T-D1603^Submandibular area
+SNM3^T-D1620^Supraclavicular region of neck
+SNM3^T-D2100^Back, NOS
+SNM3^T-D2220^Shoulder, NOS
+SNM3^T-D2310^Flank, NOS
+SNM3^T-D2500^Hip, NOS
+SNM3^T-D2600^Buttock, NOS
+SNM3^T-D2600^Gluteal region
+SNM3^T-D2700^Perineum, NOS
+SNM3^T-D3000^Thorax, NOS
+SNM3^T-D3300^Mediastinum, NOS
+SNM3^T-D4000^Abdomen, NOS
+SNM3^T-D4110^Right upper quadrant of abdomen
+SNM3^T-D4120^Right lower quadrant of abdomen
+SNM3^T-D4130^Left upper quadrant of abdomen
+SNM3^T-D4140^Left lower quadrant of abdomen
+SNM3^T-D4200^Epigastric region
+SNM3^T-D4240^Hypogastric region
+SNM3^T-D4240^Suprapubic region
+SNM3^T-D4450^Omental bursa
+SNM3^T-D4600^Omentum, NOS
+SNM3^T-D4900^Retroperitoneum, NOS
+SNM3^T-D6000^Pelvis, NOS
+SNM3^T-D6500^Broad ligament, NOS
+SNM3^T-D8100^Axilla, NOS
+SNM3^T-D8200^Arm, NOS
+SNM3^T-D8300^Elbow, NOS
+SNM3^T-D8700^Hand, NOS
+SNM3^T-D9100^Thigh, NOS
+SNM3^T-D9200^Knee, NOS
+SNM3^T-D9310^Popliteal fossa
+SNM3^T-D9400^Leg, NOS
+SNM3^T-D9700^Foot, NOS
+SNM3^A-04140^Vascular graft
+SNM3^G-A15A^Intra-articular
+SNM3^T-21300^Endo-nasal
+SNM3^T-23050^Endo-nasopharyngeal
+SNM3^T-32000^Endo-cardiac
+SNM3^T-40000^Endo-vascular
+SNM3^T-41000^Endo-arterial
+SNM3^T-48000^Endo-venous
+SNM3^T-56000^Endo-esophageal
+SNM3^T-56000^Intra-esophageal
+SNM3^T-59600^Endo-rectal
+SNM3^T-71000^Endo-renal
+SNM3^T-73000^Endo-ureteric
+SNM3^T-74250^Endo-vesical
+SNM3^T-75000^Endo-urethral
+SNM3^T-82000^Endo-vaginal
+SNM3^T-D14000^Intracranial
+SNM3^T-D3000^Intra-thoracic
+SNM3^T-D3136^Parasternal
+SNM3^T-D3213^Subxiphoid
+SNM3^T-D4010^Intra-abdominal
+SNM3^T-D4210^Subcostal
+SNM3^T-D6221^Intra-pelvic
+SNM3^T-D4212^Right hypochondriac region
+SNM3^T-D4211^Left hypochondriac region
+SNM3^T-D2300^Lumbar region
+SNM3^T-D2342^Right lumbar region
+SNM3^T-D2340^Left lumbar region
+SNM3^T-D7000^Inguinal region
+SNM3^T-D7010^Right inguinal region
+SNM3^T-D7020^Left inguinal region
+SNM3^T-D4230^Umbilical region
+#
+# CID 29 Acquisition Modality
+#
+DCM^EPS^Cardiac Electrophysiology
+DCM^CR^Computed Radiography
+DCM^CT^Computed Tomography
+DCM^DX^Digital Radiography
+DCM^ECG^Electrocardiography
+DCM^ES^Endoscopy
+DCM^XC^External-camera Photography
+DCM^GM^General Microscopy
+DCM^HD^Hemodynamic Waveform
+DCM^IO^Intra-oral Radiography
+DCM^IVUS^Intravascular Ultrasound
+DCM^MR^Magnetic Resonance
+DCM^MG^Mammography
+DCM^NM^Nuclear Medicine
+DCM^OP^Ophthalmic Photography
+DCM^PX^Panoramic X-Ray
+DCM^PT^Positron emission tomography
+DCM^RF^Radiofluoroscopy
+DCM^RG^Radiographic imaging
+DCM^RTIMAGE^Radiotherapy Image
+DCM^SM^Slide Microscopy
+DCM^US^Ultrasound
+DCM^XA^X-Ray Angiography

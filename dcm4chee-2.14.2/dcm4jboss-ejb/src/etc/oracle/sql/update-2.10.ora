@@ -1,0 +1,23 @@
+-- Update DB from dcm4chee-2.9.x to dcm4chee-2.10.x
+
+ALTER TABLE series_req ADD (req_service NVARCHAR2(255),
+                            req_physician NVARCHAR2(255),
+                            req_phys_i_name NVARCHAR2(255),
+                            req_phys_p_name NVARCHAR2(255));
+CREATE INDEX ser_req_service ON series_req(req_service);
+CREATE INDEX ser_req_phys ON series_req(req_physician);
+CREATE INDEX ser_req_phys_i ON series_req(req_phys_i_name);
+CREATE INDEX ser_req_phys_p ON series_req(req_phys_p_name);
+
+ALTER TABLE audit_record RENAME TO audit_record_old;
+DROP SEQUENCE audit_record_pk;
+CREATE SEQUENCE audit_record_old_pk_seq;
+SELECT setval('audit_record_old_pk_seq', max(pk)) FROM audit_record_old;
+
+-- Increase sps_status > 1 to respect the new inserted status READY(2).
+UPDATE mwl_item SET sps_status=sps_status+1 where sps_status > 1;
+
+DROP INDEX code_value;
+CREATE UNIQUE INDEX code_value ON code(code_value,code_designator);
+
+UPDATE roles SET roles='AuditLogUser' WHERE roles='arr-user';

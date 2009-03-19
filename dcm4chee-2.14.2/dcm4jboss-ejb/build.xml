@@ -1,0 +1,603 @@
+<project name="dcm4chee-ejb" default="jar">
+	<!-- Allow user to adjust build properties without
+	modifying this build script.
+	--> 
+	<property file="build.properties"/>
+        <property file="../build.properties" />
+
+	<property name="version" value="2.14.2"/>
+  
+	<property name="javac.debug" value="on"/>
+	<property name="javac.deprecation" value="off"/>
+	<property name="javac.optimize" value="on"/>
+	<property name="javac.source" value="1.5"/>
+	<property name="javac.target" value="1.5"/>
+
+    <!--property name="datasource.mapping" value="Hypersonic SQL"/-->
+    <!--property name="datasource.mapping" value="mySQL"/-->
+    <!--property name="datasource.mapping" value="PostgreSQL 8.0"/-->
+	<property name="datasource.mapping" value="Hypersonic SQL"/>
+	<property name="datasource.name" value="java:/pacsDS"/>
+
+    <!-- Override with your dcm4che-1.4.x source dist location -->
+    <property name="dcm4che14.home"
+      value="${user.home}/dcm4che14/build/dcm4che-1.4.22"/>
+    <property name="dcm4che.jar" value="${dcm4che14.home}/lib/dcm4che.jar"/>
+
+    <!-- Override with your XDoclet bundle dist location -->
+	<property name="xdoclet.home" value="${user.home}/xdoclet-1.2.3"/>
+	<property name="xdoclet.lib" value="${xdoclet.home}/lib"/>
+
+    <!-- Override with your Cactus bundle dist location -->
+    <property name="cactus.home" value="${user.home}/cactus-1.8.0-bin"/>
+    <property name="cactus.lib" value="${cactus.home}/lib"/>
+
+    <!-- Override with your dcm4chee installation -->
+	<property name="dcm4chee.home" value="${user.home}/dcm4chee"/>		
+    <property name="dcm4chee.lib" value="${dcm4chee.home}/server/default/lib"/>
+    <property name="dcm4chee.deploy" value="${dcm4chee.home}/server/default/deploy"/>
+	
+    <!-- Override with your JBoss/Web server bundle dist location -->
+	<property name="jboss.home" value="${user.home}/jboss-4.2.3.GA"/>		
+	<property name="jboss.client" value="${jboss.home}/client"/>		
+	<property name="jboss.conf" value="${jboss.home}/server/default"/>		
+	<property name="jboss.deploy" value="${jboss.conf}/deploy"/>		
+	<property name="ejb.jar" value="${jboss.conf}/lib/jboss-j2ee.jar"/>		
+	<property name="log4j.jar" value="${jboss.conf}/lib/log4j.jar"/>		
+	<property name="getopt.jar" value="${jboss.client}/getopt.jar"/>		
+	<property name="jboss-system.jar" value="${jboss.home}/lib/jboss-system.jar"/>		
+	<property name="jboss.jar" value="${jboss.conf}/lib/jboss.jar"/>
+	<property name="jboss-common.jar" value="${jboss.home}/lib/jboss-common.jar"/>
+	<property name="jboss-common-jdbc-wrapper.jar" value="${jboss.conf}/lib/jboss-common-jdbc-wrapper.jar"/>		
+
+	<path id="base.path">
+		<pathelement location="${jboss-system.jar}"/>
+		<pathelement location="${jboss.jar}"/>
+		<pathelement location="${jboss-common.jar}"/>
+		<pathelement location="${jboss-common-jdbc-wrapper.jar}"/>
+		<pathelement location="${concurrent.jar}"/>
+		<pathelement location="${ejb.jar}"/>
+		<pathelement location="${log4j.jar}"/>
+		<pathelement location="${getopt.jar}"/>
+		<pathelement location="${dcm4che.jar}"/>
+	</path>
+
+	<path id="jboss.client.path">
+		<fileset dir="${jboss.home}/client">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement location="${log4j.jar}"/>
+		<pathelement location="${dcm4che.jar}"/>
+	</path>
+	
+	<path id="xdoclet.path">
+		<fileset dir="${xdoclet.lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<path refid="base.path"/>
+	</path>
+	
+	<fileset id="cactus.container.jars" dir="${cactus.lib}">
+      	<include name="aspectjrt-*.jar"/>
+        <include name="cactus-*.jar"/>
+        <include name="commons-logging-*.jar"/>
+        <include name="junit-*.jar"/>
+        <exclude name="cactus-ant-*.jar"/>
+	</fileset>
+	<path id="cactus.client.path">
+		<fileset refid="cactus.container.jars"/>
+		<fileset dir="${cactus.lib}">
+    	  	<include name="commons-httpclient*.jar"/>
+    	</fileset>
+		<path refid="base.path"/>
+	</path>
+	
+	<path id="cactus.build.path">
+		<fileset dir="${cactus.lib}">
+    	  	<include name="cactus-*.jar"/>
+        	<include name="junit-*.jar"/>
+		</fileset>
+		<path refid="base.path"/>
+	</path>
+	
+	<property name="src.java" value="${basedir}/src/java"/>
+	<property name="src.res" value="${basedir}/src/resources"/>
+	<property name="src.etc" value="${basedir}/src/etc"/>
+	<property name="test.dir" value="${basedir}/test"/>
+	<property name="test.java" value="${test.dir}/java"/>
+	<property name="test.web-inf" value="${test.dir}/WEB-INF"/>
+	<property name="test.conf" value="${test.dir}/conf"/>
+	<property name="test.data" value="${test.dir}/data"/>
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="target.xdoclet" value="${target.dir}/xdoclet"/>
+	<property name="target.java" value="${target.xdoclet}/java"/>
+	<property name="target.meta-inf" value="${target.xdoclet}/META-INF"/>
+	<property name="target.meta-inf-hsql" value="${target.xdoclet}/META-INF-hsql"/>
+	<property name="target.meta-inf-psql" value="${target.xdoclet}/META-INF-psql"/>
+	<property name="target.meta-inf-mysql" value="${target.xdoclet}/META-INF-mysql"/>
+	<property name="target.meta-inf-mssql" value="${target.xdoclet}/META-INF-mssql"/>
+	<property name="target.meta-inf-oracle" value="${target.xdoclet}/META-INF-oracle"/>
+	<property name="target.meta-inf-db2" value="${target.xdoclet}/META-INF-db2"/>
+	<property name="target.meta-inf-firebird" value="${target.xdoclet}/META-INF-firebird"/>
+	<property name="target.res" value="${target.dir}/res"/>
+	<property name="target.classes" value="${target.dir}/classes"/>
+	<property name="target.common.bin" value="${target.dir}/common/bin"/>	
+	<property name="target.common.lib" value="${target.dir}/common/lib"/>	
+	<property name="target.test.web-inf" value="${target.dir}/test/WEB-INF"/>
+	<property name="target.reports" value="${target.dir}/reports"/>
+
+	<property name="dist" value="${ant.project.name}-${version}"/>
+	
+	
+    <!-- =================================================================== -->
+    <!-- Invoke XDoclet's ejbdoclet                                          -->
+    <!-- =================================================================== -->
+    <target name="ejbdoclet" unless="xdoclet.skip">
+        <taskdef
+            name="ejbdoclet"
+            classname="xdoclet.modules.ejb.EjbDocletTask"
+            classpathref="xdoclet.path"
+            />
+
+        <ejbdoclet
+            destdir="${target.java}"
+            excludedtags="@version,@author,@todo,@since"
+            addedtags="@xdoclet-generated at ${TODAY},@copyright The XDoclet Team,@author XDoclet,@version ${version}"
+            ejbspec="2.0"
+            force="${xdoclet.force}"
+            verbose="false"
+            >
+
+            <fileset dir="${src.java}">
+                <include name="**/*Bean.java"/>
+            </fileset>
+
+            <packageSubstitution packages="entity,session" substituteWith="interfaces"/>
+
+            <remoteinterface/>
+            <localinterface/>
+            <homeinterface/>
+            <localhomeinterface/>
+
+            <!--dataobject/-->
+            <!--valueobject/-->
+
+            <!--entitypk/-->
+
+            <entitycmp/>
+            <!--entitybmp/-->
+            <session/>
+
+            <!--dao>
+                <packageSubstitution packages="ejb" substituteWith="dao"/>
+            </dao-->
+
+            <!--utilobject cacheHomes="true" includeGUID="false"/-->
+
+            <deploymentdescriptor
+                destdir="${target.meta-inf-hsql}"
+                validatexml="true"
+                description="dcm4chee archive EJBs"
+                >
+                <!--configParam name="clientjar" value="blah.jar"/-->
+            </deploymentdescriptor>
+
+
+            <jboss
+                version="4.0"
+                unauthenticatedPrincipal="nobody"
+                xmlencoding="UTF-8"
+                destdir="${target.meta-inf-hsql}"
+                validatexml="true"
+                datasource="${datasource.name}"
+                typeMapping="${datasource.mapping}"                  
+                createTable="false"                  
+                />
+            
+        </ejbdoclet>
+    </target>
+
+   <target name="meta-inf-psql" unless="meta-inf-psql.notRequired">
+    	<copy todir="${target.meta-inf-psql}">
+    		<fileset dir="${target.meta-inf-hsql}"/>
+    	</copy>
+    	<replace dir="${target.meta-inf-psql}">
+  			<replacefilter
+  				token="Hypersonic SQL"
+  				value="PostgreSQL 8.0"/>
+  			<replacefilter
+  				token="hsqldb-fetch-key"
+  				value="postgresql-fetch-seq"/>
+		</replace>
+    </target>
+
+   <target name="meta-inf-mysql" unless="meta-inf-mysql.notRequired">
+    	<copy todir="${target.meta-inf-mysql}">
+    		<fileset dir="${target.meta-inf-hsql}"/>
+    	</copy>
+    	<replace dir="${target.meta-inf-mysql}">
+  			<replacefilter
+  				token="Hypersonic SQL"
+  				value="mySQL"/>
+  			<replacefilter
+  				token="hsqldb-fetch-key"
+  				value="mysql-get-generated-keys"/>
+		</replace>
+    </target>
+
+	<target name="meta-inf-mssql" unless="meta-inf-mssql.notRequired">
+	    	<copy todir="${target.meta-inf-mssql}">
+	    		<fileset dir="${target.meta-inf-hsql}"/>
+	    	</copy>
+	    	<replace dir="${target.meta-inf-mssql}">
+	  			<replacefilter
+	  				token="Hypersonic SQL"
+	  				value="MS SQLSERVER2000"/>
+	  			<replacefilter
+	  				token="hsqldb-fetch-key"
+	  				value="mssql-fetch-key"/>
+			</replace>
+    </target>
+	
+ 
+    <target name="meta-inf-oracle" unless="meta-inf-oracle.notRequired">
+    	<copy todir="${target.meta-inf-oracle}">
+    		<fileset dir="${target.meta-inf-hsql}"/>
+    	</copy>
+    	<replace dir="${target.meta-inf-oracle}">
+  			<replacefilter
+  				token="Hypersonic SQL"
+  				value="Oracle9i"/>
+  			<replacefilter
+  				token="hsqldb-fetch-key"
+  				value="oracle-table-sequence"/>
+		</replace>
+    </target>
+
+    <target name="meta-inf-db2" unless="meta-inf-db2.notRequired">
+    	<copy todir="${target.meta-inf-db2}">
+    		<fileset dir="${target.meta-inf-hsql}"/>
+    	</copy>
+    	<replace dir="${target.meta-inf-db2}">
+  			<replacefilter
+  				token="Hypersonic SQL"
+  				value="DB2"/>
+  			<replacefilter
+  				token="hsqldb-fetch-key"
+  				value="db2-fetch-key"/>
+		</replace>
+    </target>
+
+    <target name="meta-inf-firebird" unless="meta-inf-firebird.notRequired">
+        <copy todir="${target.meta-inf-firebird}">
+            <fileset dir="${target.meta-inf-hsql}"/>
+        </copy>
+        <replace dir="${target.meta-inf-firebird}">
+            <replacefilter
+                token="Hypersonic SQL"
+                value="Firebird"/>
+            <replacefilter
+                token="hsqldb-fetch-key"
+                value="firebird-table-sequence"/>
+        </replace>
+    </target>
+		
+   	<!-- =================================================================== -->
+   	<!-- Compiles the source code                                            -->
+   	<!-- =================================================================== -->
+   
+	<target name="compile" depends="ejbdoclet">
+		<tstamp>
+			<format property="TODAY" pattern="yyyy-MM-dd"/>
+		</tstamp>
+		<mkdir dir="${target.dir}/classes"/>
+		<javac
+			destdir="${target.classes}"
+			debug="${javac.debug}"
+			deprecation="${javac.deprecation}"
+			optimize="${javac.optimize}"
+			source="${javac.source}"
+			target="${javac.target}"
+			classpathref="base.path"
+		>
+		<src path="${target.java}"/>
+		<src path="${src.java}"/>
+		</javac>
+	</target>
+
+   	<target name="compile-test" depends="compile">
+		<javac
+        	destdir="${target.classes}"
+			debug="${javac.debug}"
+         	deprecation="off"
+         	optimize="on"
+         	classpathref="cactus.build.path"
+      	>
+        	<src path="${target.java}"/>
+         	<src path="${test.java}"/>
+      	</javac>
+   	</target>
+   	
+   <!-- =================================================================== -->
+   <!-- Creates the ejb-jar and jdbc-jar                                    -->
+   <!-- =================================================================== -->
+    <target name="jar" depends="compile">
+     	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="hsql"/>
+    	</antcall>
+    	<uptodate property="meta-inf-psql.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-psql}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-psql"/>
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="psql"/>
+    	</antcall>
+    	<uptodate property="meta-inf-mysql.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-mysql}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-mysql"/>
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="mysql"/>
+    	</antcall>
+    	<uptodate property="meta-inf-mssql.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-mssql}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-mssql"/>
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="mssql"/>
+    	</antcall>
+    	<uptodate property="meta-inf-oracle.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-oracle}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-oracle"/> 
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="oracle"/>
+    	</antcall>
+    	<uptodate property="meta-inf-db2.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-db2}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-db2"/>
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="db2"/>
+    	</antcall>
+    	<uptodate property="meta-inf-firebird.notRequired"
+    		srcfile="${target.meta-inf-hsql}/jbosscmp-jdbc.xml"
+    		targetfile="${target.meta-inf-firebird}/jbosscmp-jdbc.xml"
+    	/>
+    	<antcall target="meta-inf-firebird"/>
+    	<antcall target="ejb-jdbc-jar">
+    		<param name="db.name" value="firebird"/>
+    	</antcall>
+        <mkdir dir="${target.common.lib}"/>
+        <jar jarfile="${target.common.lib}/dcm4chee-ejb-client.jar">
+         	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-ejb-client"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+          	</manifest>	
+        	<fileset dir="${target.classes}">
+                <include name="**/common/*"/>
+                <include name="**/conf/*"/>
+                <include name="**/exceptions/*"/>
+                <include name="**/util/*"/>
+                <include name="**/interfaces/*"/>
+            </fileset>
+        </jar>
+        <mkdir dir="${target.common.bin}"/>
+        <jar jarfile="${target.common.bin}/editgpwl.jar">
+         	<manifest>
+				<attribute name="Main-Class" value="org.dcm4chex.archive.tools.EditGpwl"/>
+				<attribute name="Class-Path" value="../lib/getopt.jar ../client/jbossall-client.jar ../server/default/lib/dcm4che.jar ../server/default/lib/dcm4chee-ejb-client.jar"/>
+				<attribute name="Implementation-Title" value="editgpwl"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+          	</manifest>	
+        	<fileset dir="${target.classes}">
+                <include name="**/tools/EditGpwl*"/>
+            </fileset>
+        	<fileset dir="${src.res}">
+        	      <include name="log4j.properties"/>
+                <include name="**/tools/EditGpwl*"/>
+            </fileset>
+        </jar>
+        <jar jarfile="${target.common.bin}/editmwl.jar">
+         	<manifest>
+				<attribute name="Main-Class" value="org.dcm4chex.archive.tools.EditMwl"/>
+				<attribute name="Class-Path" value="../lib/getopt.jar ../client/jbossall-client.jar ../server/default/lib/dcm4che.jar ../server/default/lib/dcm4chee-ejb-client.jar"/>
+				<attribute name="Implementation-Title" value="editmwl"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+          	</manifest>	
+        	<fileset dir="${target.classes}">
+                <include name="**/tools/EditMwl*"/>
+            </fileset>
+        	<fileset dir="${src.res}">
+        	      <include name="log4j.properties"/>
+                <include name="**/tools/EditMwl*"/>
+            </fileset>
+        </jar>
+        <jar jarfile="${target.common.bin}/pwd2hash.jar">
+         	<manifest>
+				<attribute name="Main-Class" value="org.dcm4chex.archive.tools.Pwd2Hash"/>
+				<attribute name="Class-Path" value="../server/default/lib/dcm4che.jar"/>
+				<attribute name="Implementation-Title" value="pwd2hash"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+          	</manifest>	
+        	<fileset dir="${target.classes}">
+                <include name="**/tools/Pwd2Hash*"/>
+            </fileset>
+        </jar>
+    </target>
+	
+    <target name="ejb-jdbc-jar">
+        <mkdir dir="${target.dir}/${db.name}/deploy"/>
+        <jar jarfile="${target.dir}/${db.name}/deploy/dcm4chee-ejb-${db.name}.jar">
+        	<metainf dir="${target.meta-inf}-${db.name}"/>
+        	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-ejb-${db.name}"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+	    	</manifest>
+	        	
+        	<fileset dir="${target.classes}">
+                <exclude name="**/common/*"/>
+                <exclude name="**/conf/*"/>
+                <exclude name="**/exceptions/*"/>
+                <exclude name="**/*Test.class"/>
+                <exclude name="**/jdbc/**"/>
+                <exclude name="**/tools/**"/>
+                <exclude name="**/interfaces/**"/>
+                <exclude name="**/util/**"/>
+            </fileset>
+        </jar>
+        <xslt style="${src.etc}/${db.name}/jdbc-properties.xsl"
+             in="${target.meta-inf}-${db.name}/jbosscmp-jdbc.xml"
+             out="${target.res}-${db.name}/org/dcm4chex/archive/ejb/jdbc/Jdbc.properties"
+        >
+			<xmlcatalog>
+        		<dtd publicId="-//JBoss//DTD JBOSSCMP-JDBC 4.0//EN"
+            		 location="${jboss.home}/docs/dtd/jbosscmp-jdbc_4_0.dtd"/>
+		    </xmlcatalog>        
+        </xslt>
+        <mkdir dir="${target.dir}/${db.name}/lib"/>
+        <jar jarfile="${target.dir}/${db.name}/lib/dcm4chee-jdbc-${db.name}.jar">
+        	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-jdbc-${db.name}"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa HealthCare"/>
+	    	</manifest>
+        	<fileset dir="${target.classes}">
+                <include name="**/jdbc/*"/>
+            </fileset>
+         	<fileset dir="${target.res}-${db.name}"/>         	
+        </jar>
+    </target>
+
+   <!-- =================================================================== -->
+   <!-- Creates the test-war                                                -->
+   <!-- =================================================================== -->
+    <target name="test-war" depends="compile-test">
+    	<copy file="${test.web-inf}/web.xml" todir="${target.test.web-inf}">
+    		<filterset>
+                <filter token="EJB_JAR" value="dcm4chee-ejb-psql.jar"/>
+            </filterset>
+		</copy>    		
+        <war
+            warfile="${target.psql.deploy}/test.war"
+            webxml="${target.test.web-inf}/web.xml"
+        >
+            <classes dir="${target.classes}">
+                <include name="**/*Test.class"/>
+            </classes>
+            <lib refid="cactus.container.jars"/>
+        </war>
+    </target>
+    
+
+   	<!-- =================================================================== -->
+   	<!-- Deploy                                          	                 -->
+   	<!-- =================================================================== -->
+    <target name="deploy" depends="jar, test-war">
+    	<copy file="${target.psql.deploy}/dcm4chee-ejb-psql.jar" todir="${jboss.deploy}"/>
+    	<copy file="${target.psql.deploy}/test.war" todir="${jboss.deploy}"/>
+    </target>
+
+    <target name="deploy-psql" depends="jar">
+    	<copy file="${target.psql.deploy}/dcm4chee-ejb-psql.jar" todir="${dcm4chee.deploy}"/>
+    	<copy file="${target.psql.lib}/dcm4chee-jdbc-psql.jar" todir="${dcm4chee.lib}"/>
+    	<copy file="${target.common.lib}/dcm4chee-ejb-client.jar" todir="${dcm4chee.lib}"/>
+    </target>
+	
+   	<!-- =================================================================== -->
+   	<!-- undeploy                                          	                 -->
+   	<!-- =================================================================== -->
+    <target name="undeploy">
+    	<delete file="${jboss.deploy}/test.war"/>
+    	<delete file="${jboss.deploy}/dcm4chee-ejb.jar"/>
+    </target>
+
+   	<!-- =================================================================== -->
+   	<!-- Run tests                                                           -->
+   	<!-- =================================================================== -->
+    <target name="test" depends="deploy" description="Run the junit tests">
+      <antcall target="test-cactus"/>
+      <antcall target="test-client"/>
+      <antcall target="test-report"/>
+    </target>
+
+    <target name="test-report">
+      <mkdir dir="${target.reports}"/>
+      <junitreport todir="${target.reports}">
+         <fileset dir="${target.reports}" includes="TEST-*.xml"/>
+         <report format="frames" todir="${target.reports}/html"/>
+      </junitreport>
+    </target>
+           
+    <target name="test-cactus">
+      <junit printsummary="true" fork="yes">
+         <classpath>
+	    	<path refid="cactus.client.path"/>
+         	<pathelement location="${target.classes}"/>
+         	<pathelement location="${test.conf}"/>
+         </classpath>
+         <formatter type="xml" />
+         <test name="org.dcm4chex.archive.ejb.entity.CodeBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.entity.PatientBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.entity.StudyBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.entity.SeriesBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.entity.InstanceBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.entity.FileBeanTest"
+         	todir="${target.reports}"/>
+      </junit>
+    </target>
+    
+    <target name="test-client">
+      <junit printsummary="true" fork="yes" dir="${test.data}">
+         <classpath>
+	    	<path refid="jboss.client.path"/>
+         	<pathelement location="${target.classes}"/>
+         	<pathelement location="${test.conf}"/>
+         </classpath>
+         <formatter type="xml" />
+         <test name="org.dcm4chex.archive.ejb.session.StorageBeanTest"
+         	todir="${target.reports}"/>
+         <test name="org.dcm4chex.archive.ejb.session.MWLManagerBeanTest"
+         	todir="${target.reports}"/>
+      </junit>
+    </target>
+    
+    <target name="test-query">
+      <junit printsummary="true" fork="yes">
+         <classpath>
+	    	<path refid="cactus.client.path"/>
+         	<pathelement location="${target.classes}"/>
+         	<pathelement location="${test.conf}"/>
+         </classpath>
+         <formatter type="xml" />
+         <test name="org.dcm4chex.archive.ejb.jdbc.QueryCmdTest"
+         	todir="${target.reports}"/>
+      </junit>
+    </target>
+    
+   	<!-- =================================================================== -->
+   	<!-- Cleans up the current build                                         -->
+   	<!-- =================================================================== -->
+   
+   	<target name="clean">
+     	<delete dir="${target.dir}"/>
+   	</target>
+	
+	
+</project>

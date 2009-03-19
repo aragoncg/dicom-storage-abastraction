@@ -1,0 +1,681 @@
+CREATE TABLE ae (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	aet          	VARCHAR(250) BINARY NOT NULL,
+	hostname     	VARCHAR(250) BINARY NOT NULL,
+	port			INTEGER NOT NULL,
+	cipher_suites  	VARCHAR(250) BINARY,
+	pat_id_issuer	VARCHAR(250) BINARY,
+	user_id		VARCHAR(250) BINARY,
+	passwd		VARCHAR(250) BINARY,
+	fs_group_id		VARCHAR(250) BINARY,
+	ae_desc		VARCHAR(250) BINARY,
+	wado_url		VARCHAR(250) BINARY
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX aet ON ae(aet(64));
+
+CREATE TABLE code (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	code_value     	VARCHAR(250) BINARY NOT NULL,
+	code_designator	VARCHAR(250) BINARY NOT NULL,
+	code_version   	VARCHAR(250) BINARY,
+	code_meaning   	VARCHAR(250) BINARY
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX code_value ON code(code_value(64),code_designator(64),code_version(64));
+
+CREATE TABLE patient (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	merge_fk		BIGINT,
+	pat_id         	VARCHAR(250) BINARY,
+	pat_id_issuer  	VARCHAR(250) BINARY,
+	pat_name    	VARCHAR(250) BINARY,
+	pat_i_name    	VARCHAR(250) BINARY,
+	pat_p_name    	VARCHAR(250) BINARY,
+	pat_birthdate  	VARCHAR(250) BINARY,
+	pat_sex		  	VARCHAR(250) BINARY,
+	pat_custom1		VARCHAR(250) BINARY,
+	pat_custom2		VARCHAR(250) BINARY,
+	pat_custom3		VARCHAR(250) BINARY,
+	updated_time	DATETIME,
+	created_time	DATETIME,
+	pat_attrs		LONGBLOB,
+FOREIGN KEY (merge_fk) REFERENCES patient(pk)
+) ENGINE=INNODB;
+CREATE INDEX pat_merge_fk ON patient(merge_fk);
+CREATE INDEX pat_id ON patient(pat_id(64), pat_id_issuer(64));
+CREATE INDEX pat_name ON patient(pat_name(64));
+CREATE INDEX pat_i_name ON patient(pat_i_name(64));
+CREATE INDEX pat_p_name ON patient(pat_p_name(64));
+CREATE INDEX pat_birthdate ON patient(pat_birthdate(8));
+CREATE INDEX pat_sex ON patient(pat_sex(1));
+CREATE INDEX pat_custom1 ON patient(pat_custom1(64));
+CREATE INDEX pat_custom2 ON patient(pat_custom2(64));
+CREATE INDEX pat_custom3 ON patient(pat_custom3(64));
+
+CREATE TABLE other_pid (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	pat_id         	VARCHAR(250) BINARY NOT NULL,
+	pat_id_issuer  	VARCHAR(250) BINARY NOT NULL
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX other_pat_id ON other_pid(pat_id(64), pat_id_issuer(64));
+
+CREATE TABLE rel_pat_other_pid (
+	patient_fk      BIGINT,
+	other_pid_fk    BIGINT,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (other_pid_fk) REFERENCES other_pid(pk)
+) ENGINE=INNODB;
+CREATE INDEX other_pid_pat_fk ON rel_pat_other_pid(patient_fk);
+CREATE INDEX pat_other_pid_fk ON rel_pat_other_pid(other_pid_fk);
+
+CREATE TABLE study (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk      BIGINT,
+	study_iuid      VARCHAR(250) BINARY NOT NULL,
+	study_id        VARCHAR(250) BINARY,
+	study_datetime	DATETIME,
+	accession_no	VARCHAR(250) BINARY,
+	ref_physician  VARCHAR(250) BINARY,
+	ref_phys_i_name VARCHAR(250) BINARY,
+	ref_phys_p_name VARCHAR(250) BINARY,
+	study_desc      VARCHAR(250) BINARY,
+	study_custom1	VARCHAR(250) BINARY,
+	study_custom2	VARCHAR(250) BINARY,
+	study_custom3	VARCHAR(250) BINARY,
+	study_status_id VARCHAR(250) BINARY,
+	mods_in_study	VARCHAR(250) BINARY,
+    cuids_in_study  VARCHAR(250) BINARY,
+	num_series		INTEGER NOT NULL,
+	num_instances	INTEGER NOT NULL,
+	ext_retr_aet	VARCHAR(250) BINARY,
+	retrieve_aets	VARCHAR(250) BINARY,
+	fileset_iuid	VARCHAR(250) BINARY,
+	fileset_id		VARCHAR(250) BINARY,
+	availability	INTEGER NOT NULL,
+	study_status	INTEGER NOT NULL,
+	checked_time	DATETIME,
+	updated_time	DATETIME,
+	created_time	DATETIME,
+	study_attrs		LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+) ENGINE=INNODB;
+CREATE INDEX patient_fk ON study(patient_fk);
+CREATE UNIQUE INDEX study_iuid ON study(study_iuid(64));
+CREATE INDEX study_id ON study(study_id(64));
+CREATE INDEX study_datetime ON study(study_datetime);
+CREATE INDEX accession_no ON study(accession_no(16));
+CREATE INDEX ref_physician ON study(ref_physician(64));
+CREATE INDEX ref_phys_i_name ON study(ref_phys_i_name(64));
+CREATE INDEX ref_phys_p_name ON study(ref_phys_p_name(64));
+CREATE INDEX study_desc ON study(study_desc(64));
+CREATE INDEX study_custom1 ON study(study_custom1(64));
+CREATE INDEX study_custom2 ON study(study_custom2(64));
+CREATE INDEX study_custom3 ON study(study_custom3(64));
+CREATE INDEX study_status_id ON study(study_status_id(16));
+CREATE INDEX study_checked ON study(checked_time);
+CREATE INDEX study_created ON study(created_time);
+CREATE INDEX study_updated ON study(updated_time);
+CREATE INDEX study_status ON study(study_status);
+
+CREATE TABLE rel_study_pcode (
+	study_fk       BIGINT,
+	pcode_fk       BIGINT,
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (pcode_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX pcode_study_fk ON rel_study_pcode(study_fk);
+CREATE INDEX study_pcode_fk ON rel_study_pcode(pcode_fk);
+
+CREATE TABLE study_permission (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_iuid      VARCHAR(250) BINARY NOT NULL,
+	action          VARCHAR(250) BINARY NOT NULL,
+	roles           VARCHAR(250) BINARY NOT NULL
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX study_perm_idx ON study_permission(study_iuid(64), action(1), roles(16));
+
+CREATE TABLE mpps (
+	pk          		BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk      	BIGINT,
+	drcode_fk			BIGINT,
+	mpps_iuid			VARCHAR(250) BINARY NOT NULL,
+	pps_start			DATETIME,
+	station_aet			VARCHAR(250) BINARY,
+	modality	    	VARCHAR(250) BINARY,
+	accession_no		VARCHAR(250) BINARY,
+	mpps_status	INTEGER NOT NULL,
+	updated_time	    DATETIME,
+	created_time	    DATETIME,
+	mpps_attrs			LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (drcode_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX mpps_iuid ON mpps (mpps_iuid);
+CREATE INDEX mpps_patient_fk ON mpps(patient_fk);
+CREATE INDEX mpps_drcode_fk ON mpps(drcode_fk);
+CREATE INDEX mpps_pps_start ON mpps (pps_start);
+CREATE INDEX mpps_station_aet ON mpps (station_aet(16));
+CREATE INDEX mpps_modality ON mpps (modality(16));
+CREATE INDEX mpps_accession_no ON mpps (accession_no(16));	
+
+CREATE TABLE series (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_fk		BIGINT,
+	mpps_fk			BIGINT,
+	series_iuid     VARCHAR(250) BINARY NOT NULL,
+	series_no		VARCHAR(250) BINARY,
+	modality		VARCHAR(250) BINARY,
+	body_part		VARCHAR(250) BINARY,
+	laterality		VARCHAR(250) BINARY,
+	series_desc		VARCHAR(250) BINARY,
+	institution		VARCHAR(250) BINARY,
+	station_name	VARCHAR(250) BINARY,
+	department		VARCHAR(250) BINARY,
+	perf_physician	VARCHAR(250) BINARY,
+	perf_phys_i_name  VARCHAR(250) BINARY,
+	perf_phys_p_name  VARCHAR(250) BINARY,
+	pps_start		DATETIME,
+	pps_iuid		VARCHAR(250) BINARY,
+	series_custom1	VARCHAR(250) BINARY,
+	series_custom2	VARCHAR(250) BINARY,
+	series_custom3	VARCHAR(250) BINARY,
+	num_instances	INTEGER,
+	src_aet			VARCHAR(250) BINARY,
+	ext_retr_aet	VARCHAR(250) BINARY,
+	retrieve_aets	VARCHAR(250) BINARY,
+	fileset_iuid	VARCHAR(250) BINARY,
+	fileset_id		VARCHAR(250) BINARY,
+	availability	INTEGER NOT NULL,
+	series_status	INTEGER NOT NULL,
+	created_time	DATETIME,
+	updated_time	DATETIME,
+	series_attrs	LONGBLOB,
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (mpps_fk) REFERENCES mpps(pk)
+) ENGINE=INNODB;
+CREATE INDEX study_fk ON series(study_fk);
+CREATE INDEX series_mpps_fk ON series(mpps_fk);
+CREATE UNIQUE INDEX series_iuid ON series(series_iuid(64));
+CREATE INDEX series_no ON series(series_no(16));
+CREATE INDEX modality ON series(modality(16));
+CREATE INDEX body_part ON series(body_part(16));
+CREATE INDEX laterality ON series(laterality(16));
+CREATE INDEX series_desc ON series(series_desc(64));
+CREATE INDEX institution ON series(institution(64));
+CREATE INDEX station_name ON series(station_name(16));
+CREATE INDEX department ON series(department(64));
+CREATE INDEX perf_physician ON series(perf_physician(64));
+CREATE INDEX perf_phys_i_name ON series(perf_phys_i_name(64));
+CREATE INDEX perf_phys_p_name ON series(perf_phys_p_name(64));
+CREATE INDEX series_pps_start ON series(pps_start);
+CREATE INDEX series_pps_iuid ON series (pps_iuid(64));
+CREATE INDEX series_custom1 ON series(series_custom1(64));
+CREATE INDEX series_custom2 ON series(series_custom2(64));
+CREATE INDEX series_custom3 ON series(series_custom3(64));
+CREATE INDEX series_src_aet ON series (src_aet(64));
+CREATE INDEX series_status ON series(series_status);
+CREATE INDEX series_created ON series(created_time);
+CREATE INDEX series_updated ON series(updated_time);
+
+CREATE TABLE series_req (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	series_fk       BIGINT,
+	study_iuid      VARCHAR(250) BINARY,
+	req_proc_id     VARCHAR(250) BINARY,
+	sps_id          VARCHAR(250) BINARY,
+	req_service	    VARCHAR(250) BINARY,
+	req_physician   VARCHAR(250) BINARY,
+	req_phys_i_name VARCHAR(250) BINARY,
+	req_phys_p_name VARCHAR(250) BINARY,
+	FOREIGN KEY (series_fk) REFERENCES series(pk)
+) ENGINE=INNODB;
+CREATE INDEX ser_req_series_fk ON series_req(series_fk);
+CREATE INDEX ser_rq_study_iuid ON series_req(study_iuid(64));
+CREATE INDEX ser_req_proc_id ON series_req(req_proc_id(16));
+CREATE INDEX ser_req_sps_id ON series_req(sps_id(16));	
+CREATE INDEX ser_req_service ON series_req(req_service(64));
+CREATE INDEX ser_req_phys ON series_req(req_physician(64));
+CREATE INDEX ser_req_phys_i ON series_req(req_phys_i_name(64));
+CREATE INDEX ser_req_phys_p ON series_req(req_phys_p_name(64));
+
+CREATE TABLE media (
+	pk          		BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	fileset_iuid		VARCHAR(250) BINARY NOT NULL,
+	fileset_id			VARCHAR(250) BINARY,
+	media_rq_iuid		VARCHAR(250) BINARY,
+	media_status		INTEGER NOT NULL,
+	media_status_info	VARCHAR(250) BINARY,
+	media_usage			BIGINT NOT NULL,
+	created_time		DATETIME,
+	updated_time		DATETIME
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX fileset_iuid ON media(fileset_iuid);
+CREATE INDEX media_status ON media(media_status);
+
+CREATE TABLE instance (
+	pk              	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	series_fk			BIGINT,
+	srcode_fk			BIGINT,
+	media_fk			BIGINT,
+	sop_iuid			VARCHAR(250) BINARY NOT NULL,
+	sop_cuid			VARCHAR(250) BINARY NOT NULL,
+	inst_no				VARCHAR(250) BINARY,
+	content_datetime	DATETIME,
+	sr_complete			VARCHAR(250) BINARY,
+	sr_verified			VARCHAR(250) BINARY,
+	inst_custom1		VARCHAR(250) BINARY,
+	inst_custom2		VARCHAR(250) BINARY,
+	inst_custom3		VARCHAR(250) BINARY,	
+	ext_retr_aet		VARCHAR(250) BINARY,
+	retrieve_aets		VARCHAR(250) BINARY,
+	availability		INTEGER NOT NULL,
+	inst_status			INTEGER NOT NULL,
+	all_attrs			BIT NOT NULL,
+	commitment			BIT NOT NULL,
+	updated_time	    DATETIME,
+	created_time	    DATETIME,
+	inst_attrs			LONGBLOB,
+FOREIGN KEY (series_fk)	REFERENCES series(pk),
+FOREIGN KEY (srcode_fk)	REFERENCES code(pk),
+FOREIGN KEY (media_fk)	REFERENCES media(pk)
+) ENGINE=INNODB;
+CREATE INDEX series_fk ON instance(series_fk);
+CREATE INDEX srcode_fk ON instance(srcode_fk);
+CREATE INDEX media_fk ON instance(media_fk);
+CREATE UNIQUE INDEX sop_iuid ON instance(sop_iuid(64));
+CREATE INDEX sop_cuid ON instance(sop_cuid(64));
+CREATE INDEX inst_no ON instance(inst_no(16));
+CREATE INDEX content_datetime ON instance(content_datetime);
+CREATE INDEX sr_complete ON instance(sr_complete(16));
+CREATE INDEX sr_verified ON instance(sr_verified(16));
+CREATE INDEX inst_custom1 ON instance(inst_custom1(64));
+CREATE INDEX inst_custom2 ON instance(inst_custom2(64));
+CREATE INDEX inst_custom3 ON instance(inst_custom3(64));
+CREATE INDEX ext_retr_aet ON instance(ext_retr_aet(16));
+CREATE INDEX commitment ON instance(commitment);
+CREATE INDEX inst_status ON instance(inst_status);
+
+CREATE TABLE verify_observer (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	instance_fk     BIGINT,
+	verify_datetime DATETIME,
+	observer_name   VARCHAR(250) BINARY,
+	observer_i_name VARCHAR(250) BINARY,
+	observer_p_name VARCHAR(250) BINARY,
+FOREIGN KEY (instance_fk) REFERENCES instance(pk)
+) ENGINE=INNODB;
+CREATE INDEX observer_inst_fk ON verify_observer(instance_fk);
+CREATE INDEX verify_datetime ON verify_observer(verify_datetime);
+CREATE INDEX observer_name ON verify_observer(observer_name(64));
+CREATE INDEX observer_i_name ON verify_observer(observer_i_name(64));
+CREATE INDEX observer_p_name ON verify_observer(observer_p_name(64));
+
+CREATE TABLE filesystem (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	next_fk         BIGINT,
+	dirpath			VARCHAR(250) BINARY NOT NULL,
+	fs_group_id		VARCHAR(250) BINARY NOT NULL,
+	retrieve_aet	VARCHAR(250) BINARY NOT NULL,
+	availability	INTEGER NOT NULL,
+	fs_status		INTEGER NOT NULL,
+	user_info		VARCHAR(250) BINARY,
+FOREIGN KEY (next_fk) REFERENCES filesystem(pk)
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX fs_dirpath ON filesystem(dirpath(64));
+CREATE INDEX fs_next_fk ON filesystem(next_fk);
+CREATE INDEX fs_group_id ON filesystem(fs_group_id(16));
+CREATE INDEX fs_retrieve_aet ON filesystem(retrieve_aet(16));
+CREATE INDEX fs_availability ON filesystem(availability);
+CREATE INDEX fs_status ON filesystem(fs_status);
+
+CREATE TABLE files (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	instance_fk     BIGINT,
+	filesystem_fk	BIGINT,
+	filepath		VARCHAR(250) BINARY NOT NULL,
+	file_tsuid      VARCHAR(250) BINARY NOT NULL,
+	file_md5        VARCHAR(250) BINARY,
+	file_size       BIGINT,
+	file_status     INTEGER,
+	md5_check_time	DATETIME,
+	created_time	DATETIME,
+FOREIGN KEY (instance_fk)	REFERENCES instance(pk),
+FOREIGN KEY (filesystem_fk)	REFERENCES filesystem(pk)
+) ENGINE=INNODB;
+CREATE INDEX instance_fk ON files(instance_fk);
+CREATE INDEX filesystem_fk ON files(filesystem_fk);
+CREATE INDEX file_tsuid ON files(file_tsuid(64));
+CREATE INDEX md5_check_time ON files(md5_check_time);
+CREATE INDEX file_created ON files(created_time);
+CREATE INDEX file_status ON files(file_status);
+
+CREATE TABLE study_on_fs (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_fk		BIGINT,
+	filesystem_fk	BIGINT,
+	access_time		DATETIME NOT NULL,
+FOREIGN KEY (study_fk) REFERENCES study(pk),
+FOREIGN KEY (filesystem_fk) REFERENCES filesystem(pk)
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX i_study_on_fs ON study_on_fs(study_fk, filesystem_fk);
+CREATE INDEX fs_of_study ON study_on_fs(filesystem_fk);
+CREATE INDEX access_time ON study_on_fs(access_time);
+
+CREATE TABLE mwl_item (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk      BIGINT,
+	sps_status      INTEGER,
+	sps_id			VARCHAR(250) BINARY,
+	start_datetime	DATETIME NOT NULL,
+	station_aet     VARCHAR(250) BINARY NOT NULL,
+	station_name    VARCHAR(250) BINARY,
+	modality	    VARCHAR(250) BINARY NOT NULL,
+	perf_physician VARCHAR(250) BINARY,
+	perf_phys_i_name  VARCHAR(250) BINARY,
+	perf_phys_p_name  VARCHAR(250) BINARY,
+	req_proc_id    	VARCHAR(250) BINARY NOT NULL,
+	accession_no	VARCHAR(250) BINARY,
+	study_iuid      VARCHAR(250) BINARY NOT NULL,
+	updated_time	DATETIME,
+	created_time	DATETIME,
+	item_attrs		LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+) ENGINE=INNODB;
+CREATE INDEX mwl_patient_fk ON mwl_item(patient_fk);
+CREATE INDEX sps_status ON mwl_item(sps_status);
+CREATE UNIQUE INDEX mwl_sps_id ON mwl_item(sps_id(16),req_proc_id(16));
+CREATE INDEX mwl_start_time ON mwl_item(start_datetime);
+CREATE INDEX mwl_station_aet ON mwl_item(station_aet(16));
+CREATE INDEX mwl_station_name ON mwl_item(station_name(16));
+CREATE INDEX mwl_modality ON mwl_item(modality(16));
+CREATE INDEX mwl_perf_physician ON mwl_item(perf_physician(64));
+CREATE INDEX mwl_perf_phys_i_nm ON mwl_item(perf_phys_i_name(64));
+CREATE INDEX mwl_perf_phys_p_nm ON mwl_item(perf_phys_p_name(64));
+CREATE INDEX mwl_req_proc_id ON mwl_item(req_proc_id(16));
+CREATE INDEX mwl_accession_no ON mwl_item(accession_no(16));
+CREATE INDEX mwl_study_iuid ON mwl_item(study_iuid(64));
+
+CREATE TABLE gpsps (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk      BIGINT,
+	code_fk         BIGINT,
+	gpsps_iuid      VARCHAR(250) BINARY NOT NULL,
+	gpsps_tuid      VARCHAR(250) BINARY,
+	start_datetime  DATETIME NOT NULL,
+	end_datetime    DATETIME,
+	gpsps_status    INTEGER,
+	gpsps_prior     INTEGER,
+	in_availability INTEGER,
+	item_attrs      LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk),
+FOREIGN KEY (code_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX gpsps_patient_fk ON gpsps(patient_fk);
+CREATE INDEX gpsps_code_fk ON gpsps(code_fk);
+CREATE UNIQUE INDEX gpsps_iuid ON gpsps(gpsps_iuid(64));
+CREATE INDEX gpsps_tuid ON gpsps(gpsps_tuid(64));
+CREATE INDEX gpsps_start_time ON gpsps(start_datetime);
+CREATE INDEX gpsps_end_time ON gpsps(end_datetime);
+CREATE INDEX gpsps_status ON gpsps(gpsps_status);
+CREATE INDEX gpsps_prior ON gpsps(gpsps_prior);
+CREATE INDEX in_availability ON gpsps(in_availability);
+
+CREATE TABLE rel_gpsps_appcode (
+	gpsps_fk       BIGINT,
+	appcode_fk     BIGINT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (appcode_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX appcode_gpsps_fk ON rel_gpsps_appcode(gpsps_fk);
+CREATE INDEX gpsps_appcode_fk ON rel_gpsps_appcode(appcode_fk);
+
+CREATE TABLE rel_gpsps_devname (
+	gpsps_fk       BIGINT,
+	devname_fk     BIGINT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devname_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX devname_gpsps_fk ON rel_gpsps_devname(gpsps_fk);
+CREATE INDEX gpsps_devname_fk ON rel_gpsps_devname(devname_fk);
+
+CREATE TABLE rel_gpsps_devclass (
+	gpsps_fk       BIGINT,
+	devclass_fk     BIGINT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devclass_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX devclass_gpsps_fk ON rel_gpsps_devclass(gpsps_fk);
+CREATE INDEX gpsps_devclass_fk ON rel_gpsps_devclass(devclass_fk);
+
+CREATE TABLE rel_gpsps_devloc (
+	gpsps_fk       BIGINT,
+	devloc_fk  BIGINT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (devloc_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX devloc_gpsps_fk ON rel_gpsps_devloc(gpsps_fk);
+CREATE INDEX gpsps_devloc_fk ON rel_gpsps_devloc(devloc_fk);
+
+CREATE TABLE gpsps_perf (
+	pk                 BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	gpsps_fk           BIGINT,
+	code_fk            BIGINT,
+	human_perf_name    VARCHAR(250) BINARY,
+	hum_perf_i_name    VARCHAR(250) BINARY,
+	hum_perf_p_name    VARCHAR(250) BINARY,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (code_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX gpsps_perf_sps_fk ON gpsps_perf(gpsps_fk);
+CREATE INDEX gpsps_perf_code_fk ON gpsps_perf(code_fk);
+CREATE INDEX gpsps_perf_name ON gpsps_perf(human_perf_name(64));
+CREATE INDEX gpsps_perf_i_name ON gpsps_perf(hum_perf_i_name(64));
+CREATE INDEX gpsps_perf_p_name ON gpsps_perf(hum_perf_p_name(64));
+
+CREATE TABLE gpsps_req (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	gpsps_fk        BIGINT,
+	req_proc_id		VARCHAR(250) BINARY,
+	accession_no	VARCHAR(250) BINARY,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk)
+) ENGINE=INNODB;
+CREATE INDEX gpsps_req_gpsps_fk ON gpsps_req(gpsps_fk);
+CREATE INDEX gpsps_req_proc_id ON gpsps_req(req_proc_id);
+CREATE INDEX gpsps_req_acc_no ON gpsps_req(accession_no);	
+
+CREATE TABLE gppps (
+	pk          		BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk			BIGINT,
+	pps_iuid			VARCHAR(250) BINARY NOT NULL,
+	pps_start			DATETIME,
+	pps_status			INTEGER NOT NULL,
+	created_time	    DATETIME,
+	updated_time	    DATETIME,
+	pps_attrs			LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES patient(pk)
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX gppps_iuid ON gppps (pps_iuid);
+CREATE INDEX gppps_patient_fk ON gppps(patient_fk);
+CREATE INDEX gppps_pps_start ON gppps (pps_start);
+
+CREATE TABLE rel_gpsps_gppps (
+	gpsps_fk        BIGINT,
+	gppps_fk        BIGINT,
+FOREIGN KEY (gpsps_fk) REFERENCES gpsps(pk),
+FOREIGN KEY (gppps_fk) REFERENCES gppps(pk)
+) ENGINE=INNODB;
+CREATE INDEX gppps_gpsps_fk ON rel_gpsps_gppps(gpsps_fk);
+CREATE INDEX gpsps_gppps_fk ON rel_gpsps_gppps(gppps_fk);
+
+CREATE TABLE hp (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	user_fk         BIGINT,
+	hp_iuid         VARCHAR(250) BINARY NOT NULL,
+	hp_cuid         VARCHAR(250) BINARY,
+	hp_name         VARCHAR(250) BINARY,
+	hp_group        VARCHAR(250) BINARY,
+	hp_level        INTEGER,
+	num_priors      INTEGER,
+	num_screens     INTEGER,
+	hp_attrs        LONGBLOB,
+FOREIGN KEY (user_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX hp_user_fk ON hp(user_fk);
+CREATE UNIQUE INDEX hp_iuid ON hp(hp_iuid(64));
+CREATE INDEX hp_cuid ON hp(hp_cuid(64));
+CREATE INDEX hp_name ON hp(hp_name(64));
+CREATE INDEX hp_level ON hp(hp_level);
+CREATE INDEX num_priors ON hp(num_priors);
+CREATE INDEX num_screens ON hp(num_screens);
+
+CREATE TABLE hpdef (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	hp_fk           BIGINT,
+	modality        VARCHAR(250) BINARY,
+	laterality      VARCHAR(250) BINARY,
+FOREIGN KEY (hp_fk) REFERENCES hp(pk)
+) ENGINE=INNODB;
+CREATE INDEX hp_fk ON hpdef(hp_fk);
+CREATE INDEX hpdef_modality ON hpdef(modality(16));
+CREATE INDEX hpdef_laterality ON hpdef(laterality(16));
+
+CREATE TABLE rel_hpdef_region (
+	hpdef_fk        BIGINT,
+	region_fk       BIGINT,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (region_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX region_hpdef_fk ON rel_hpdef_region(hpdef_fk);
+CREATE INDEX hpdef_region_fk ON rel_hpdef_region(region_fk);
+
+CREATE TABLE rel_hpdef_proc (
+	hpdef_fk        BIGINT,
+	proc_fk         BIGINT,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (proc_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX proc_hpdef_fk ON rel_hpdef_proc(hpdef_fk);
+CREATE INDEX hpdef_proc_fk ON rel_hpdef_proc(proc_fk);
+
+CREATE TABLE rel_hpdef_reason (
+	hpdef_fk        BIGINT,
+	reason_fk       BIGINT,
+FOREIGN KEY (hpdef_fk) REFERENCES hpdef(pk),
+FOREIGN KEY (reason_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX reason_hpdef_fk ON rel_hpdef_reason(hpdef_fk);
+CREATE INDEX hpdef_reason_fk ON rel_hpdef_reason(reason_fk);
+
+CREATE TABLE priv_patient (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	priv_type		INTEGER NOT NULL,
+	pat_id         	VARCHAR(250) BINARY,
+	pat_id_issuer  	VARCHAR(250) BINARY,
+	pat_name  		VARCHAR(250) BINARY,
+	pat_attrs		LONGBLOB
+) ENGINE=INNODB;
+CREATE INDEX priv_pat_id ON priv_patient(pat_id, pat_id_issuer(64));
+CREATE INDEX priv_pat_name ON priv_patient(pat_name(64));
+CREATE INDEX priv_pat_type ON priv_patient(priv_type);
+
+CREATE TABLE priv_study (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	patient_fk      BIGINT,
+	priv_type		INTEGER NOT NULL,
+	study_iuid      VARCHAR(250) BINARY NOT NULL,
+	accession_no	VARCHAR(250) BINARY,
+	study_attrs		LONGBLOB,
+FOREIGN KEY (patient_fk) REFERENCES priv_patient(pk)
+) ENGINE=INNODB;
+CREATE INDEX priv_patient_fk ON priv_study(patient_fk);
+CREATE INDEX priv_study_type ON priv_study(priv_type);
+CREATE INDEX priv_study_iuid ON priv_study(study_iuid(64));
+CREATE INDEX priv_study_accs_no ON priv_study(accession_no(16));
+
+CREATE TABLE priv_series (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_fk		BIGINT,
+	priv_type		INTEGER NOT NULL,
+	series_iuid     VARCHAR(250) BINARY NOT NULL,
+	src_aet			VARCHAR(250) BINARY,
+	series_attrs	LONGBLOB,
+FOREIGN KEY (study_fk) REFERENCES priv_study(pk)
+) ENGINE=INNODB;
+CREATE INDEX priv_study_fk ON priv_series(study_fk);
+CREATE INDEX priv_series_type ON priv_series(priv_type);
+CREATE INDEX priv_series_iuid ON priv_series(series_iuid(64));
+CREATE INDEX priv_ser_src_aet ON priv_series(src_aet(16));
+
+
+CREATE TABLE priv_instance (
+	pk             	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	series_fk		BIGINT,
+	priv_type		INTEGER NOT NULL,
+	sop_iuid		VARCHAR(250) BINARY NOT NULL,
+	inst_attrs		LONGBLOB,
+FOREIGN KEY (series_fk) REFERENCES priv_series(pk)
+) ENGINE=INNODB;
+CREATE INDEX priv_series_fk ON priv_instance(series_fk);
+CREATE INDEX priv_inst_type ON priv_instance(priv_type);
+CREATE INDEX priv_sop_iuid ON priv_instance(sop_iuid(64));
+
+CREATE TABLE priv_file (
+	pk              BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	instance_fk     BIGINT,
+	filesystem_fk   BIGINT,
+	filepath		VARCHAR(250) BINARY NOT NULL,
+	file_tsuid      VARCHAR(250) BINARY NOT NULL,
+	file_md5        VARCHAR(250) BINARY,
+	file_size       BIGINT,
+	file_status     INTEGER,
+FOREIGN KEY (instance_fk)	REFERENCES priv_instance(pk),
+FOREIGN KEY (filesystem_fk)	REFERENCES filesystem(pk)
+) ENGINE=INNODB;
+CREATE INDEX priv_instance_fk ON priv_file(instance_fk);
+CREATE INDEX priv_fs_fk ON priv_file(filesystem_fk);
+
+
+CREATE TABLE device (
+	pk          	BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	station_name    VARCHAR(250) BINARY NOT NULL,
+	station_aet     VARCHAR(250) BINARY NOT NULL,
+	modality		VARCHAR(250) BINARY NOT NULL
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX dev_station_name ON device(station_name(16));
+
+CREATE TABLE rel_dev_proto (
+	device_fk      BIGINT,
+	prcode_fk      BIGINT,
+FOREIGN KEY (device_fk) REFERENCES device(pk),
+FOREIGN KEY (prcode_fk) REFERENCES code(pk)
+) ENGINE=INNODB;
+CREATE INDEX device_fk ON rel_dev_proto(device_fk);
+CREATE INDEX prcode_fk ON rel_dev_proto(prcode_fk);
+
+CREATE TABLE users(
+	user_id		VARCHAR(250) BINARY NOT NULL PRIMARY KEY,
+	passwd 		VARCHAR(250) BINARY
+) ENGINE=INNODB;
+CREATE TABLE roles(
+	user_id		VARCHAR(250) BINARY,
+	roles	 	VARCHAR(250) BINARY,
+FOREIGN KEY (user_id) REFERENCES users(user_id)
+) ENGINE=INNODB;
+CREATE INDEX roles_user_id ON roles(user_id(16));
+
+INSERT INTO users VALUES('admin','0DPiKuNIrrVmD8IUCuw1hQxNqZc=');
+INSERT INTO roles VALUES('admin','JBossAdmin');
+INSERT INTO roles VALUES('admin','WebAdmin');
+INSERT INTO roles VALUES('admin','WebUser');
+INSERT INTO roles VALUES('admin','McmUser');
+INSERT INTO roles VALUES('admin','AuditLogUser');
+INSERT INTO roles VALUES('admin','Doctor');
+
+INSERT INTO users VALUES('user','Et6pb+wgWTVmq3VpLJlJWWgzrck=');
+INSERT INTO roles VALUES('user','WebUser');
+INSERT INTO roles VALUES('user','McmUser');
+INSERT INTO roles VALUES('user','Doctor');
+
+INSERT INTO ae (aet,hostname,port,pat_id_issuer,ae_desc)
+	VALUES('DCM4CHEE','localhost',11112,'DCM4CHEE','This dcm4chee archive instance');
+INSERT INTO ae (aet,hostname,port,ae_desc)
+	VALUES('CDRECORD','localhost',10104,'Media Creation Server (part of dcm4chee)');

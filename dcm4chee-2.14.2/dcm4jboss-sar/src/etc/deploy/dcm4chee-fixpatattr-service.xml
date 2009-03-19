@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-fixpatattr-service.xml 2533 2006-06-20 17:26:32Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.mbean.FixPatientAttributesService" 
+	name="dcm4chee.archive:service=FixPatientAttributesService"
+	xmbean-dd="xmdesc/dcm4chee-fixpatattr-xmbean.xml">
+  </mbean>
+</server>
+
+

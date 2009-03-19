@@ -1,0 +1,155 @@
+/* DICOM+XML style sheet */
+body
+{
+	
+}
+
+a
+{
+	text-decoration: none;
+}
+
+h1
+{
+	font-size: 18pt;
+}
+
+/* Generic table */
+table td
+{
+  vertical-align: top;
+}
+/* DICOM ds table */
+table.dcmds
+{
+	border: thin #FDFDDF ridge;
+	font-family: "arial";
+}
+table.dcmds tr.head
+{
+	font-size: 14pt;
+	background-color: #CCCCCC;
+}
+table.dcmds tr
+{
+    font-size: 10pt;
+}
+table.dcmds tr.row0
+{
+    background-color: #FDFDDF;
+}
+table.dcmds tr.row1
+{
+    background-color: #F0F0FD;
+}
+
+table.dcmds td.itemno
+{
+	border: thin #FDFDDF ridge;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+STRONG {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : bold;
+}
+
+H0 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 15px;
+	font-weight : bold;
+	letter-spacing : 4px;
+	align: top;
+	vertical-align: top;
+}	
+H1 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+	font-weight : bold;
+	letter-spacing : 3px;
+	align: top;
+}
+H2 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : bold;
+	letter-spacing : 2px;
+	text-decoration : none;
+}
+
+H3 {
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-weight : normal;
+	letter-spacing : 2px;
+	color : Red;
+	font-position: center center;
+}
+
+H4 {
+	font : normal 9px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color : 666666;
+	vertical-align: middle;
+
+}
+
+P {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 9px;
+	vertical-align: middle;
+}
+
+TABLE {
+	background : transparent;
+	font : normal 11px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	text-decoration : none;
+} 
+
+BODY {
+	color : #666666;
+}
+
+
+P {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+}
+
+A       {text-decoration: none; font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size : 11px;}
+		
+A:hover {text-decoration: underline; color: #FF0000}
+
+UL, LI {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	list-style : disc;
+	list-style-position : inside;
+}
+
+B {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font : bold;
+}
+
+HR {
+	color : Silver;
+	font : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+}
+
+BLOCKQUOTE {
+	color : Red;
+	font : BankGothic Md BT;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-style : normal;
+	font-variant : small-caps;
+	font-weight : bold;
+	letter-spacing : 2px;
+	text-transform : none;
+}

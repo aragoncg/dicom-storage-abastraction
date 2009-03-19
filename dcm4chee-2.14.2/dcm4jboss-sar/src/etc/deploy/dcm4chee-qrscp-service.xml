@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-qrscp-service.xml 7629 2008-10-17 12:16:41Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee.jar"/>
+  <mbean code="org.dcm4chex.archive.dcm.qrscp.QueryRetrieveScpService"
+    name="dcm4chee.archive:service=QueryRetrieveScp"
+    xmbean-dd="xmdesc/dcm4chee-qrscp-xmbean.xml">
+    <depends optional-attribute-name="AEServiceName"
+      >dcm4chee.archive:service=AE</depends>
+    <depends optional-attribute-name="AuditLoggerName"
+      >dcm4chee.archive:service=AuditLogger</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+    <depends optional-attribute-name="DcmServerName"
+      >dcm4chee.archive:service=DcmServer</depends>
+    <depends optional-attribute-name="DicomSecurityServiceName"
+      >dcm4chee.archive:service=DicomSecurity</depends>
+    <depends optional-attribute-name="StgCmtScuScpName"
+      >dcm4chee.archive:service=StgCmtScuScp</depends>
+    <depends optional-attribute-name="TarRetrieverName"
+      >dcm4chee.archive:service=TarRetriever</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+    <depends optional-attribute-name="PixQueryServiceName"
+      >dcm4chee.archive:service=PIXQuery</depends>
+  </mbean>
+</server>

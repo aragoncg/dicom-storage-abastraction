@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>Check File Status Service.</description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+   </descriptors>
+
+   <class>org.dcm4chex.archive.hsm.SyncFileStatusService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>SyncFileStatusService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getFileSystem"
+      setMethod="setFileSystem">
+      <description>Directory/Mount Point of the monitored File System. 
+        NONE = disabled this service.
+      </description>
+      <name>MonitoredFileSystem</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMinimumFileAge"
+      setMethod="setMinimumFileAge">
+      <description><![CDATA[Only files created longer ago than the specified intervall
+      ##w (in weeks), ##d (in days), ##h (in hours) are checked for status change.]]>
+      </description>
+      <name>MinimumFileAge</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="1w"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCheckFileStatus"
+      setMethod="setCheckFileStatus">
+      <description>Checks files with the specified status for status change.
+      Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED, QUERY_HSM_FAILED
+      </description>
+      <name>CheckFileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TO_ARCHIVE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCommandFailedFileStatus"
+      setMethod="setCommandFailedFileStatus">
+      <description>New file status, if the query command could not be executed.
+      Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED, QUERY_HSM_FAILED
+      </description>
+      <name>CommandFailedFileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TO_ARCHIVE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getNonZeroExitFileStatus"
+      setMethod="setNonZeroExitFileStatus">
+      <description>New file status, if query command returns non-zero exit code.
+      Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED, QUERY_HSM_FAILED
+      </description>
+      <name>NonZeroExitFileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="QUERY_HSM_FAILED"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getNoMatchFileStatus"
+      setMethod="setNoMatchFileStatus">
+      <description>New file status, if the query result does NOT match specified pattern.
+      Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED, QUERY_HSM_FAILED
+      </description>
+      <name>NoMatchFileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="TO_ARCHIVE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getMatchFileStatus"
+      setMethod="setMatchFileStatus">
+      <description>New file status, if the query result does match specified pattern.
+      Enumerated values: DEFAULT, TO_ARCHIVE, ARCHIVED, QUERY_HSM_FAILED
+      </description>
+      <name>MatchFileStatus</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="ARCHIVED"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getCommand"
+      setMethod="setCommand">
+      <description><![CDATA[Command to query status of specific file.
+         <br>%d will be replaced by file system name (directory path/mount point),
+         <br>%f will be replaced by the file path,
+         <br>%i will be replaced by user info associated with the file system.
+       ]]>
+      </description>
+      <name>Command</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="mmls %i/%f"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPattern"
+      setMethod="setPattern">
+      <description><![CDATA[Regular expression, applied to stdout of
+      command. Result determines if status is changed to MatchFileStatus
+      or NoMatchFileStatus.
+       ]]>
+      </description>
+      <name>Pattern</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value=".*\bArchived\b.*"/>
+      </descriptors>
+   </attribute>
+   
+     <attribute access="read-write"
+      getMethod="getTaskInterval"
+      setMethod="setTaskInterval">
+      <description><![CDATA[Interval in which the File status is checked.
+         <br>Format: 
+		 <br><i>interval</i>!<i>from</i>-<i>to</i> or NEVER
+         <br><i>interval</i> = ##m (in minutes), ##h (in hours).
+         <br><i>from</i> = start hour (0-23) when no file status check should be performed
+         <br><i>to</i> = end hour (0-23) when no file status check should be performed
+         <br>NEVER = disable file status checking
+         <br>Example:<br>1h!9-17 means every hour,
+         synchronize file status, except between the hours of 9:00am and 5:00pm.
+         By setting this type of TaskInterval, you can perform file status synchronisation outside of peak hours.
+         ]]>
+      </description>
+      <name>TaskInterval</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NEVER"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getLimitNumberOfFilesPerTask"
+      setMethod="setLimitNumberOfFilesPerTask">
+      <description>Maximum number of files which are checked for status change in one task.
+      </description>
+      <name>NumberOfFilesPerTask</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getTimerIDCheckSyncFileStatus"
+      setMethod="setTimerIDCheckSyncFileStatus">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TimerIDCheckSyncFileStatus</name>
+      <type>java.lang.String</type>
+   </attribute>
+   
+   <attribute access="read-write"
+      getMethod="getSchedulerServiceName"
+      setMethod="setSchedulerServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>SchedulerServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+
+   <operation impact="ACTION">
+      <description>Check files for status changes.</description>
+      <name>check</name>
+      <return-type>int</return-type>
+   </operation>
+
+   <operation impact="INFO">
+      <description>Apply pattern to given string</description>
+      <name>applyPattern</name>
+      <parameter>
+        <name>string</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>boolean</return-type>
+   </operation>
+
+</mbean>
+    

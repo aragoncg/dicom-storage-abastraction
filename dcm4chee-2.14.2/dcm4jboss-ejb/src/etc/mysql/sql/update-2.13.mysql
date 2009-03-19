@@ -1,0 +1,24 @@
+-- Update DB from dcm4chee-2.12.x to dcm4chee-2.13.x
+
+DROP TABLE study_permission;
+CREATE TABLE study_permission (
+	pk              INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	study_iuid      VARCHAR(250) BINARY NOT NULL,
+	action          VARCHAR(250) BINARY NOT NULL,
+	roles           VARCHAR(250) BINARY NOT NULL
+) ENGINE=INNODB;
+CREATE UNIQUE INDEX study_perm_idx ON study_permission(study_iuid(64), action(1), roles(16));
+
+ALTER TABLE ae ADD fs_group_id VARCHAR(250) BINARY;
+
+ALTER TABLE series ADD (perf_physician   VARCHAR(250) BINARY,
+                        perf_phys_i_name VARCHAR(250) BINARY,
+                        perf_phys_p_name VARCHAR(250) BINARY);
+
+CREATE INDEX perf_physician ON series(perf_physician(64));
+CREATE INDEX perf_phys_i_name ON series(perf_phys_i_name(64));
+CREATE INDEX perf_phys_p_name ON series(perf_phys_p_name(64));
+CREATE INDEX series_updated ON series(updated_time);
+
+INSERT INTO roles VALUES('admin','Doctor');
+INSERT INTO roles VALUES('user','Doctor');

@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC 
+    "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" 
+    "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[File System Management Service. Specifies the location
+    of file systems in which DICOM objects received from the Store SCP Server
+    are stored. You can also set up rules to delete the most infrequently
+    accessed studies.]]>
+  </description>
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+  <class>org.dcm4chex.archive.mbean.FileSystemMgt2Service</class>
+  <constructor>
+    <description>The default constructor</description>
+    <name>FileSystemMgt2Service</name>
+  </constructor>
+
+  <!-- Attributes -->
+  &defaultAttributes;
+
+  <attribute access="read-only" getMethod="getFileSystemGroupID">
+    <description><![CDATA[Identifier of the file system group managed by this
+      service, specified by property <b>group</b> of its MBean name.]]>
+    </description>
+    <name>FileSystemGroupID</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDefRetrieveAET"
+    setMethod="setDefRetrieveAET">
+    <description><![CDATA[Default Retrieve AE Title, which will be associated
+      with new file systems added by operation <i>addRWFileSystem</i>.]]>
+    </description>
+    <name>DefaultRetrieveAETitle</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="DCM4CHEE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDefAvailability"
+    setMethod="setDefAvailability">
+    <description><![CDATA[Default Availability, which will be associated with
+      new file systems added by operation <i>addRWFileSystem</i>. Enumerated
+      values: "ONLINE", "NEARLINE","OFFLINE", "UNAVAILABLE".]]>
+    </description>
+    <name>DefaultAvailability</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="ONLINE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDefUserInfo"
+    setMethod="setDefUserInfo">
+    <description><![CDATA[Default User Information, which will be associated
+      with new file systems added by operation <i>addRWFileSystem</i>.]]>
+    </description>
+    <name>DefaultUserInformation</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDefStorageDir"
+    setMethod="setDefStorageDir">
+    <description><![CDATA[Default Storage Directory, used on receive of the
+      first object if no Storage File System was explicit configured by
+      operation <i>addRWFileSystem</i>. A relative path name is resolved
+      relative to <i>&lt;archive-install-directory&gt;</i>/server/default/.
+      Use "NONE" to disable auto-configuration to force failure to receive
+      objects, if no Storage File System was explicit configured.]]>
+    </description>
+    <name>DefaultStorageDirectory</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="archive" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isCheckStorageFileSystemStatus"
+    setMethod="setCheckStorageFileSystemStatus">
+    <description><![CDATA[Flag indicating if the RW status of the current
+      storage file system is checked before each file storage of objects
+      received by the Storage SCP.
+      <p>If the update of the status of the file system is only performed by
+      invoking operations <i>updateFileSystemStatus</i> of this service
+      - in particular, if there are no other running dcm4chee applications on
+      other nodes  (dcm4chee cluster), and File System records in the database
+      will NOT be updated by executing SQL statements using some dcm4chee
+      external SQL client application - the check can be deactivated to spare
+      the execution of one additional SQL statement for each stored object.</p>
+      ]]>
+    </description>
+    <name>CheckStorageFileSystemStatus</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isMakeStorageDirectory"
+    setMethod="setMakeStorageDirectory">
+    <description><![CDATA[Create storage directory, if no one exists.]]>
+    </description>
+    <name>MakeStorageDirectory</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getMountFailedCheckFile"
+    setMethod="setMountFailedCheckFile">
+    <description><![CDATA[If the specified file exists, this signals a failed
+      mount.]]>
+    </description>
+    <name>MountFailedCheckFile</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NO_MOUNT" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getMinFreeDiskSpace"
+    setMethod="setMinFreeDiskSpace">
+    <description><![CDATA[Minimum free disk space. If the free available disk
+      space on the current storage file system falls below this value, the next
+      configured file system becomes the current storage system.
+      1MB = 1000000 bytes, 1GB = 1000MB.
+      NONE = disable check for minimal free available disk space.]]>
+    </description>
+    <name>MinimumFreeDiskSpace</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="50MB" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getFreeDiskSpaceOnCurFS">
+    <description><![CDATA[Get free available disk space on the current storage
+      file system in bytes.]]>
+    </description>
+    <name>FreeDiskSpaceOnCurrentStorageFileSystem</name>
+    <type>long</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getFreeDiskSpaceOnCurFSString">
+    <description><![CDATA[Get free available disk space on the current storage
+      file system as string.]]>
+    </description>
+    <name>FreeDiskSpaceOnCurrentStorageFileSystemString</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getUsableDiskSpaceOnCurFS">
+    <description><![CDATA[Get usable free disk space on the current storage
+      file system, considering the configured value for
+      <i>MinimumFreeDiskSpace</i>, by substracting that value from
+      <i>FreeDiskSpaceOnCurrentStorageFileSystem</i>, in bytes.]]>
+    </description>
+    <name>UsableDiskSpaceOnCurrentStorageFileSystem</name>
+    <type>long</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getUsableDiskSpaceOnCurFSString">
+    <description><![CDATA[Get usable free disk space on the current storage
+      file system, considering the configured value for
+      <i>MinimumFreeDiskSpace</i>, by substracting that value from
+      <i>FreeDiskSpaceOnCurrentStorageFileSystem</i>, as string.]]>
+    </description>
+    <name>UsableDiskSpaceOnCurrentStorageFileSystemString</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getFreeDiskSpace">
+    <description><![CDATA[Get free available disk space on writable file
+      systems of the file system group managed my this service.]]>
+    </description>
+    <name>FreeDiskSpace</name>
+    <type>long</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getFreeDiskSpaceString">
+    <description><![CDATA[Get free available disk space on writable file
+      systems of the file system group managed my this service as string.]]>
+    </description>
+    <name>FreeDiskSpaceString</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getUsableDiskSpace">
+    <description><![CDATA[Get usable free disk space on writable file
+      systems of the file system group managed my this service, considering
+      the configured value for <i>MinimumFreeDiskSpace</i>, in bytes.]]>
+    </description>
+    <name>UsableDiskSpace</name>
+    <type>long</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getUsableDiskSpaceString">
+    <description><![CDATA[Get usable free disk space on writable file
+      systems of the file system group managed my this service, considering
+      the configured value for <i>MinimumFreeDiskSpace</i>, as string.]]>
+    </description>
+    <name>UsableDiskSpaceString</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getCheckFreeDiskSpaceMinimalInterval"
+    setMethod="setCheckFreeDiskSpaceMinimalInterval">
+    <description><![CDATA[Minimal Interval for checking free available disk
+      space on current storage file system against minimum value specified by
+      <i>MinimumFreeDiskSpace</i>. The current interval (curInterval) is
+      calculated by multiplication of this value (minInterval) with the ratio
+      of the current free available disk space (curFDS) to the configured
+      <i>MinimumFreeDiskSpace</i> (minFDS), but maximal the value specified by
+      <i>CheckFreeDiskSpaceMaximalInterval</i> (maxInterval):
+      <p>
+      <tt>curInterval = min(minInterval * curFDS/minFDS, maxInterval)</tt>
+      <p>Format: ##m (in minutes) | ##s (in seconds).]]>
+    </description>
+    <name>CheckFreeDiskSpaceMinimalInterval</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="10s" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getCheckFreeDiskSpaceMaximalInterval"
+    setMethod="setCheckFreeDiskSpaceMaximalInterval">
+    <description><![CDATA[Maximal Interval for checking free available disk
+      space on current storage file system against minimum value specified by
+      <i>MinimumFreeDiskSpace</i>. Effective as long the current free available
+      disk space is greater than <i>MinimumFreeDiskSpace</i> multiplied by the
+      ratio of this value and the configured
+      <i>CheckFreeDiskSpaceMinimalInterval</i>. Otherwise the interval will be
+      calculated as described above for attribute
+      <i>CheckFreeDiskSpaceMinimalInterval</i>.
+      <p>Format: ##m (in minutes) | ##s (in seconds).]]>
+    </description>
+    <name>CheckFreeDiskSpaceMaximalInterval</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="60s" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDeleterThresholds"
+    setMethod="setDeleterThresholds">
+    <description><![CDATA[Defines thresholds dependent on hour of day, for
+      deleting the most infrequently accessed studies which satisfy the
+      configured set of constraints.
+      <p>Format: HOUR:##MB or HOUR:##GB or HOUR:##h, multiple thresholds with
+      different (start) hour separated by ';'. NONE = disable deletion of
+      studies on file systems of the file system group managed my this service.
+      <p>E.g.: 7:1h;19:24h => free space for expected data volume received in
+      24 hours between  7pm and 7am. Between 7am and 7pm only delete studies if
+      the usable free space falls below the expected data volume received in
+      one hour.]]>
+    </description>
+    <name>DeleterThresholds</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="7:1h;19:24h" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getExpectedDataVolumePerDay"
+    setMethod="setExpectedDataVolumePerDay">
+    <description><![CDATA[Expected data volume per day. Used to transform
+      time based deleter thresholds (s. DeleterThresholds) into disk space size
+      to free.]]>
+    </description>
+    <name>ExpectedDataVolumePerDay</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="100MB" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isAdjustExpectedDataVolumePerDay"
+    setMethod="setAdjustExpectedDataVolumePerDay">
+    <description><![CDATA[Update value of attribute ExpectedDataVolumePerDay
+      at midnight, if data volume received during last 24 hours exceeds its
+      current value.]]>
+    </description>
+    <name>AdjustExpectedDataVolumePerDay</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getCurrentDeleterThreshold">
+    <description><![CDATA[Get current effective deleter threshold in bytes
+      according configured <i>DeleterThreshold</i> and
+      <i>ExpectedDataVolumePerDay</i>. If <i>UsableDiskSpace</i> falls below
+      this value, most infrequently accessed studies which satisfy the
+      configured set of constraints will be deleted on next invocation of
+      operation <i>scheduleStudiesForDeletion</i>.]]>
+    </description>
+    <name>CurrentDeleterThreshold</name>
+    <type>long</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDeleteStudyIfNotAccessedFor"
+    setMethod="setDeleteStudyIfNotAccessedFor">
+    <description><![CDATA[Defines when a study not accessed for the specified
+      time will be deleted from file systems of the file system group managed
+      my this service, if it satisfies the configured set of constraints.
+      <p>Format: 
+      <br>##h (in hours) | ##d (in days) | ##w (in weeks) | NEVER
+      <br>NEVER = deletion of studies is only triggered by running out of disk
+      space.
+      <br>Example:
+      <br>52w = any studies that have not been accessed for 52 weeks or more
+      can be deleted if they satisfies the configured set of constraints.]]>
+    </description>
+    <name>DeleteStudyIfNotAccessedFor</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NEVER" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDeleteStudyOnlyIfNotAccessedFor"
+    setMethod="setDeleteStudyOnlyIfNotAccessedFor">
+    <description><![CDATA[Defines minimal time a study must not be accessed
+      before it becomes a candidate for deletion.
+      <p>Format: 
+      <br>##h (in hours) | ##d (in days) | ##w (in weeks)]]>
+    </description>
+    <name>DeleteStudyOnlyIfNotAccessedFor</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="1d" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isDeleteStudyOnlyIfStorageNotCommited"
+    setMethod="setDeleteStudyOnlyIfStorageNotCommited">
+    <description><![CDATA[Defines if no Storage Commitment request must have
+      been accepted for any instances of a study to become a candidate for
+      deletion from file systems of the file system group managed my this
+      service triggered by running out of disk space or being not accessed
+      longer than configured <i>DeleteStudiesNotAccessedFor</i>. Typically only
+      activated if no other constraint for study deletion is configured.]]>
+    </description>
+    <name>DeleteStudyOnlyIfStorageNotCommited</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isDeleteStudyOnlyIfCopyExternalRetrieveable"
+    setMethod="setDeleteStudyOnlyIfCopyExternalRetrieveable">
+    <description><![CDATA[Defines if all instances of a study must be
+      retrieveable from an external Application Entity to become a candidate
+      for deletion from file systems of the file system group managed my this
+      service triggered by running out of disk space or being not accessed
+      longer than configured <i>DeleteStudiesNotAccessedFor</i>.]]>
+    </description>
+    <name>DeleteStudyOnlyIfExternalRetrieveable</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isDeleteStudyOnlyIfCopyOnMedia"
+    setMethod="setDeleteStudyOnlyIfCopyOnMedia">
+    <description><![CDATA[Defines if all instances of a study must be
+      stored on Media to become a candidate for deletion from file systems of
+      the file system group managed my this service triggered by running out of
+      disk space or being not accessed longer than configured
+      <i>DeleteStudiesNotAccessedFor</i>.]]>
+    </description>
+    <name>DeleteStudyOnlyIfCopyOnMedia</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="getDeleteStudyOnlyIfCopyOnFileSystemOfFileSystemGroup"
+    setMethod="setDeleteStudyOnlyIfCopyOnFileSystemOfFileSystemGroup">
+    <description><![CDATA[Defines if all instances of a study must be
+      stored on a file system of the specified different file system group to
+      become a candidate for deletion from file systems of the file system
+      group managed my this service triggered by running out of disk space or
+      being not accessed longer than configured <i>DeleteStudiesNotAccessedFor</i>.
+      "NONE" = no such constraint.]]>
+    </description>
+    <name>DeleteStudyOnlyIfCopyOnFileSystemOfFileSystemGroup</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NEARLINE_STORAGE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isDeleteStudyOnlyIfCopyArchived"
+    setMethod="setDeleteStudyOnlyIfCopyArchived">
+    <description><![CDATA[Defines if all instances of a study must be stored
+      on a file system of a different file system group with file status:
+      ARCHIVED to become a candidate for deletion from file systems of the file
+      system group managed my this service triggered by running out of disk
+      space or being not accessed longer than configured
+      <i>DeleteStudiesNotAccessedFor</i>. Typically the file system group of
+      the file system holding the archived copy is specified by
+      <i>DeleteStudyIfCopyOnFileSystemOfFileSystemGroup</i>.]]>
+    </description>
+    <name>DeleteStudyOnlyIfCopyArchived</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isDeleteStudyOnlyIfCopyOnReadOnlyFileSystem"
+    setMethod="setDeleteStudyOnlyIfCopyOnReadOnlyFileSystem">
+    <description><![CDATA[Defines if all instances of a study must be stored
+      on a read-only file system of a different file system group to become a
+      candidate for deletion from file systems of the file system group managed
+      my this service triggered by running out of disk space or being not
+      accessed longer than configured <i>DeleteStudiesNotAccessedFor</i>.
+      Typically the file system group of the read-only file systems is
+      specified by <i>DeleteStudyIfCopyOnFileSystemOfFileSystemGroup</i>.]]> 
+    </description>
+    <name>DeleteStudyOnlyIfCopyOnReadOnlyFileSystem</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="isScheduleStudiesForDeletionOnSeriesStored"
+    setMethod="setScheduleStudiesForDeletionOnSeriesStored">
+    <description><![CDATA[Defines if operation <i>scheduleStudiesForDeletion</i>
+      is invoked to schedule deletion of most infrequently accessed studies
+      after storage of a new Series by the Storage SCP Service.]]> 
+    </description>
+    <name>ScheduleStudiesForDeletionOnSeriesStored</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="getScheduleStudiesForDeletionInterval"
+    setMethod="setScheduleStudiesForDeletionInterval">
+    <description><![CDATA[Interval in which operation
+      <i>scheduleStudiesForDeletion</i> is invoked to schedule deletion of most
+      infrequently accessed studies which satisfies the configured set of
+      constraints from writable file systems of the file system group managed
+      my this service, if they were not accessed longer than configured
+      <i>DeleteStudiesNotAccessedFor</i> or if <i>UsableDiskSpace</i>
+      falls below <i>CurrentDeleterThreshold</i>.
+      <p>Format: ##s (in seconds), ##m (in minutes), ##h (in hours).
+      <br>NEVER = do not invoke operation <i>scheduleStudiesForDeletion</i>
+      by timer thread automatically. => If also
+      <i>scheduleStudiesForDeletionOnSeriesStored</i> is not activated, no
+      studies will be deleted automatically from file systems of the file
+      system group managed my this service.]]>
+    </description>
+    <name>ScheduleStudiesForDeletionInterval</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="5m" />
+    </descriptors>
+  </attribute>
+ 
+  <attribute access="read-write"
+    getMethod="getScheduleStudiesForDeletionBatchSize"
+    setMethod="setScheduleStudiesForDeletionBatchSize">
+    <description><![CDATA[Defines maximal number of studies scheduled for
+      deletion in one transaction.]]> 
+    </description>
+    <name>ScheduleStudiesForDeletionBatchSize</name>
+    <type>int</type>
+    <descriptors>
+      <value value="100" />
+    </descriptors>
+  </attribute>
+ 
+  <attribute access="read-write"
+    getMethod="getDeleteOrphanedPrivateFilesInterval"
+    setMethod="setDeleteOrphanedPrivateFilesInterval">
+    <description><![CDATA[Interval in which operation
+      <i>deleteOrphanedPrivateFiles</i> is invoked to delete orphaned private
+      files from writable file systems of the file system group managed my this
+      service. Orphaned private files are the result of deleting instances
+      from the web trash folder.
+      <p>Format: ##s (in seconds), ##m (in minutes), ##h (in hours).
+      <br>NEVER = do not invoke operation <i>deleteOrphanedPrivateFiles</i>
+      automatically => never delete orphaned private files from the file
+      system group managed my this service automatically.]]>
+    </description>
+    <name>DeleteOrphanedPrivateFilesInterval</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="1m" />
+    </descriptors>
+  </attribute>
+
+   <attribute access="read-write"
+      getMethod="getDeleteOrphanedPrivateFilesBatchSize"
+      setMethod="setDeleteOrphanedPrivateFilesBatchSize">
+      <description><![CDATA[Limit the number of orphaned private files that are
+        deleted by one invocation of operation <i>deleteOrphanedPrivateFiles</i>.]]>
+      </description>
+      <name>DeleteOrphanedPrivateFilesBatchSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>
+
+   <attribute access="read-write"
+      getMethod="getUpdateStudiesBatchSize"
+      setMethod="setUpdateStudiesBatchSize">
+      <description><![CDATA[Defines maximal number of studies fetched from the
+        data base in one transaction by operation
+        <i>updateFileSystemAvailability</i> and
+        <i>updateFileSystemRetrieveAETitle</i> for update of <i>Availability</i>
+        and <i>RetrieveAETs</i> values in Study, Series and Instance records.]]>
+      </description>
+      <name>UpdateStudiesBatchSize</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1000"/>
+      </descriptors>
+   </attribute>
+
+  <attribute access="read-write"
+    getMethod="getTimerIDScheduleStudiesForDeletion"
+    setMethod="setTimerIDScheduleStudiesForDeletion">
+    <description>Used internally. Do NOT modify. </description>
+    <name>TimerIDScheduleStudiesForDeletion</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write"
+    getMethod="getTimerIDDeleteOrphanedPrivateFiles"
+    setMethod="setTimerIDDeleteOrphanedPrivateFiles">
+    <description>Used internally. Do NOT modify. </description>
+    <name>TimerIDDeleteOrphanedPrivateFiles</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getSchedulerServiceName"
+    setMethod="setSchedulerServiceName">
+    <description>Used internally. Do NOT modify. </description>
+    <name>SchedulerServiceName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getDeleteStudyServiceName"
+    setMethod="setDeleteStudyServiceName">
+    <description>Used internally. Do NOT modify. </description>
+    <name>DeleteStudyServiceName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getStoreScpServiceName"
+    setMethod="setStoreScpServiceName">
+    <description>Used internally. Do NOT modify. </description>
+    <name>StoreScpServiceName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <!-- Operations -->
+  &defaultOperations;
+
+  <operation impact="INFO">
+    <description>List all configured file systems.</description>
+    <name>listAllFileSystems</name>
+    <return-type>java.lang.String</return-type>
+  </operation>
+
+  <operation impact="INFO">
+    <description><![CDATA[List all configured file systems associated with the
+      file system group managed my this service.]]>
+    </description>
+    <name>listFileSystems</name>
+    <return-type>java.lang.String</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Add RW file system to the file system group managed
+      my this service. The file system is also linked to existing other file
+      systems of the group.]]>
+    </description>
+    <name>addRWFileSystem</name>
+    <parameter>
+      <description>Directory/Mount Point</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Remove empty file system from the file system group
+      managed my this service. Will fail, if there are already/still file
+      records associated with the file system.]]>
+    </description>
+    <name>removeFileSystem</name>
+    <parameter>
+      <description>Directory/Mount Point</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Link or unlink two file systems of the file system
+      group managed my this service.]]>
+    </description>
+    <name>linkFileSystems</name>
+    <parameter>
+      <description>Directory/Mount Point file system</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <parameter>
+      <description>Directory/Mount Point of next file
+        system or "" to unlink the file system from its successor. 
+      </description>
+      <name>next</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Update RW status of the specified file system. If
+      the new file system status is "RW+", which defines the file system as
+      current storage file system, the status of the previous storage file
+      system is set to "RW", to ensure that there is only one file system in
+      one file system group with status "RW+".]]>
+    </description>
+    <name>updateFileSystemStatus</name>
+    <parameter>
+      <description>Directory/Mount Point file system</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <parameter>
+      <description>New file system status. Enumerated values: "RW", "RW+","RO".
+      </description>
+      <name>status</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Update file system availability of the specified file
+      system.]]>
+    </description>
+    <name>updateFileSystemAvailability</name>
+    <parameter>
+      <description>Directory/Mount Point file system</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <parameter>
+      <description>New file system availability. Enumerated values: "ONLINE",
+        "NEARLINE","OFFLINE", "UNAVAILABLE".
+      </description>
+      <name>availability</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Update Retrieve AE Title associated to the specified
+      file system.]]>
+    </description>
+    <name>updateFileSystemRetrieveAETitle</name>
+    <parameter>
+      <description>Directory/Mount Point file system</description>
+      <name>dirPath</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <parameter>
+      <description>New Retrieve AE Title.
+      </description>
+      <name>aet</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Select Storage File System</description>
+    <name>selectStorageFileSystem</name>
+    <return-type>org.dcm4chex.archive.ejb.interfaces.FileSystemDTO</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Update value of attribute
+      <i>ExpectedDataVolumePerDay</i>, if data volume received during last
+      24 hours exceeds its current value.]]>
+    </description>
+    <name>adjustExpectedDataVolumePerDay</name>
+    <return-type>java.lang.String</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Schedules deletion of most infrequently accessed
+      studies which satisfies the configured set of constraints from writable
+      file systems of the file system group managed my this service, if they
+      were not accessed longer than configured
+      <i>DeleteStudiesNotAccessedFor</i> or if  <i>UsableDiskSpace</i> falls
+      below <i>CurrentDeleterThreshold</i>.
+      Returns the number of studies scheduled for deletion.]]>
+    </description>
+    <name>scheduleStudiesForDeletion</name>
+    <return-type>int</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Schedule deletion of study with specified Study
+      Instance UID from writable file systems of the file system group managed
+      by this service, <b>without</b> consideration of the configured set of
+      constraints. Returns size of study in bytes scheduled for deletion.]]>
+    </description>
+    <name>scheduleStudyForDeletion</name>
+    <parameter>
+      <description>Study Instance UID.
+      </description>
+      <name>suid</name>
+      <type>java.lang.String</type>
+    </parameter>
+    <return-type>long</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description><![CDATA[Delete orphaned private files from writable file
+      systems of the file system group managed my this service. Orphaned
+      private files are the result of deleting instances from the web trash
+      folder. Returns the number of deleted files.]]>
+    </description>
+    <name>deleteOrphanedPrivateFiles</name>
+    <return-type>int</return-type>
+  </operation>
+
+  <!-- Notifications -->
+
+  <notification>
+    <description>The notification sent whenever the current storage
+      file system changed to the next configured storage file system.
+    </description>
+    <name>javax.management.Notification</name>
+    <notification-type>org.dcm4chex.archive.notif.StorageFileSystemSwitched</notification-type>
+  </notification>
+</mbean>

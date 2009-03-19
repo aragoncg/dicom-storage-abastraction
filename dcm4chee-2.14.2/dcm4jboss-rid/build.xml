@@ -1,0 +1,159 @@
+<project name="dcm4chee-rid" default="war">
+
+	<property file="build.properties"/>
+	<property file="../build.properties"/>
+
+	<property name="javac.debug" value="on"/>
+	<property name="javac.deprecation" value="off"/>
+	<property name="javac.optimize" value="on"/>
+	<property name="javac.source" value="1.5"/>
+	<property name="javac.target" value="1.5"/>
+
+	<property name="lib" value="${basedir}/lib"/>
+
+	<!-- Override with your JBoss dist location -->
+	<property name="jboss.home" value="${user.home}/jboss-4.2.3.GA" />
+	<property name="jboss.lib" value="${jboss.home}/lib"/>
+	<property name="jboss.server.lib" value="${jboss.home}/server/default/lib"/>
+
+    <!-- Override with your dcm4che-1.4.x source dist location -->
+    <property name="dcm4che14.home"
+      value="${user.home}/dcm4che14/build/dcm4che-1.4.22"/>
+    <property name="dcm4che.jar" value="${dcm4che14.home}/lib/dcm4che.jar"/>
+
+	<!-- Override with your dcm4chee-ejb working directory -->
+	<property name="dcm4chee-ejb.home" value="../dcm4jboss-ejb" />
+	<property name="dcm4chee-ejb.target" value="${dcm4chee-ejb.home}/target" />
+	<property name="dcm4chee-ejb-client.jar" value="${dcm4chee-ejb.target}/common/lib/dcm4chee-ejb-client.jar" />
+	<property name="dcm4chee-ejb-server.jar" value="${dcm4chee-ejb.target}/hsql/lib/dcm4chee-jdbc-hsql.jar"/>
+
+	<!-- Override with your dcm4chee-sar working directory -->
+	<property name="dcm4chee-sar.home" value="../dcm4jboss-sar" />
+	<property name="dcm4chee-sar.lib" value="${dcm4chee-sar.home}/lib" />
+	<property name="dcm4chee-sar.target" value="${dcm4chee-sar.home}/target" />
+	<property name="dcm4chee.jar" value="${dcm4chee-sar.target}/lib/dcm4chee.jar" />
+
+	<!-- Override with your local Maven2 repository location -->
+	<property name="docstore-version" value="0.0.2"/>
+    <property name="m2.repos" value="${user.home}/.m2/repository"/>
+	<property name="dcm4chee-docstore.lib" 
+	    value="${m2.repos}/dcm4che/dcm4chee-docstore-store/${docstore-version}"/>
+
+	<!-- Override with your FOP dist location -->
+	<property name="fop.home" value="${user.home}/fop-0.20.5"/>
+	<property name="fop.build" value="${fop.home}/build"/>
+	<property name="fop.lib" value="${fop.home}/lib"/>
+
+	<property name="target.dir" value="target"/>
+	<property name="product" value="${ant.project.name}"/>
+	<property name="war.file" value="${target.dir}/deploy/${product}.war"/>
+	<property name="" value="${target.dir}/lib/${product}.jar"/>
+
+	<property name="javasrc.dir" value="src/java"/>
+	<property name="classes.dir" value="${target.dir}/classes"/>
+	<property name="web.dir" value="src/web"/>
+	<property name="etc.dir" value="src/etc"/>
+	<property name="service.xml.dir" value="${etc.dir}/deploy"/>
+	<property name="xmbean.xml.dir" value="${etc.dir}/conf/xmdesc"/>
+	
+	<!-- deploy properties. Overwrite deploy.root with your running application instance. -->
+	<property name="deploy.root" value="${jboss.home}/server/pacs"/>
+	<property name="war.deploy.dir" value="${deploy.root}/deploy"/>
+	<property name="jar.deploy.dir" value="${deploy.root}/lib"/>
+	<property name="service.deploy.dir" value="${deploy.root}/deploy"/>
+	<property name="xmbean.deploy.dir" value="${deploy.root}/conf/xmdesc"/>
+	<property name="conf.deploy.dir" value="${deploy.root}/conf/dcm4chee-docstore"/>
+
+	<path id="class.path">
+		<pathelement location="${dcm4che.jar}"/>
+		<pathelement location="${dcm4chee-ejb-client.jar}"/>
+		<pathelement location="${dcm4chee-ejb-server.jar}"/>
+		<pathelement location="${dcm4chee.jar}"/>
+		<pathelement location="${dcm4chee-sar.lib}/dcm4che-audit-2.0.17.jar"/>		
+		<fileset dir="${dcm4chee-docstore.lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${jboss.lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${jboss.server.lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement location="${fop.build}/fop.jar"/>
+		<pathelement location="${fop.lib}/avalon-framework-cvs-20020806.jar"/>
+	</path>
+
+	<property name="debug" value="on"/>
+	<property name="deprecation" value="on"/>
+
+	<target name="clean">
+		<delete dir="${target.dir}"/>
+	</target>
+
+ 	<target name="compile">
+		<mkdir dir="${classes.dir}"/>
+		
+		<javac
+			destdir="${classes.dir}"
+			srcdir="${javasrc.dir}"
+			classpathref="class.path"
+			debug="${javac.debug}"
+			deprecation="${javac.deprecation}"
+			optimize="${javac.optimize}"
+			source="${javac.source}"
+			target="${javac.target}"
+		>
+		</javac>
+	</target>
+
+	<target name="war" depends="compile">
+		<mkdir dir="${target.dir}/deploy/"/>
+		<war warfile="${war.file}" webxml="${web.dir}/WEB-INF/web.xml">
+	     	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-rid"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa Healthcare"/>
+	     	</manifest>
+			<fileset dir="${web.dir}">
+				<exclude name="WEB-INF/web.xml" />
+			</fileset>
+			
+			<classes dir="${classes.dir}">
+				<include name="org/dcm4chex/rid/web/*.class" />
+			</classes>
+		</war>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<mkdir dir="${target.dir}/lib/"/>
+	    <jar jarfile="${}">
+	     	<manifest>
+				<attribute name="Implementation-Title" value="dcm4chee-rid"/>
+				<attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+				<attribute name="Implementation-Vendor" value="Agfa Healthcare"/>
+	     	</manifest>
+	     	<fileset dir="${classes.dir}">
+	     		<include name="**/mbean/**" />
+	     		<include name="**/common/**" />
+	     		<include name="**/docstore/**" />
+	        </fileset>
+	     	<fileset dir="${etc.dir}">
+	     		<include name="META-INF/**" />
+	        </fileset>
+	     </jar>
+	</target>
+
+	<target name="deploy" depends="war,jar,deploy-only"/>
+	
+	<target name="deploy-only">
+		<copy file="${war.file}" todir="${war.deploy.dir}" />
+		<copy file="${}" todir="${jar.deploy.dir}" />
+		<copy todir="${service.deploy.dir}" >
+			<fileset dir="${service.xml.dir}" includes="**/*.xml" />
+		</copy>
+		<copy todir="${xmbean.deploy.dir}" >
+			<fileset dir="${xmbean.xml.dir}" includes="**/*.xml" />
+		</copy>
+	</target>
+	
+</project>

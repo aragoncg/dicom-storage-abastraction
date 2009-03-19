@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC 
+    "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" 
+    "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+  <description><![CDATA[
+Compression Service. The Compression Service supports delayed, lossless
+compression of received images. This is an alternative to immediately
+compressing images when received. (The lossless compression rules are
+configured by the <b>CompressionRules</b> attribute in the StorageSCP
+service.) The value of the attributes <b>MaxConcurrentCodec</b>,
+<b>MaxBufferedImagePoolSize</b> and <b>MaxBufferedImagePoolMemoryattribute</b>
+of the Compression Service also effects the on-the-fly compression and
+decompression during the receive and retrieve of images by the StorageSCP and
+QueryRetrieveSCP  services. (For details, see the these attributes below.)
+]]></description>
+
+  <descriptors>
+    <persistence persistPolicy="OnUpdate" />
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+  </descriptors>
+
+  <class>org.dcm4chex.archive.mbean.CompressionService</class>
+
+  <constructor>
+
+    <description>The default constructor</description>
+    <name>CompressionService</name>
+  </constructor>
+
+   <!-- Attributes -->
+  <attribute access="read-write" getMethod="getMaxConcurrentCodec"
+    setMethod="setMaxConcurrentCodec">
+    <description><![CDATA[
+Maximum number of concurrent tasks for compressing and decompressing images.
+With the default value of <b>MaxConcurrentCodec</b> = 1, all compression and
+decompression operations are serialized. For example, if on-the-fly compression
+during an image receive is activated, and three modalities concurrently send
+uncompressed images to the archive, only one image received from one modality
+is compressed at the same time. This significantly reduces the receiving
+performance. The used codec allocates memory for uncompressed pixel data of at
+least one frame, so without limiting the maximum number of concurrent
+compression tasks, memory consumption could become unacceptable.
+You will receive an out of memory error if the memory consumption exceeds the
+configured -Xmx value in the $DCM4CHEE_HOME/bin/run.conf file).
+]]></description>
+    <name>MaxConcurrentCodec</name>
+    <type>int</type>
+    <descriptors>
+      <value value="1" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getFileSystemGroupIDs"
+    setMethod="setFileSystemGroupIDs">
+    <description><![CDATA[Group IDs of writable file systems which are scanned
+     for image files to compress in configured <b>TaskInterval</b>. Separate
+     multiple values by comma (',').
+     ]]>
+    </description>
+    <name>FileSystemGroupIDs</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="ONLINE_STORAGE" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getMaxBufferedImagePoolSize"
+    setMethod="setMaxBufferedImagePoolSize">
+    <description><![CDATA[
+Maximum number of pooled BufferedImage objects. If
+<b>MaxBufferedImagePoolSize</b> > 0, BufferedImage objects allocated for
+compression and decompression operations are pooled so they can be reused by
+subsequent compression and decompression operations with matching pixel matrix
+dimensions. The pool size is additional limited by
+<b>MaxBufferedImagePoolMemory</b>, the maximum amount of memory allocated by
+pooled BufferedImage objects.
+]]></description>
+    <name>MaxBufferedImagePoolSize</name>
+    <type>int</type>
+    <descriptors>
+      <value value="10" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getCurrentBufferedImagePoolSize">
+    <description> Current number of pooled BufferedImage objects. 
+    </description>
+    <name>CurrentBufferedImagePoolSize</name>
+    <type>int</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getMaxBufferedImagePoolMemory"
+    setMethod="setMaxBufferedImagePoolMemory">
+    <description><![CDATA[
+Maximum amount of memory allocated by pooled BufferedImage objects.
+1MB = 1000000 bytes. If <b>MaxBufferedImagePoolSize</b> > 0, BufferedImage
+objects allocated for compression and decompression operations are pooled so
+they can be reused by subsequent compression and decompression operations with
+matching pixel matrix dimensions. The pool size is additional limited by
+<b>MaxBufferedImagePoolSize</b>, the maximum number of pooled BufferedImage
+objects.
+]]></description>
+    <name>MaxBufferedImagePoolMemory</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="1MB" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getCurrentBufferedImagePoolMemory">
+    <description> Current amount of memory allocated by pooled
+      BufferedImage objects. 1MB = 1000000 bytes. </description>
+    <name>CurrentBufferedImagePoolMemory</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  <attribute access="read-only" getMethod="getBufferedImagePoolHitRate">
+    <description> Ratio of the number of BufferedImage objects reused
+      from the pool to the total number of used (= reused or new
+      allocated) BufferedImage objects. </description>
+    <name>BufferedImagePoolHitRate</name>
+    <type>float</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getTaskInterval"
+    setMethod="setTaskInterval">
+    <description><![CDATA[Interval in which the database is checked for image
+      files located on writeable file systems with one of the configured
+      <b>FileSystemGroupIDs</b> to compress.
+      <br>Format: 
+      <br><i>interval</i>!<i>from</i>-<i>to</i> or NEVER
+      <br><i>interval</i> = ##s (in seconds), ##m (in minutes), ##h (in hours).
+      <br><i>from</i> = start hour (0-23) when no compression should be performed
+      <br><i>to</i> = end hour (0-23) when no compression should be performed
+      <br>NEVER = disable automatic compression
+      <br>Example:10s!9-17 means every 10 seconds, poll the database and check
+      for images to compress, except between the hours of 9:00am and 5:00pm.
+      By setting this type of TaskInterval, you can ensure compression of
+      images happens outside of peak imaging hours.]]>
+    </description>
+    <name>TaskInterval</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="NEVER" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getLimitNumberOfFilesPerTask"
+    setMethod="setLimitNumberOfFilesPerTask">
+    <description>Maximum number of files that are compressed in
+      one task.</description>
+    <name>LimitNumberOfFilesPerTask</name>
+    <type>int</type>
+    <descriptors>
+      <value value="1000" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getCompressionRules"
+    setMethod="setCompressionRules">
+    <description><![CDATA[Specifies compression rules and delay for individual
+      SOP Classes.
+      <br>Format: 
+      <br><i>sop-class-name-or-uid</i>:<i>compression</i>:<i>delay</i>
+      <br><i>sop-class-name-or-uid</i> = the UID of the SOP class, or a string
+      name defined in the dictionary.xml file under uids type="SOPClass"
+      <br><i>compression</i> = JPLL|JLSL|J2KR
+      <br>JPLL -JPEG lossless
+      <br>JLSL - JPEG-LS lossless
+      <br>J2KR - JPEG 2000 lossless
+      <br><i>delay</i> = ##d (in days)
+      <br>Example:
+      <br>ComputedRadiographyImageStorage:JLSL:5d means compress Computed
+      Radiography Images with JPEG-LS lossless compression after 5 days.
+      ]]>
+    </description>
+    <name>CompressionRules</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value
+        value="
+         ComputedRadiographyImageStorage:JLSL:5d
+         DigitalXRayImageStorageForPresentation:JLSL:5d
+         DigitalXRayImageStorageForProcessing:JLSL:5d
+         DigitalMammographyXRayImageStorageForPresentation:JLSL:5d
+         DigitalMammographyXRayImageStorageForProcessing:JLSL:5d
+         CTImageStorage:JLSL:5d
+         MRImageStorage:JLSL:5d
+         UltrasoundImageStorage:JLSL:5d
+         UltrasoundMultiframeImageStorage:JLSL:5d
+         UltrasoundImageStorageRetired:JLSL:5d
+         UltrasoundMultiframeImageStorageRetired:JLSL:5d
+         SecondaryCaptureImageStorage:JLSL:5d
+         XRayAngiographicImageStorage:JLSL:5d
+         XRayRadiofluoroscopicImageStorage:JLSL:5d
+         NuclearMedicineImageStorage:JLSL:5d
+         " />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="isVerifyCompression"
+    setMethod="setVerifyCompression">
+    <description>Enables the verification of the compressed file. 
+    </description>
+    <name>VerifyCompression</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getTempDir"
+    setMethod="setTempDir">
+    <description><![CDATA[Directory used to spool decompressed files for 
+      compression verification. Relative path names are resolved relative to
+      $DCM4CHEE_HOME/server/default/.]]>
+    </description>
+    <name>TempDirectory</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="tmp" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getKeepTempFileIfVerificationFails"
+    setMethod="setKeepTempFileIfVerificationFails">
+    <description><![CDATA[Defines how long files that were decompressed for
+      verification remain for further analysis before being deleted, if the
+      decompressed pixel data differs from the pixel data in the original file.
+      <br>Format: <br>##m (in minutes), ##h (in hours), ##d (in days)]]>
+    </description>
+    <name>KeepTempFileIfVerificationFails</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="1d" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getBufferSize"
+    setMethod="setBufferSize">
+    <description>Size of write byte buffer. </description>
+    <name>BufferSize</name>
+    <type>int</type>
+    <descriptors>
+      <value value="8192" />
+    </descriptors>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getSchedulerServiceName"
+    setMethod="setSchedulerServiceName">
+    <description>Used internally. Do NOT modify. </description>
+    <name>SchedulerServiceName</name>
+    <type>javax.management.ObjectName</type>
+  </attribute>
+
+  <attribute access="read-write" getMethod="getTimerIDCheckFilesToCompress"
+    setMethod="setTimerIDCheckFilesToCompress">
+    <description>Used internally. Do NOT modify. </description>
+    <name>TimerIDCheckFilesToCompress</name>
+    <type>java.lang.String</type>
+  </attribute>
+
+  &defaultAttributes;
+
+  <!-- Operations -->
+  &defaultOperations;
+
+  <operation impact="ACTION">
+    <description>
+        <![CDATA[Reset <b>BufferedImagePoolHitRate</b>.]]>
+    </description>
+    <name>resetBufferedImagePoolHitRate</name>
+    <return-type>void</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Check for temporary image files to delete.</description>
+    <name>checkForTempFilesToDelete</name>
+    <return-type>void</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Check for files to compress.</description>
+    <name>checkForFilesToCompress</name>
+    <return-type>void</return-type>
+  </operation>
+
+  <operation impact="ACTION">
+    <description>Compress specified object if it is uncompressed
+      and if there is a Compression Rule for its SOP Class UID
+      configured</description>
+    <name>compress</name>
+    <parameter>
+      <name>fileDTO</name>
+      <type>org.dcm4chex.archive.ejb.interfaces.FileDTO</type>
+    </parameter>
+    <return-type>boolean</return-type>
+  </operation>
+  
+</mbean>

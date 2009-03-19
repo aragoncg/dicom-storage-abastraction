@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dcm4chee-attribute-filter SYSTEM "dcm4chee-attribute-filter.dtd">
+<dcm4chee-attribute-filter>
+    <patient>
+        <attr tag="00080005"/> <!-- Specific Character Set -->
+        <attr tag="00081120"/> <!-- Referenced Patient Sequence -->
+        <attr tag="00100010"/> <!-- Patient's Name -->
+        <attr tag="00100020"/> <!-- Patient ID -->
+        <attr tag="00100021"/> <!-- Issuer of Patient ID -->
+        <attr tag="00100040"/> <!-- Patient's Sex -->
+        <attr tag="00100030"/> <!-- Patient's Birth Date -->
+        <attr tag="00100032"/> <!-- Patient's Birth Time -->
+        <attr tag="00101000"/> <!-- Other Patient IDs -->
+        <attr tag="00101001"/> <!-- Other Patient Names -->
+        <attr tag="00101002"/> <!-- Other Patient IDs Sequence -->
+        <attr tag="00102160"/> <!-- Ethic Group -->
+        <attr tag="00104000"/> <!-- Patient Comments -->
+        <attr tag="00120010"/> <!-- Clinical Trial Sponsor Name -->
+        <attr tag="00120020"/> <!-- Clinical Trial Protocol ID -->
+        <attr tag="00120021"/> <!-- Clinical Trial Protocol Name -->
+        <attr tag="00120030"/> <!-- Clinical Trial Site ID -->
+        <attr tag="00120031"/> <!-- Clinical Trial Site Name -->        
+        <attr tag="00120040"/> <!-- Clinical Trial Subject ID -->        
+        <attr tag="00120042"/> <!-- Clinical Trial Subject Reading ID -->        
+        <attr tag="0040050A"/> <!-- Specimen Accession Number -->        
+        <attr tag="00400550"/> <!-- Specimen Seq -->        
+    </patient>
+    <study>
+        <attr tag="00080005"/> <!-- Specific Character Set -->
+        <attr tag="00080020"/> <!-- Study Date -->
+        <attr tag="00080030"/> <!-- Study Time -->
+        <attr tag="00080050"/> <!-- Accession Number -->
+        <attr tag="00080090"/> <!-- Referring Physician Name -->
+        <attr tag="00080096"/> <!-- Referring Physician Identification Seq -->
+        <attr tag="00081030"/> <!-- Study Description -->
+        <attr tag="00081032"/> <!-- Procedure Code Seq -->
+        <attr tag="00081048"/> <!-- Physician(s) of Record -->
+        <attr tag="00081049"/> <!-- Physician(s) of Record Identification Seq -->
+        <attr tag="00081060"/> <!-- Name of Physician(s) Reading Study -->
+        <attr tag="00081062"/> <!-- Physician(s) Reading Study Identification Seq -->
+        <attr tag="00081080"/> <!-- Admitting Diagnoses Description -->
+        <attr tag="00081084"/> <!-- Admitting Diagnoses Code Seq -->        
+        <attr tag="00081110"/> <!-- Referenced Study Sequence -->
+        <attr tag="00101010"/> <!-- Patient's Age -->
+        <attr tag="00101020"/> <!-- Patient's Size -->
+        <attr tag="00101030"/> <!-- Patient's Weight -->
+        <attr tag="00102180"/> <!-- Occupation -->
+        <attr tag="001021B0"/> <!-- Additional Patient’s History -->
+        <attr tag="00120050"/> <!-- Clinical Trial Time Point ID -->
+        <attr tag="00120051"/> <!-- Clinical Trial Time Point Description -->
+        <attr tag="0020000D" coerce="false"/> <!-- Study Instance UID -->
+        <attr tag="00200010"/> <!-- Study ID -->
+    </study>
+    <series>
+        <attr tag="00080005"/> <!-- Specific Character Set -->
+        <attr tag="00080021"/> <!-- Series Date -->
+        <attr tag="00080031"/> <!-- Series Time -->
+        <attr tag="00080060"/> <!-- Modality -->
+        <attr tag="00080068"/> <!-- Presentation Intent Type -->
+        <attr tag="00080070"/> <!-- Manufacturer -->
+        <attr tag="00080080"/> <!-- Institution Name -->
+        <attr tag="00080081"/> <!-- Institution Address -->
+        <attr tag="00081010"/> <!-- Station Name -->
+        <attr tag="0008103E"/> <!-- Series Description -->
+        <attr tag="00081040"/> <!-- Institutional Department Name -->
+        <attr tag="00081050"/> <!-- Performing Physicians' Name -->
+        <attr tag="00081052"/> <!-- Performing Physician Identification Seq -->
+        <attr tag="00081070"/> <!-- Operators' Name -->
+        <attr tag="00081072"/> <!-- Operator Identification Seq -->
+        <attr tag="00081090"/> <!-- Manufacturer Model Name -->
+        <attr tag="00081111"/> <!-- Referenced Performed Procedure Step Sequence -->
+        <attr tag="00081250"/> <!-- Related Series Sequence -->
+        <attr tag="00120060"/> <!-- Clinical Trial Coordinating Center Name -->
+        <attr tag="00180015"/> <!-- Body Part Examined -->
+        <attr tag="00181000"/> <!-- Device Serial Number -->
+        <attr tag="00181010"/> <!-- Secondary Capture Device ID -->
+        <attr tag="00181016"/> <!-- Secondary Capture Device Manufacturer -->
+        <attr tag="00181018"/> <!-- Secondary Capture Device Manufacturer's Model Name -->
+        <attr tag="00181019"/> <!-- Secondary Capture Device Software Version -->
+        <attr tag="00181020"/> <!-- Software Versions -->
+        <attr tag="00181030"/> <!-- Protocol Name -->
+        <attr tag="00181050"/> <!-- Spatial Resolution -->
+        <attr tag="0018106A"/> <!-- Synchronization Trigger -->
+        <attr tag="0018106C"/> <!-- Synchronization Channel -->
+        <attr tag="00181200"/> <!-- Date of Last Calibration -->
+        <attr tag="00181201"/> <!-- Time of Last Calibration -->
+        <attr tag="00181800"/> <!-- Acquisition Time Synchronized -->
+        <attr tag="00181801"/> <!-- Time Source -->
+        <attr tag="00181802"/> <!-- Time Distribution Protocol -->
+        <attr tag="00181803"/> <!-- NTP Source Address -->
+        <attr tag="0020000E" coerce="false"/> <!-- Series Instance UID -->
+        <attr tag="00200011"/> <!-- Series Number -->
+        <attr tag="00200052"/> <!-- Frame of Reference UID -->
+        <attr tag="00200060"/> <!-- Laterality -->
+        <attr tag="00200200"/> <!-- Synchronization Frame of Reference UID -->
+        <attr tag="00201040"/> <!-- Position Reference Indicator -->
+        <attr tag="00280108"/> <!-- Smallest Pixel Value in Series -->
+        <attr tag="00280109"/> <!-- Largest Pixel Value in Series -->
+        <attr tag="00280120"/> <!-- Pixel Padding Value -->
+        <attr tag="00400244"/> <!-- Performed Procedure Step Start Date -->
+        <attr tag="00400245"/> <!-- Performed Procedure Step Start Time -->
+        <attr tag="00400253"/> <!-- Performed Procedure Step ID -->
+        <attr tag="00400254"/> <!-- Performed Procedure Step Description --> 
+        <attr tag="00400260"/> <!-- Performed Protocol Code Sequence -->
+        <attr tag="00400280"/> <!-- Comments on the Performed Procedure Step -->
+        <attr tag="00400275"/> <!-- Request Attributes Sequence -->
+        <attr tag="00541001"/> <!-- Units -->
+    </series>
+    <!-- Deflated Explicit VR LE Transfer Syntax -->
+    <instance exclude="true" exclude-private="true" tsuid="1.2.840.10008.1.2.1.99">
+        <attr vr="OB"/>
+        <attr vr="OW"/>
+        <attr vr="UN"/>
+    </instance>
+</dcm4chee-attribute-filter>

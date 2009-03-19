@@ -1,0 +1,24 @@
+-- Update DB from dcm4chee-2.12.x to dcm4chee-2.13.x
+
+DROP TABLE study_permission;
+CREATE TABLE study_permission (
+	pk              SERIAL NOT NULL CONSTRAINT study_permission_pk PRIMARY KEY,
+	study_iuid      TEXT NOT NULL,
+	action          TEXT NOT NULL,
+	roles           TEXT NOT NULL
+);
+CREATE UNIQUE INDEX study_perm_idx ON study_permission(study_iuid, action, roles);
+
+ALTER TABLE ae ADD fs_group_id TEXT;
+
+ALTER TABLE series ADD perf_physician TEXT,
+                   ADD perf_phys_i_name TEXT,
+                   ADD perf_phys_p_name TEXT;
+
+CREATE INDEX perf_physician ON series(perf_physician);
+CREATE INDEX perf_phys_i_name ON series(perf_phys_i_name);
+CREATE INDEX perf_phys_p_name ON series(perf_phys_p_name);
+CREATE INDEX series_updated ON series(updated_time);
+
+INSERT INTO roles VALUES('admin','Doctor');
+INSERT INTO roles VALUES('user','Doctor');

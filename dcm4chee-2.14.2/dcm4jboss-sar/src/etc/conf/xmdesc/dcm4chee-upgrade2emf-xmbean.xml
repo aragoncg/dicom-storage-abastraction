@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+ <description>
+  Upgrade to Enhanced Multi-frame Image Service. Upgrades received Series of
+  legacy DICOM CT/MR/PET Single-frame images to a Private DCM4CHEE Upgraded
+  CT/MR/PET Multi-frame image, which IOD match that of a regular DICOM Enhanced
+  CT/MR/PET Multi-frame image at maximum degree.
+ </description>
+
+ <descriptors>
+  <persistence persistPolicy="OnUpdate" />
+  <persistence-manager
+   value="org.jboss.mx.persistence.DelegatingPersistenceManager" />
+ </descriptors>
+
+ <class>org.dcm4chex.archive.emf.UpgradeToEnhancedMFService</class>
+
+ <constructor>
+  <description>The default constructor</description>
+  <name>UpgradeToEnhancedMFService</name>
+ </constructor>
+
+ <!-- Attributes -->
+ <attribute access="read-write" getMethod="getConfigDir"
+  setMethod="setConfigDir">
+  <description>
+   Directory where XML configuration files defining the generation of DCM4CHEE
+   Upgraded Multi-frame images from DICOM CT, MR or PET Single-frame images are
+   located: if "upgrade-ct.xml", "upgrade-mr.xml" or "upgrade-pet.xml" exists in
+   this directory or in a sub-directory equal to the AE Title of the Storage
+   SCU, received CT, MR or PET Series will be upgraded DCM4CHEE Upgraded CT, MR
+   or PET Multi-frame images. A relative path name is resolved relative to
+   archive-install-directory/server/default/.
+  </description>
+  <name>ConfigDirectory</name>
+  <type>java.lang.String</type>
+  <descriptors>
+   <value value="conf/dcm4chee-ae" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write"
+  getMethod="isMergePatientStudySeriesAttributesFromDB"
+  setMethod="setMergePatientStudySeriesAttributesFromDB">
+  <description>
+   &lt;p&gt;Defines, if Patient, Study and Series attributes are merged from
+   corresponding DB records into the generated Multi-frame image, so they need
+   not be specified in upgrade-XX.xml to be copied from the Single-frame images
+   to the generated Multi-frame image. Attributes not specified in
+   upgrade-XX.xml are not verified for equality of values over all source
+   images. Therefore, skipping such attributes from upgrade-XX.xml allows the
+   generation of the Multi-frame image even if the attribute value differs
+   between source images.&lt;/p&gt; &lt;p&gt;Series Instance UID is never merged
+   from the DB, so it can be defined by upgrade-XX.xml - including an entry for
+   the Series Instance UID attribute or not - if the generated Multi-frame image
+   shall be put into the same Series as the source images, or not.&lt;/p&gt;
+  </description>
+  <name>MergePatientStudySeriesAttributesFromDB</name>
+  <type>boolean</type>
+  <descriptors>
+   <value value="true" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="isNoPixelData"
+  setMethod="setNoPixelData">
+  <description>
+   Defines, if the generated Multi-frame image is stored with DICOM Transfer
+   Syntax: No Pixel Data [Deflate] without pixel data. If
+   &lt;code&gt;false&lt;/code&gt;, pixel data is copied from the original
+   Single-frame images into the generated Multi-frame image.
+  </description>
+  <name>NoPixelData</name>
+  <type>boolean</type>
+  <descriptors>
+   <value value="true" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="isDeflate" setMethod="setDeflate">
+  <description>
+   Defines, if the generated Multi-frame image is stored with DICOM Transfer
+   Syntax &lt;i&gt;No Pixel Data&lt;/i&gt; or &lt;i&gt;No Pixel Data
+   Deflate&lt;/i&gt;. Only effective, if attribute
+   &lt;b&gt;NoPixelData&lt;/b&gt; is &lt;code&gt;true&lt;/code&gt;.
+  </description>
+  <name>Deflate</name>
+  <type>boolean</type>
+  <descriptors>
+   <value value="true" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="isDeleteOriginalStoredSeries"
+  setMethod="setDeleteOriginalStoredSeries">
+  <description>
+   Defines, if original stored Series of legacy CT/MR/PET Single-frame images
+   are deleted after successful storage of the generated Enhanced Multi-frame
+   image.&lt;br/&gt; Warning: Will break configured forwarding, file copy to HSM
+   file system and Image Available Notification. Also cause loss of private
+   attributes of legacy CT/MR/PET Single-frame images, which are not included in
+   the generated Enhanced Multi-frame image.
+  </description>
+  <name>DeleteOriginalStoredSeries</name>
+  <type>boolean</type>
+  <descriptors>
+   <value value="false" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="getBufferSize"
+  setMethod="setBufferSize">
+  <description>
+   Size of byte buffer used for copying pixel data to generated Multi-frame
+   image file.
+  </description>
+  <name>BufferSize</name>
+  <type>int</type>
+  <descriptors>
+   <value value="8192" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="getConcurrency"
+  setMethod="setConcurrency">
+  <description>
+   Maximum number of concurrent processed Upgrade Requests.
+  </description>
+  <name>Concurrency</name>
+  <type>int</type>
+  <descriptors>
+   <value value="1" />
+  </descriptors>
+ </attribute>
+ <attribute access="read-write" getMethod="getQueueName"
+  setMethod="setQueueName">
+  <description>Used internally. Do NOT modify.</description>
+  <name>QueueName</name>
+  <type>java.lang.String</type>
+ </attribute>
+ <attribute access="read-write" getMethod="getStoreScpServiceName"
+  setMethod="setStoreScpServiceName">
+  <description>Used internally. Do NOT modify.</description>
+  <name>StoreScpServiceName</name>
+  <type>javax.management.ObjectName</type>
+ </attribute>
+ <attribute access="read-write" getMethod="getJmsServiceName"
+  setMethod="setJmsServiceName">
+  <description>Used internally. Do NOT modify.</description>
+  <name>JMSServiceName</name>
+  <type>javax.management.ObjectName</type>
+ </attribute>
+ <attribute access="read-write" getMethod="getQueryRetrieveScpServiceName"
+  setMethod="setQueryRetrieveScpServiceName">
+  <description>Used internally. Do NOT modify.</description>
+  <name>QueryRetrieveScpServiceName</name>
+  <type>javax.management.ObjectName</type>
+ </attribute>
+ &defaultAttributes;
+
+ <!-- Operations -->
+ &defaultOperations;
+ <operation impact="INFO">
+  <description>Check if upgrade of stored Series is enabled</description>
+  <name>isUpgradeEnabled</name>
+  <parameter>
+   <name>storedSeries</name>
+   <type>org.dcm4chex.archive.common.SeriesStored</type>
+  </parameter>
+  <return-type>boolean</return-type>
+ </operation>
+
+</mbean>
+

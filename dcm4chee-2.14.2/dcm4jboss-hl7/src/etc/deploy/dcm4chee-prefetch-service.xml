@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: dcm4chee-prefetch-service.xml 5630 2008-01-02 14:15:30Z gunterze $ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+  <mbean code="org.jboss.mq.server.jmx.Queue"
+    name="dcm4chee.archive:service=Queue,name=Prefetch">
+    <depends optional-attribute-name="DestinationManager"
+      >jboss.mq:service=DestinationManager</depends>
+  </mbean>
+  <mbean code="org.dcm4chex.archive.hl7.PrefetchService"
+    name="dcm4chee.archive:service=Prefetch"
+    xmbean-dd="xmdesc/dcm4chee-prefetch-xmbean.xml">
+    <depends optional-attribute-name="HL7ServerName"
+      >dcm4chee.archive:service=HL7Server</depends>
+    <depends optional-attribute-name="TLSConfigName"
+      >dcm4chee.archive:service=TLSConfig</depends>
+    <depends optional-attribute-name="JMSServiceName"
+      >dcm4chee.archive:service=JMS</depends>
+    <depends optional-attribute-name="MoveScuServiceName"
+      >dcm4chee.archive:service=MoveScu</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+    <depends>dcm4chee.archive:service=Queue,name=Prefetch</depends>
+    <attribute name="QueueName">Prefetch</attribute>
+  </mbean>
+</server>

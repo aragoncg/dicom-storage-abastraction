@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<server>
+  <classpath codebase="lib" archives="dcm4chee-hl7.jar"/>
+   
+  <mbean code="org.dcm4chex.archive.hl7.StudyPermissionService" 
+	     name="dcm4chee.archive:service=StudyPermission"
+	     xmbean-dd="xmdesc/dcm4chee-permission-xmbean.xml">
+    <depends optional-attribute-name="HL7ServerName"
+      >dcm4chee.archive:service=HL7Server</depends>
+    <depends optional-attribute-name="StoreScpServiceName"
+      >dcm4chee.archive:service=StoreScp</depends>
+    <depends optional-attribute-name="MppsScpServiceName"
+      >dcm4chee.archive:service=MPPSScp</depends>
+    <depends optional-attribute-name="TemplatesServiceName"
+      >dcm4chee.archive:service=Templates</depends>
+  </mbean>
+</server>

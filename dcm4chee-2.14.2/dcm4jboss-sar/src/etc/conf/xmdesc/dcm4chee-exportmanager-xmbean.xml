@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "DCMSCU attributes template extends jboss_xmbean_1_1.dtd" "dcm4chee-scu-xmbean.dtd">
+
+<mbean>
+   <description><![CDATA[Teaching File and Clinical Trial Export Manager.]]></description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.tce.ExportManagerService</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>ExportManagerService</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getCallingAET"
+      setMethod="setCallingAET">
+      <description>Calling AE title of the Storage SCU.
+      </description>
+      <name>CallingAETitle</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="DCM4CHEE" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getExportSelectorTitles"
+      setMethod="setExportSelectorTitles">
+      <description><![CDATA[Document Title of Export Selection Key Object
+      (Manifest) considered by this service.
+      Format: CODE_VALUE^CODING_SCHEME_DESIGNATOR.
+      Separate multiple values by new line. NONE = service disabled.
+      Default:
+         TCE001^IHERADTF,
+         TCE002^IHERADTF,
+         TCE007^IHERADTF,
+         113019^99DCM4CHE]]>
+      </description>
+      <name>ExportSelectorTitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+         TCE001^IHERADTF
+         TCE002^IHERADTF
+         TCE007^IHERADTF
+         113019^99DCM4CHE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDelayReasons"
+      setMethod="setDelayReasons">
+      <description><![CDATA[Recognized Delay Reasons Codes
+      Format: CODE_VALUE^CODING_SCHEME_DESIGNATOR.
+      Separate multiple values by new line. NONE = ignore Delay Reason Codes in
+      Export Selection Key Object.
+      Default:
+       TCE011^IHERADTF,
+       TCE012^IHERADTF,
+       TCE013^IHERADTF,
+       TCE014^IHERADTF,
+       TCE015^IHERADTF,
+       TCE016^IHERADTF,
+       TCE017^IHERADTF,
+       TCE018^IHERADTF]]>
+      </description>
+      <name>DelayReasons</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="
+         TCE011^IHERADTF
+         TCE012^IHERADTF
+         TCE013^IHERADTF
+         TCE014^IHERADTF
+         TCE015^IHERADTF
+         TCE016^IHERADTF
+         TCE017^IHERADTF
+         TCE018^IHERADTF"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getDispositionConfigFile"
+      setMethod="setDispositionConfigFile">
+      <description><![CDATA[Configuration file, which maps
+      different Document Titles or Key Object Descriptions of the manifest
+      to different configurations about destination and de-identification.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>DispositionConfigFile</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-tce.conf"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAutoExportConfigDir"
+      setMethod="setAutoExportConfigDir">
+      <description><![CDATA[Directory where configuration files defining
+      auto-export rules are located: if XSL stylesheet "export.xsl" exists in
+      this directory or in a sub-directory equal to the AE Title of the
+      Performing Station AE Title in received MPPS COMPLETED messages,
+      objects referenced in the MPPS message will be exported according the
+      export rules in the stylesheet.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>AutoExportConfigDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-ae"/>
+      </descriptors>
+   </attribute>
+    <attribute access="read-write"
+      getMethod="getPersonNameMapping"
+      setMethod="setPersonNameMapping">
+      <description><![CDATA[Mapping login user name to Person Name to get Observer Person.<br>
+        Separate each mapping with newline or semicolon.<br>
+      	Format: <user>:<PersonName> (e.g. Smith^John or Smith^John^^Dr^)<br>
+      	If this mapping is disabled with NONE or a user is not mapped the PersonName will be created with following rule:<br>
+      	<callingAET>^<user> (e.g. DCM4CHEE^admin).]]>
+      </description>
+      <name>PersonNameMapping</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="NONE"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getFilesetIDPattern"
+      setMethod="setFilesetIDPattern">
+      <description><![CDATA[Specifies format of Fileset ID of exported Media.
+      0 or # will be replaced by incremented value of <i>LastFilesetIDSeqno</i>.]]>
+      </description>
+      <name>FilesetIDPattern</name>
+      <type>java.lang.String</type>      
+      <descriptors>
+         <value value="DISK_000" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getLastFilesetIDSeqno"
+      setMethod="setLastFilesetIDSeqno">
+      <description><![CDATA[Used with <i>FilesetIDPattern</i> to generate the
+      Fileset ID for created Media. Will automatically incremented for each 
+      exported Fileset on Media.]]>
+      </description>
+      <name>FilesetIDSeqno</name>
+      <type>int</type>      
+      <descriptors>
+         <value value="1" />
+      </descriptors>
+   </attribute>      
+   <attribute access="read-write"
+      getMethod="getMediaIDPrefix"
+      setMethod="setMediaIDPrefix">
+      <description><![CDATA[Specifies prefix to Fileset ID for assembling a
+      Media ID for usage in the emitted Export Audit Message.]]>
+      </description>
+      <name>MediaURIPrefix</name>
+      <type>java.lang.String</type>      
+      <descriptors>
+         <value value="cdr:" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="isDeleteKeyObjects"
+      setMethod="setDeleteKeyObjects">
+      <description>Enable/disable deletion of Key Objects after export.
+      </description>
+      <name>DeleteKeyObjectsAfterExport</name>
+      <type>boolean</type>
+      <descriptors>
+         <value value="true" />
+      </descriptors>
+   </attribute>   
+   <attribute access="read-write"
+      getMethod="getExportDelay"
+      setMethod="setExportDelay">
+      <description>Delay in milliseconds before export process starts.
+      </description>
+      <name>ExportDelay</name>
+      <type>int</type>
+      <descriptors>
+         <value value="2000"/>
+      </descriptors>
+   </attribute>
+
+   &defaultSCUAttributes;
+
+   <attribute access="read-write"
+      getMethod="getConcurrency"
+      setMethod="setConcurrency">
+      <description>Maximum number of concurrent processed Export Requests.
+      </description>
+      <name>Concurrency</name>
+      <type>int</type>
+      <descriptors>
+         <value value="1" />
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getQueueName"
+      setMethod="setQueueName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>QueueName</name>
+      <type>java.lang.String</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAuditLoggerName"
+      setMethod="setAuditLoggerName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>AuditLoggerName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+     getMethod="getIANScuServiceName"
+     setMethod="setIANScuServiceName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>IANScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getJmsServiceName"
+      setMethod="setJmsServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>JMSServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getStoreScpServiceName"
+      setMethod="setStoreScpServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>StoreScpServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getTLSConfigName"
+      setMethod="setTLSConfigName">
+      <description>Used internally. Do not modify.
+      </description>
+      <name>TLSConfigName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   <operation impact="ACTION">
+      <description><![CDATA[Clear configuration cache.<br>
+      				Force to reread disposition configuration files. ]]></description>
+      <name>clearConfigCache</name>
+      <return-type>void</return-type>
+   </operation>   
+   <operation impact="INFO">
+      <description>List Dispositions configured in DispositionConfigFile</description>
+      <name>listConfiguredDispositions</name>
+      <return-type>java.util.Collection</return-type>
+   </operation>   
+   <operation impact="INFO">
+      <description>Get Observer Person Name for username</description>
+      <name>getObserverPerson</name>
+      <parameter>
+        <name>user</name>
+        <type>java.lang.String</type>
+      </parameter>
+      <return-type>java.lang.String</return-type>
+   </operation>   
+   <operation impact="ACTION">
+      <description>Send Export Selector to specified destination</description>
+      <name>storeExportSelection</name>
+      <parameter>
+        <name>manifest</name>
+        <type>org.dcm4che.data.Dataset</type>
+      </parameter>
+      <parameter>
+        <name>prior</name>
+        <type>int</type>
+      </parameter>
+      <return-type>void</return-type>
+   </operation>   
+   
+   <!-- Notifications -->
+</mbean>
+

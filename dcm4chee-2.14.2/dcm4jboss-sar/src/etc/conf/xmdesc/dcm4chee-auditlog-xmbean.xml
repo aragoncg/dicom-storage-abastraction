@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC
+   "-//JBoss//DTD JBOSS XMBEAN 1.1//EN"
+   "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+<mbean>
+  <description><![CDATA[Audit Logger. Identifies Audit Source in emitted Audit
+   Log Messages formatted according the new RFC-3881 based schema of the
+   IHE ITI Audit Trail and Node Authentication Profile.
+   ]]></description>
+  <descriptors>
+    <persistence persistPolicy="OnUpdate"/>
+    <persistence-manager
+      value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+  </descriptors>
+  <class>org.dcm4chee.audit.logger.AuditLogger</class>
+  <constructor>
+    <description>The default constructor</description>
+    <name>AuditLogger</name>
+  </constructor>
+  <!-- Attributes -->
+  <attribute access="read-write" getMethod="getAuditSourceID"
+    setMethod="setAuditSourceID">
+    <description><![CDATA[Identifier of this application as source where
+    the event originated.<br/>
+    Format: Unique identifier text string, at least within the Audit
+    Enterprise Site ID<br/>
+    Default: host name]]></description>
+    <name>AuditSourceID</name>
+    <type>java.lang.String</type>
+  </attribute>
+  <attribute access="read-write" getMethod="getAuditEnterpriseSiteID"
+    setMethod="setAuditEnterpriseSiteID">
+    <description><![CDATA[Logical source location within the healthcare
+      enterprise network, e.g., a hospital or other provider location within a
+      multi-entity provider group.<br/>
+      Format: Unique identifier text string within the healthcare
+      enterprise. May be unvalued (='-') when the audit-generating application
+      is uniquely identified by Audit Source ID.<br/>
+      Default: <code>-</code>]]></description>
+    <name>AuditEnterpriseSiteID</name>
+    <type>java.lang.String</type>
+  </attribute>
+  <attribute access="read-write" getMethod="getAuditSourceTypeCodes"
+    setMethod="setAuditSourceTypeCodes">
+    <description><![CDATA[Code specifying the type of source where event originated.<br/>
+    Format/Values:<ul>
+    <li><code>1</code> - End-user interface</li>
+    <li><code>2</code> - Data acquisition device or instrument</li>
+    <li><code>3</code> - Web server process tier in a multi-tier system</li>
+    <li><code>4</code> - Application server process tier in a multi-tier system</li>
+    <li><code>5</code> - Database server process tier in a multi-tier system</li>
+    <li><code>6</code> - Security server, e.g., a domain controller</li>
+    <li><code>7</code> - ISO level 1-3 network component</li>
+    <li><code>8</code> - ISO level 4-6 operating software</li>
+    <li><code>9</code> - External source, other or unknown type</li>
+    </ul>
+    Multiple values separated by comma (',') can be specified.<br/>
+    Default: <code>4</code>]]></description>
+    <name>AuditSourceTypeCodes</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="4"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-only" getMethod="getProcessID">
+    <description><![CDATA[Used to identify this application instance as
+    <i>Active Participant</i> in emitted Audit Messages. Initialized from
+    <i>System Property</i> <code>app.pid</code> or alternatively extracted
+    from <code>java.lang.management.RuntimeMXBean#getName()</code>.
+    ]]></description>
+    <name>ProcessID</name>
+    <type>java.lang.String</type>
+  </attribute>
+  <attribute access="read-write" getMethod="getProcessName"
+    setMethod="setProcessName">
+    <description><![CDATA[Used to identify this application as
+    <i>Active Participant</i> in emitted Audit Messages.<br/>
+    Format: Text string<br/>
+    Default: <i>System Property</i> <code>app.name</code>]]></description>
+    <name>ProcessName</name>
+    <type>java.lang.String</type>
+  </attribute>
+  <attribute access="read-write" getMethod="getLocalAETitles"
+    setMethod="setLocalAETitles">
+    <description><![CDATA[List of AE titles supported by this application,
+    separated by \(backslash).<br/>
+    Default: <code>DCM4CHEE</code>]]></description>
+    <name>LocalAETitles</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="DCM4CHEE"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isEnableDNSLookups"
+    setMethod="setEnableDNSLookups">
+    <description><![CDATA[Enables reverse DNS lookups to identify remote hosts
+    by their host name - instead of their IP address - in emitted Audit Messages.<br/>
+    Default: <code>false</code>]]></description>
+    <name>EnableDNSLookups</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isIncludeXMLDeclaration"
+    setMethod="setIncludeXMLDeclaration">
+    <description><![CDATA[Determines, if emitted Audit Messages starts with 
+     <code><?xml version="1.0" encoding="UTF-8"?></code> or if the XML
+     declaration is skipped.<br/>
+     Default: <code>false</code>]]></description>
+    <name>IncludeXMLDeclaration</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isTimezonedDateTime"
+    setMethod="setTimezonedDateTime">
+    <description><![CDATA[Determines, if the Event Date/Time in emitted Audit
+    Messages includes the time-zone offset to Coordinated Universal Time (UTC).<br/>
+    Default: <code>true</code>]]></description>
+    <name>TimezonedDateTime</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="true"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isUtcDateTime"
+    setMethod="setUtcDateTime">
+    <description><![CDATA[Determines, if the Event Date/Time in the emitted
+    Audit Messages is given as Coordinated Universal Time (UTC).<br/>
+    Default: <code>false</code>]]></description>
+    <name>UtcDateTime</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isQualifyHostname"
+    setMethod="setQualifyHostname">
+    <description><![CDATA[Determines, if host names included in the emitted
+    Audit Messages shall be fully qualified.<br/>
+    Default: <code>false</code>]]></description>
+    <name>QualifyHostname</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="isEncodeUserIsRequestorTrue"
+    setMethod="setEncodeUserIsRequestorTrue">
+    <description><![CDATA[Determines, if attribute UserIsRequestor="true" of
+    element <ActiveParticipant> in the emitted Audit Messages is explicit
+    encoded.<br/>
+    Default: <code>false</code>]]></description>
+    <name>EncodeUserIsRequestorTrue</name>
+    <type>boolean</type>
+    <descriptors>
+      <value value="false"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-write" getMethod="getConfigurationDirectory"
+    setMethod="setConfigurationDirectory">
+    <description><![CDATA[Directory which contains configuration files
+    <i>xxx</i><code>-xmbean.xml</code>, which list service attributes, for
+    which changes are audited by Security Alert messages. A relative path name
+    is resolved relative to <i>archive-install-directory</i>/server/default/.<br/>
+    Default: <code>conf/dcm4chee-auditlog</code>]]></description>
+    <name>ConfigurationDirectory</name>
+    <type>java.lang.String</type>
+    <descriptors>
+      <value value="conf/dcm4chee-auditlog"/>
+    </descriptors>
+  </attribute>
+  <attribute access="read-only" getMethod="isIHEYr4">
+    <description><![CDATA[Used to distinguish this RFC 3881 compliant Audit Logger
+    Service from the preceding Audit Logger Service, which creates Audit Messages
+    according the Provisional XML Schema definition of the IHE Basic Security
+    Integration Profile.]]></description>
+    <name>IHEYr4</name>
+    <type>boolean</type>
+  </attribute>
+  <!-- Operations -->
+  <operation>
+    <description><![CDATA[Emits Application Start Audit Message.]]></description>
+    <name>auditApplicationStart</name>
+  </operation>
+  <operation>
+    <description><![CDATA[Emits Application Stop Audit Message.]]></description>
+    <name>auditApplicationStop</name>
+  </operation>
+ &defaultOperations;
+</mbean>

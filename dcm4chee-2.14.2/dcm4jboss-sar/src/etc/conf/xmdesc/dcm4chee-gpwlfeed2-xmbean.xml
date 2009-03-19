@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.1//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_1.dtd">
+
+<mbean>
+   <description>GPWL Feed Service. Used to add entries to the General Purpose Worklist, triggered by received MPPS N-Set messages.
+   </description>
+
+   <descriptors>
+      <persistence persistPolicy="OnUpdate"/>
+      <persistence-manager value="org.jboss.mx.persistence.DelegatingPersistenceManager"/>
+   </descriptors>
+
+   <class>org.dcm4chex.archive.dcm.gpwlscp.GPWLFeedService2</class>
+
+   <constructor>
+      <description>The default constructor</description>
+      <name>GPWLFeedService2</name>
+   </constructor>
+
+   <!-- Attributes -->
+   <attribute access="read-write"
+      getMethod="getLogStationAETs"
+      setMethod="setLogStationAETs">
+      <description><![CDATA[List of the AE titles for Modalities for which
+      XMLized MPPS attributes are logged into files 
+      <i>AET</i>/<i>timestamp</i>-mpps.xml in the log directory.
+      Useful for creation of XSL stylesheets for GP Work Item creation.
+      Separate multiple values by \ (backslash).]]>  
+      </description>
+      <name>LogStationAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MESA_MOD\MODALITY1\MR3T"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getPGPStationAETs"
+      setMethod="setPGPStationAETs">
+      <description><![CDATA[List of the AE titles for Modalities which
+      emits MPPS messages according the <i>Presentation of Grouped Procedure (PGP)</i>
+      defined by the <i>IHE Radiology Technical Framework</i>.
+      Separate multiple values by \ (backslash).]]>  
+      </description>
+      <name>PGPStationAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MESA_MOD\MODALITY1\MR3T"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getAppendCaseStationAETs"
+      setMethod="setAppendCaseStationAETs">
+      <description><![CDATA[List of the AE titles for Modalities which
+      emits MPPS messages according the <i>Append Case</i>, with multiple
+      MPPS objects refering the same Scheduled Procedure Step, 
+      <i>Relationship between Scheduled and Performed Procedure Steps</i>
+      defined by <i>IHE Radiology Technical Framework</i>.
+      Separate multiple values by \ (backslash).]]>  
+      </description>
+      <name>AppendCaseStationAETitles</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="MESA_MOD\MODALITY1\MR3T"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+      getMethod="getWorkItemConfigDir"
+      setMethod="setWorkItemConfigDir">
+      <description><![CDATA[Directory where configuration files for
+      creation of work items are located: if XSL stylesheet "mpps2gpwl.xsl" 
+      exists in this directory or in a sub-directory equal to the AE Title of 
+      the modality, a work item will be created on receive of the last object
+      refered in the final MPPS, according these stylesheet.
+      A relative path name is resolved relative to
+      <i>archive-install-directory</i>/server/default/.]]>  
+      </description>
+      <name>WorkItemConfigDirectory</name>
+      <type>java.lang.String</type>
+      <descriptors>
+         <value value="conf/dcm4chee-ae"/>
+      </descriptors>
+   </attribute>
+   <attribute access="read-write"
+       getMethod="getIANScuServiceName"
+       setMethod="setIANScuServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>IANScuServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   <attribute access="read-write" 
+      getMethod="getTemplatesServiceName"
+      setMethod="setTemplatesServiceName">
+      <description>Used internally. Do NOT modify.
+      </description>
+      <name>TemplatesServiceName</name>
+      <type>javax.management.ObjectName</type>
+   </attribute>
+   &defaultAttributes;
+
+   <!-- Operations -->
+   &defaultOperations;
+   
+</mbean>
