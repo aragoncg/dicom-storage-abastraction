@@ -463,9 +463,13 @@ public class WADOSupport {
 
         if ("true".equals(req.getRequest().getParameter("useOrig"))) {
             try {
+//                WADOStreamResponseObjectImpl resp = new WADOStreamResponseObjectImpl(
+//                        new FileInputStream(file), CONTENT_TYPE_DICOM,
+//                        HttpServletResponse.SC_OK, null);
                 WADOStreamResponseObjectImpl resp = new WADOStreamResponseObjectImpl(
-                        new FileInputStream(file), CONTENT_TYPE_DICOM,
+                        createInputStream(file), CONTENT_TYPE_DICOM,
                         HttpServletResponse.SC_OK, null);
+                
                 log.info("Original Dicom object file retrieved (useOrig=true) objectUID:"
                         + req.getObjectUID());
                 Dataset ds = req.getObjectInfo();
@@ -569,9 +573,12 @@ public class WADOSupport {
         String iuid = req.getObjectUID();
         FileDataSource ds = null;
         try {
-            ds = (FileDataSource) server.invoke(queryRetrieveScpName,
-                    "getDatasourceOfInstance", new Object[] { iuid },
-                    new String[] { String.class.getName() });
+//            ds = (FileDataSource) server.invoke(queryRetrieveScpName,
+//                    "getDatasourceOfInstance", new Object[] { iuid },
+//                    new String[] { String.class.getName() });
+            ds = createDataSource(server, queryRetrieveScpName,
+                              "getDatasourceOfInstance", iuid);
+            
             Dataset d = ds.getMergeAttrs();
             ds.setWriteFile(true);
             ds.setExcludePrivate(req.isExcludePrivate());
@@ -750,8 +757,11 @@ public class WADOSupport {
     private WADOResponseObject handleTextTransform(WADORequestObject req,
             File file, String contentType, String xslURL, TagDictionary dict) {
         try {
+//          DataInputStream in = new DataInputStream(new BufferedInputStream(
+//                               new FileInputStream(file)));
             DataInputStream in = new DataInputStream(new BufferedInputStream(
-                    new FileInputStream(file)));
+                                 createInputStream(file)));
+            
             DcmParser parser = DcmParserFactory.getInstance().newDcmParser(in);
             Dataset ds = dof.newDataset();
             parser.setDcmHandler(ds.getDcmHandler());
@@ -1067,7 +1077,9 @@ public class WADOSupport {
         if (!it.hasNext())
             return null; // TODO more useful stuff
         ImageReader reader = (ImageReader) it.next();
-        ImageInputStream in = new FileImageInputStream(file);
+//      ImageInputStream in = new FileImageInputStream(file);
+        ImageInputStream in = createImageInputStream(file);
+        
         reader.setInput(in);
         BufferedImage bi = null;
         Rectangle regionRectangle = null;
@@ -1505,5 +1517,20 @@ public class WADOSupport {
         public BufferedImage getImage() {
             return bi;
         }
+    }
+    
+    //The following three methods are added by YangLin@cn-arg.com on 02.12.2009
+    protected InputStream createInputStream(File file) throws FileNotFoundException {
+        return new FileInputStream(file);     
+    }
+    
+    protected ImageInputStream createImageInputStream(File file) throws IOException {
+        return new FileImageInputStream(file);
+    }
+    
+    protected FileDataSource createDataSource(MBeanServer server, 
+            ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
+        return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 
+              new Object[] { iuid }, new String[] { String.class.getName() });
     }
 }

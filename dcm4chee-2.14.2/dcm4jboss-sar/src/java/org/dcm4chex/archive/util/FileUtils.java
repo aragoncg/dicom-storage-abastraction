@@ -54,6 +54,7 @@ import org.dcm4che.data.DcmParser;
 import org.dcm4che.data.DcmParserFactory;
 import org.dcm4che.data.FileFormat;
 import org.dcm4che.dict.Tags;
+import org.dcm4chex.archive.factory.ScpFactoryUtil;
 import org.jboss.system.server.ServerConfigLocator;
 
 
@@ -258,24 +259,12 @@ public class FileUtils {
     		in1.close();
     	}
     }
-
+    
+    //Modified by YangLin@cn-arg.com on 03.04.2009
     public static boolean delete(File file, boolean deleteEmptyParents) {
         log.info("M-DELETE file: " + file);
-        if (!file.exists()) {
-            log.warn("File: " + file + " was already deleted");
-            return true;
-        }
-        if (!file.delete()) {
-            log.warn("Failed to delete file: " + file);
-            return false;
-        }
-        if (deleteEmptyParents) {
-            File parent = file.getParentFile();
-            while (parent.delete()) {
-                log.info("M-DELETE directory: " + parent);
-                parent = parent.getParentFile();
-            }
-        }
-        return true;
+         
+        return ScpFactoryUtil.getScpFactory().
+                              getFileDeleted(file, log, deleteEmptyParents);
     }
 }

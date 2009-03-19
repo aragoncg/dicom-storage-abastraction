@@ -70,6 +70,7 @@ import org.dcm4chex.archive.notif.StudyDeleted;
 import org.dcm4chex.wado.common.WADORequestObject;
 import org.dcm4chex.wado.common.WADOResponseObject;
 import org.dcm4chex.wado.mbean.cache.WADOCacheImpl;
+import org.dcm4chex.wado.mbean.factory.WADOSupportFactoryUtil;
 
 /**
  * @author franz.willer
@@ -82,8 +83,12 @@ import org.dcm4chex.wado.mbean.cache.WADOCacheImpl;
 public class WADOService extends AbstractCacheService {
 
     private static final String NONE = "NONE";
-    private WADOSupport support = new WADOSupport(this.server);
-
+    
+    //Modified by YangLin@cn-arg.com on 03.03.2009
+//  private WADOSupport support = new WADOSupport(this.server);
+    private WADOSupport support = WADOSupportFactoryUtil.getWADOSupportFactory().
+                                  getWADOSupport(this.server); 
+    
     private final NotificationListener seriesStoredListener =
         new NotificationListener() {
         public void handleNotification(Notification notif, Object handback) {

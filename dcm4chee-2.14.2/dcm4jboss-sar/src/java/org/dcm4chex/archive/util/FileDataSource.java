@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.ImageInputStream;
 
 import org.dcm4che.data.Dataset;
 import org.dcm4che.data.DcmElement;
@@ -204,9 +205,14 @@ public class FileDataSource implements DataSource {
 
     public void writeTo(OutputStream out, String tsUID) throws IOException {
         log.info("M-READ file:" + file);
+        
+//        DataInputStream dis = new DataInputStream(
+//                 new BufferedInputStream(new FileInputStream(file)));
+//        FileImageInputStream fiis = null;
         DataInputStream dis = new DataInputStream(
-                new BufferedInputStream(new FileInputStream(file)));
-        FileImageInputStream fiis = null;
+        		  new BufferedInputStream(createInputStream(file)));
+        ImageInputStream fiis = null;
+        
         try {
             DcmParser parser = DcmParserFactory.getInstance().newDcmParser(dis);
             Dataset ds = DcmObjectFactory.getInstance().newDataset();
@@ -347,7 +353,10 @@ public class FileDataSource implements DataSource {
                 // decompress encapsulated Pixel Data
                 dis.close();
                 dis = null;
-                fiis = new FileImageInputStream(file);
+                
+//                fiis = new FileImageInputStream(file);
+                fiis = createImageInputStream(file);
+                
                 fiis.seek(parser.getStreamPosition());
                 parser = DcmParserFactory.getInstance().newDcmParser(fiis);
                 DecompressCmd cmd = new DecompressCmd(ds, tsOrig, parser);
@@ -472,4 +481,14 @@ public class FileDataSource implements DataSource {
             out.write(buffer, 0, len);
         }
     }
+    
+    //The following two methods are added by YangLin@cn-arg.com on 02.12.2009
+    protected InputStream createInputStream(File file) throws IOException {
+        return new FileInputStream(file);
+    }
+    
+    protected ImageInputStream createImageInputStream(File file) throws IOException {
+        return new FileImageInputStream(file);
+    }
+    
 }
