@@ -54,7 +54,10 @@ import org.dcm4chex.rid.mbean.RIDSupport;
 public class DBRIDSupportFactory implements RIDSupportFactory {
     
 	private DBRIDSupport dbRIDSupport;
-
+    
+	/**
+     * Construct a DBRIDSupport instance.
+     */
 	public RIDSupport getRIDSupport(RIDService service) {
 		
 		if(dbRIDSupport == null) {

@@ -70,6 +70,7 @@ public class RIDService extends ServiceMBeanSupport  {
     private static final String NONE = "NONE";
     
 	//Modified by YangLin@cn-arg.com on 03.04.2009
+    //Acquire RIDSupport instance according to Dicom image storage way
 //	private RIDSupport support = new RIDSupport( this );
 	private RIDSupport support = RIDSupportFactoryUtil.getRIDSupportFactory().
 	                             getRIDSupport(this);

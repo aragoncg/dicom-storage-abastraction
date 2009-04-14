@@ -1187,12 +1187,18 @@ public class StoreScp extends DcmServiceBase implements AssociationListener {
         store.commitSeriesStored(seriesStored);
     }
     
-    //The two methods are added by YangLin@cn-arg.com on 01.20.2009
-    //For accessing private fields from sub-type
+    /**
+     * The following two methods are added by YangLin@cn-arg.com 
+     * on 01.20.2009.
+     * To access the private referencedDirectoryURI from sub-type.
+     */
     protected String getReferencedDirectoryURI() {
         return referencedDirectoryURI;
     }
-   
+    
+    /**
+     * To access the private perfMon from sub-type.
+     */
     protected PerfMonDelegate getPerfMon() {
         return perfMon;
     }

@@ -56,11 +56,17 @@ public class DBECGSupport extends ECGSupport{
     
     private QrSCPDBImpl qri = null;
     
+    /**
+     * Constructor of DBECGSupport.
+     */
     public DBECGSupport( DBRIDSupport ridSupport, QrSCPDBImpl qrSCPDBImpl ) {
         super(ridSupport);
         qri = qrSCPDBImpl; 
     }
     
+    /**
+     * Acquire a DBDataSource instance.
+     */
     protected FileDataSource createDataSource(MBeanServer server, 
             ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
         DBDataSource dds = (DBDataSource) server.invoke(fileSystemMgtName, methodName, 

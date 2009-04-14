@@ -63,6 +63,9 @@ public class DBScpFactory implements ScpFactory {
 	
 	private DelSCPDBImpl dsi; 
 	
+	/**
+     * Construct a DBStoreScp instance.
+     */
 	public StoreScp getStoreScp(StoreScpService service) {
 		if(dbStoreScp == null) {
 			dbStoreScp = new DBStoreScp(service);
@@ -70,12 +73,18 @@ public class DBScpFactory implements ScpFactory {
 		return dbStoreScp;
 	}
 
-	@Override
+	/**
+     * Construct a DBDataSource instance.
+     */
 	public DataSource getDataSource(File file, Dataset mergeAttrs, int bufferSize) {
 		return new DBDataSource(file, mergeAttrs, new byte[bufferSize]);
 	}
 
-	@Override
+	/**
+     * Delete some OrdDicom record according to record Id.
+     * Since deletion is done by some deamon thread, this
+     * method is thread-safe. 
+     */
 	public boolean getFileDeleted(File file, Logger log, boolean deleteEmptyParents) {
 		
 		if (dsi == null) {

@@ -975,17 +975,27 @@ public class RIDSupport {
         return storage;
     }
     
-	//The following three methods are added by YangLin@cn-arg.com on 02.14.2009
+    /**
+     * The following three methods are added by YangLin@cn-arg.com 
+     * on 02.14.2009.
+     * Acquire the inputStream of @param file.
+     */
 	protected InputStream createInputStream(File file) throws FileNotFoundException {
 	     return new FileInputStream(file);     
 	}
-	    
+	
+	/**
+     * Acquire a FileDataSource instance.
+     */
 	protected FileDataSource createDataSource(MBeanServer server, 
 	          ObjectName fileSystemMgtName, String methodName, String docUID) throws Exception {
 	     return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 
 	         new Object[] { docUID }, new String[] { String.class.getName() });
 	}
 	
+	/**
+     * Acquire the ECGSupport.
+     */
 	protected ECGSupport createECGSupport() {
 	     return getECGSupport();
 	}

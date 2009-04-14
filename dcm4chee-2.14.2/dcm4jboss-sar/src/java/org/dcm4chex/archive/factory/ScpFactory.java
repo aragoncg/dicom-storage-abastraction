@@ -52,10 +52,19 @@ import org.dcm4chex.archive.dcm.storescp.StoreScpService;
  * @since 02.25.2009
  */
 public interface ScpFactory {
-	
+	  
+	  /**
+       * Acquire a StoreScp instance.
+       */
       public StoreScp getStoreScp(StoreScpService service);
       
+      /**
+       * Acquire a DataSource instance.
+       */
       public DataSource getDataSource(File file, Dataset mergeAttrs, int bufferSize);
       
+      /**
+       * Get some file deleted.
+       */
       public boolean getFileDeleted(File file, Logger logger, boolean deleteEmptyParents);
 }

@@ -53,16 +53,23 @@ import org.dcm4chex.archive.util.FileDataSource;
  * @version 1.0
  * @since 01.22.2009
  * 
- * Override two methods in order to read content from database. 
+ * This class overrides two methods of DataSource in order to read data 
+ * from database. 
  */
 public class DBDataSource extends FileDataSource{
     
     private QrSCPDBImpl qri = null;
     
+    /**
+     * Constructor of DBDataSource.
+     */
     public DBDataSource(File file, Dataset mergeAttrs, byte[] buffer) {
         super(file, mergeAttrs, buffer);
     }
     
+    /**
+     * Acquire the inputStream of @param file.
+     */
     protected InputStream createInputStream(File file) throws IOException {
         InputStream is = null;       
         try {
@@ -73,6 +80,9 @@ public class DBDataSource extends FileDataSource{
         return is;
     }
     
+    /**
+     * Acquire the imageInputStream of @param file.
+     */
     protected ImageInputStream createImageInputStream(File file) throws IOException {
         ImageInputStream iis = null;
         try {
@@ -83,6 +93,9 @@ public class DBDataSource extends FileDataSource{
         return iis;
     }
     
+    /**
+     * Set qri field.
+     */
     public void setQrSCPDBImpl(QrSCPDBImpl qri) {
         this.qri = qri;
     }

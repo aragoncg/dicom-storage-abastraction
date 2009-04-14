@@ -51,6 +51,9 @@ public class WADOSupportFactoryUtil {
 	
     private static WADOSupportFactory wadoSupportFactory;
 	
+    /**
+     * Acquire a WADOSupportFactory instance.
+     */
 	public static WADOSupportFactory getWADOSupportFactory() {
 		if(wadoSupportFactory == null) {
 		   if(org.dcm4chex.archive.dcm.DBConUtil.saveToDB) {

@@ -482,11 +482,18 @@ public class FileDataSource implements DataSource {
         }
     }
     
-    //The following two methods are added by YangLin@cn-arg.com on 02.12.2009
+    /**
+     * The following two methods are added by YangLin@cn-arg.com 
+     * on 02.12.2009.
+     * Acquire the inputStream of @param file.
+     */
     protected InputStream createInputStream(File file) throws IOException {
         return new FileInputStream(file);
     }
     
+    /**
+     * Acquire the imageInputStream of @param file.
+     */
     protected ImageInputStream createImageInputStream(File file) throws IOException {
         return new FileImageInputStream(file);
     }

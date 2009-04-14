@@ -48,6 +48,9 @@ import org.dcm4chex.rid.mbean.RIDSupport;
  */
 public interface RIDSupportFactory {
 	
+	/**
+     * Acquire a RIDSupport instance.
+     */
 	public RIDSupport getRIDSupport(RIDService service);
 
 }

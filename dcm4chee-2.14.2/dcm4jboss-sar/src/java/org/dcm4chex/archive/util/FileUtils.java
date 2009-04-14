@@ -260,10 +260,14 @@ public class FileUtils {
     	}
     }
     
-    //Modified by YangLin@cn-arg.com on 03.04.2009
+    /**
+     * The following method is modified by YangLin@cn-arg.com 
+     * on 03.04.2009.
+     * Get file deleted according to Dicom image storage way.
+     */
     public static boolean delete(File file, boolean deleteEmptyParents) {
         log.info("M-DELETE file: " + file);
-         
+        
         return ScpFactoryUtil.getScpFactory().
                               getFileDeleted(file, log, deleteEmptyParents);
     }

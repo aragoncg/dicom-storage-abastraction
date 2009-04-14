@@ -48,6 +48,9 @@ import org.dcm4chex.wado.mbean.WADOSupport;
  * @since 03.05.2009
  */
 public interface WADOSupportFactory {
- 
+      
+	  /**
+       * Acquire a WADOSupport instance.
+       */
 	  public WADOSupport getWADOSupport(MBeanServer mbServer);
 }

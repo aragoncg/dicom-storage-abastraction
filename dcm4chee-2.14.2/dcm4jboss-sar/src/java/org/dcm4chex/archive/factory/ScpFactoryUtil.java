@@ -51,6 +51,9 @@ public class ScpFactoryUtil {
     
 	private static ScpFactory scpFactory;
 	
+	/**
+     * Acquire a ScpFactory instance.
+     */
 	public static ScpFactory getScpFactory() {
 		if(scpFactory == null) {
 		   if(org.dcm4chex.archive.dcm.DBConUtil.saveToDB) {

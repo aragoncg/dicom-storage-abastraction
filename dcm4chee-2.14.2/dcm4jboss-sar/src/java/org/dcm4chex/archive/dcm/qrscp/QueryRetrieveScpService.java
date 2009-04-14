@@ -1467,7 +1467,8 @@ public class QueryRetrieveScpService extends AbstractScpService {
                                         DatasetUtils .fromByteArray(
                                                 info.instAttrs))));
                 
-                //Modified by YangLin@cn-arg.com on 03.03.2009                
+                //Modified by YangLin@cn-arg.com on 03.03.2009 
+                //Acquire DataSource instance according to Dicom image storage way
 //              return new FileDataSource(f, mergeAttrs, new byte[bufferSize]);
                 return ScpFactoryUtil.getScpFactory().getDataSource(
                 		                  f, mergeAttrs, bufferSize);

@@ -52,7 +52,10 @@ import org.dcm4chex.rid.mbean.RIDSupport;
 public class FileRIDSupportFactory implements RIDSupportFactory {
 
 	private RIDSupport ridSupport;
-
+    
+	/**
+     * Construct a RIDSupport instance.
+     */
 	public RIDSupport getRIDSupport(RIDService service) {
 		
 		if(ridSupport == null) {

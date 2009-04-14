@@ -130,17 +130,22 @@ public class DBStoreScp extends StoreScp {
     private static final String SERIES_STORED = "SERIES_STORED";
     
     private StSCPDBImpl dbStore;
-
+    
+    /**
+     * Constructor of DBStoreScp. 
+     */
     public DBStoreScp(StoreScpService service) {
         super(service);
         dbStore = new StSCPDBImpl();
     }
-
+    
+    /**
+     * Store a Dicom image and its metadata into database.
+     */
     protected void doActualCStore(ActiveAssociation activeAssoc, Dimse rq,
             Command rspCmd, Dataset ds, DcmParser parser) throws IOException,
             DcmServiceException {
 
-        // File Storage Related
         File file = null;
 
         boolean dcm4cheeURIReferenced = rq.getTransferSyntaxUID().equals(
@@ -150,10 +155,10 @@ public class DBStoreScp extends StoreScp {
             Association assoc = activeAssoc.getAssociation();
             String callingAET = assoc.getCallingAET();
 
-            // validate sop class id, sop instance id, serial id, study id
+            //Validate sop class id, sop instance id, serial id, study id
             String iuid = checkSOPInstanceUID(rqCmd, ds, callingAET);
 
-            // validate append permission of the same association
+            //Validate append permission of the same association
             checkAppendPermission(assoc, ds);
 
             List duplicates = new QueryFilesCmd(iuid).getFileDTOs();
@@ -165,7 +170,6 @@ public class DBStoreScp extends StoreScp {
                 return;
             }
 
-            // pre-process the dataset
             service.preProcess(ds);
 
             if (service.getLog().isDebugEnabled()) {
@@ -173,13 +177,11 @@ public class DBStoreScp extends StoreScp {
                 service.getLog().debug(ds);
             }
 
-            // Set original dataset
             getPerfMon().setProperty(activeAssoc, rq, PerfPropertyEnum.REQ_DATASET,
                     ds);
 
             service.logDIMSE(assoc, STORE_XML, ds);
 
-            // some kind of check on the dataset
             if (isCheckIncorrectWorklistEntry()
                     && checkIncorrectWorklistEntry(ds)) {
                 service
@@ -209,7 +211,7 @@ public class DBStoreScp extends StoreScp {
             }
 
             if (dcm4cheeURIReferenced) {
-                // acquire the store uri
+                //Acquire storage URI
                 String uri = ds.getString(Tags.RetrieveURI);
                 if (uri == null) {
                     throw new DcmServiceException(
@@ -225,11 +227,10 @@ public class DBStoreScp extends StoreScp {
                                     + getReferencedDirectoryPath());
                 }
 
-                // acquire the store path
+                //Acquire storage path
                 filePath = uri.substring(getReferencedDirectoryURI().length());
 
-                // validate if the file specified by the uri is a normal file,
-                // not a directory
+                //Validate if the file specified by the URI is a real file
                 if (uri.startsWith("file:/")) {
                     file = new File(new URI(uri));
                     if (!file.isFile()) {
@@ -247,7 +248,7 @@ public class DBStoreScp extends StoreScp {
                     
                     fileLength = file.length();
                     
-                    // create a new empty dataset
+                    //Create a new empty dataset
                     Dataset fileDS = objFact.newDataset();
 
                     FileInputStream fis = new FileInputStream(file);
@@ -276,8 +277,8 @@ public class DBStoreScp extends StoreScp {
                     }
                     fileDS.putAll(ds, Dataset.REPLACE_ITEMS);
                     ds = fileDS;
-                } else {// if reading referenced file is not required generate
-                        // metaInfo individually
+                } else {//If reading referenced file is not required generate
+                        //metaInfo individually
                     ds.setPrivateCreatorID(PrivateTags.CreatorID);
                     String tsuid = ds.getString(
                             PrivateTags.Dcm4cheURIReferencedTransferSyntaxUID,
@@ -286,7 +287,7 @@ public class DBStoreScp extends StoreScp {
                             .getAffectedSOPClassUID(), rqCmd
                             .getAffectedSOPInstanceUID(), tsuid));
                 }
-            } else {// if not tianiURIReferenced
+            } else {//If not tianiURIReferenced
             	String fsgrpid = service.selectFileSystemGroup(callingAET, ds);
                 fsDTO = service.selectStorageFileSystem(fsgrpid);
                 
@@ -298,7 +299,7 @@ public class DBStoreScp extends StoreScp {
                         baseDir.getPath().length() + 1).replace(
                         File.separatorChar, '/');
 
-                // generate metainfo
+                //Generate metaInfo
                 String compressTSUID = (parser.getReadTag() == Tags.PixelData && parser
                         .getReadLength() != -1) ? getCompressionRules()
                         .getTransferSyntaxFor(assoc, ds) : null;
@@ -319,7 +320,7 @@ public class DBStoreScp extends StoreScp {
                 
                 StringBuilder tempLength = new StringBuilder();
                 
-                //The place where storage happens
+                //Store image data to database
                 md5sum = storeToDB(parser, ds, file, tempPath, tempLength, getByteBuffer(assoc));
                 
                 filePath = tempPath.toString();
@@ -386,7 +387,7 @@ public class DBStoreScp extends StoreScp {
             getPerfMon().start(activeAssoc, rq,
                     PerfCounterEnum.C_STORE_SCP_OBJ_REGISTER_DB);
 
-            //Update corresponding database info
+            //Update metaInfo of image in database
             Dataset coercedElements = updateDB(store, ds, fsDTO.getPk(),
                     filePath, fileLength, md5sum,
                     newSeries);
@@ -554,11 +555,15 @@ public class DBStoreScp extends StoreScp {
         }
         return buf;
     }
-
+    
+    /**
+     * Write a Dicom image into database and update its metadata.
+     */
     private byte[] storeToDB(DcmParser parser, Dataset ds, File file,
             StringBuilder filePath, StringBuilder fileLength, byte[] buffer) throws Exception {
         service.getLog().info("M-WRITE to Database Oracle.11g");
         
+        //Acquire OutputStream of the new inserted empty Dicom object in database
         int id = dbStore.getNewId();
         OutputStream ops = dbStore.getOutputStream(id);
         
@@ -622,7 +627,7 @@ public class DBStoreScp extends StoreScp {
                 ops.close();
         }
         
-        //Update the content of Dicom image in the database
+        //Extract and update the metadata of the new inserted Dicom image in database
         fileLength.append(dbStore.setProperties(id));
         filePath.append(DBConUtil.DBSTORE_MARK + id);
         file.delete();

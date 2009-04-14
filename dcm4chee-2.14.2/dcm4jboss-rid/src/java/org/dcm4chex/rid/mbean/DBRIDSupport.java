@@ -62,11 +62,17 @@ public class DBRIDSupport extends RIDSupport{
     
     private DBECGSupport ecgSupport = null;
     
+    /**
+     * Constructor of DBRIDSupport.
+     */
     public DBRIDSupport(RIDService service) {
         super(service);
         qri = new QrSCPDBImpl();
     }
     
+    /**
+     * Acquire the inputStream of @param file.
+     */
     protected InputStream createInputStream(File file) throws FileNotFoundException {
         InputStream is = null;       
         try {
@@ -76,7 +82,10 @@ public class DBRIDSupport extends RIDSupport{
         }  
         return is;    
     }
-       
+    
+    /**
+     * Acquire a DBDataSource instance.
+     */
     protected FileDataSource createDataSource(MBeanServer server, 
              ObjectName fileSystemMgtName, String methodName, String docUID) throws Exception {
         DBDataSource dds = (DBDataSource) server.invoke(fileSystemMgtName, methodName, 
@@ -84,7 +93,10 @@ public class DBRIDSupport extends RIDSupport{
         dds.setQrSCPDBImpl(qri);
         return dds;
     }
-   
+    
+    /**
+     * Acquire the DBECGSupport.
+     */
     protected ECGSupport createECGSupport() {
         return getDBECGSupport();
     }

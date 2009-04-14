@@ -1519,15 +1519,25 @@ public class WADOSupport {
         }
     }
     
-    //The following three methods are added by YangLin@cn-arg.com on 02.12.2009
+    /**
+     * The following three methods are added by YangLin@cn-arg.com 
+     * on 02.12.2009.
+     * Acquire the inputStream of @param file.
+     */
     protected InputStream createInputStream(File file) throws FileNotFoundException {
         return new FileInputStream(file);     
     }
     
+    /**
+     * Acquire the imageInputStream of @param file.
+     */
     protected ImageInputStream createImageInputStream(File file) throws IOException {
         return new FileImageInputStream(file);
     }
     
+    /**
+     * Acquire a FileDataSource instance.
+     */
     protected FileDataSource createDataSource(MBeanServer server, 
             ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
         return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 

@@ -183,6 +183,7 @@ public class StoreScpService extends AbstractScpService {
     private boolean md5sum = true;
 
     //Modified by YangLin@cn-arg.com on 03.02.2009
+    //Acquire StoreScp instance according to Dicom image storage way
 //  private StoreScp scp = new StoreScp(this); 
     private StoreScp scp = ScpFactoryUtil.getScpFactory().getStoreScp(this);
 

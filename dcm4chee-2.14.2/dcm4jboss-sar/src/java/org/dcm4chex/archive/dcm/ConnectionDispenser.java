@@ -41,6 +41,7 @@ package org.dcm4chex.archive.dcm;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author YangLin@cn-arg.com
@@ -51,13 +52,23 @@ import java.sql.SQLException;
  */
 public class ConnectionDispenser {
 	
+	/**
+     * Set up a threadLocal connection and call setdatamodel.
+     */
     private static class ThreadLocalConnection extends ThreadLocal<Connection> {
         public Connection initialValue() {
             Connection con = null;
             try {
-                //The connection can also come from connection pool
+                //Connection can also come from connection pool
                 con = DriverManager.getConnection(DBConUtil.CON_URL,
                         DBConUtil.CON_USER, DBConUtil.CON_PW);
+                StringBuilder multiSql = new StringBuilder();
+                multiSql.append("begin ");
+                multiSql.append("ord_dicom.setdatamodel;");
+                multiSql.append(" end;");
+                Statement st = con.createStatement();
+                st.execute(multiSql.toString());
+                st.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -66,7 +77,10 @@ public class ConnectionDispenser {
     }
 
     private static ThreadLocalConnection conn = new ThreadLocalConnection();
-
+    
+    /**
+     * Acquire a threadLocal connection.
+     */
     public static Connection getConnection() {
         return conn.get();
     }

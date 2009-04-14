@@ -64,11 +64,17 @@ public class DBWADOSupport extends WADOSupport{
     
     private QrSCPDBImpl qri = null;
     
+    /**
+     * Constructor of DBWADOSupport.
+     */
     public DBWADOSupport(MBeanServer mbServer) {
         super(mbServer);
         qri = new QrSCPDBImpl();
     }
     
+    /**
+     * Acquire the inputStream of @param file.
+     */
     protected InputStream createInputStream(File file) throws FileNotFoundException {
         InputStream is = null;       
         try {
@@ -79,6 +85,9 @@ public class DBWADOSupport extends WADOSupport{
         return is;
     }
     
+    /**
+     * Acquire the imageInputStream of @param file.
+     */
     protected ImageInputStream createImageInputStream(File file) throws IOException {
         ImageInputStream iis = null;
         try {
@@ -89,6 +98,9 @@ public class DBWADOSupport extends WADOSupport{
         return iis;
     }
     
+    /**
+     * Acquire a DBDataSource instance.
+     */
     protected FileDataSource createDataSource(MBeanServer server, 
             ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
         DBDataSource dds = (DBDataSource) server.invoke(fileSystemMgtName, methodName, 

@@ -349,7 +349,11 @@ public class ECGSupport {
         return (WaveformGroup[]) l.toArray(new WaveformGroup[l.size()]);
     }
     
-    //Added by YangLin@cn-arg.com on 02.14.2009
+    /**
+     * The following method is Added by YangLin@cn-arg.com 
+     * on 02.14.2009.
+     * Acquire a FileDataSource instance.
+     */
     protected FileDataSource createDataSource(MBeanServer server, 
             ObjectName fileSystemMgtName, String methodName, String iuid) throws Exception {
         return (FileDataSource) server.invoke(fileSystemMgtName, methodName, 

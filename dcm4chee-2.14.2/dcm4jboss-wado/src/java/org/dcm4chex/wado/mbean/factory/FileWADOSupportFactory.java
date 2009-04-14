@@ -52,7 +52,10 @@ import org.dcm4chex.wado.mbean.WADOSupport;
 public class FileWADOSupportFactory implements WADOSupportFactory {
 
 	private WADOSupport wadoSupport;
-
+    
+	/**
+     * Construct a WADOSupport instance.
+     */
 	public WADOSupport getWADOSupport(MBeanServer mbServer) {
 		if(wadoSupport == null) {
 			wadoSupport = new WADOSupport(mbServer);

@@ -58,7 +58,10 @@ import org.dcm4chex.archive.util.FileDataSource;
 public class FileScpFactory implements ScpFactory {
     
 	private StoreScp storeScp;
-
+    
+	/**
+     * Construct a StoreScp instance.
+     */
 	public StoreScp getStoreScp(StoreScpService service) {
 		if(storeScp == null) {
 			storeScp = new StoreScp(service);
@@ -66,12 +69,19 @@ public class FileScpFactory implements ScpFactory {
 		return storeScp;
 	}
 
-	@Override
+	/**
+     * Construct a DataSource instance.
+     */
 	public DataSource getDataSource(File file, Dataset mergeAttrs, int bufferSize) {
 		return new FileDataSource(file, mergeAttrs, new byte[bufferSize]);
 	}
 
-	@Override
+
+	/**
+     * Delete Dicom image stored in file.
+     * Since deletion is done by some deamon thread, this
+     * method is thread-safe. 
+     */
 	public boolean getFileDeleted(File file, Logger log, boolean deleteEmptyParents) {
 		
 		if (!file.exists()) {

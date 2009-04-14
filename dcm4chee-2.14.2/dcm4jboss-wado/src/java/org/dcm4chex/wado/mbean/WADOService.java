@@ -85,6 +85,7 @@ public class WADOService extends AbstractCacheService {
     private static final String NONE = "NONE";
     
     //Modified by YangLin@cn-arg.com on 03.03.2009
+    //Acquire WADOSupport instance according to Dicom image storage way
 //  private WADOSupport support = new WADOSupport(this.server);
     private WADOSupport support = WADOSupportFactoryUtil.getWADOSupportFactory().
                                   getWADOSupport(this.server); 

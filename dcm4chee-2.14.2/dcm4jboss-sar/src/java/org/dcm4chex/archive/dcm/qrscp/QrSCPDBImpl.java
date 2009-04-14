@@ -40,7 +40,6 @@ package org.dcm4chex.archive.dcm.qrscp;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.ref.SoftReference;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -59,13 +58,16 @@ import org.dcm4chex.archive.dcm.DBConUtil;
  * @version 1.0
  * @since 01.04.2009
  * 
- * This class is used to retrieve the content of Diocm image stored
- * in the Oracle 11g database.
+ * This class is used to retrieve the data of Diocm image
+ * stored in Oracle 11g database.
  */
 public class QrSCPDBImpl {
     
     private Connection con = null;
-
+    
+    /**
+     * Constructor of QrSCPDBImpl.
+     */
     public QrSCPDBImpl() {
         try {
             setDBCon();
@@ -74,28 +76,38 @@ public class QrSCPDBImpl {
         }
     }
     
+    /**
+     * Set up a database connection.
+     */
     private void setDBCon() throws Exception {
         if (useManualCon()) {
             configCon();
-//            con = null;
         } else {
             lookupCon();
         }
     }
-
+    
+    /**
+     * Add looking up code if using connection pool.
+     */
     private void lookupCon() {
         // JNDI look up
     }
-
+    
+    /**
+     * Manually acquire a database connection.
+     */
     private void configCon() throws ClassNotFoundException, SQLException {
 
         con = DriverManager.getConnection(
                 DBConUtil.CON_URL, DBConUtil.CON_USER, DBConUtil.CON_PW);
-
-//        con.setAutoCommit(false);
-//        softRef = new SoftReference(con);
     }
     
+    /**
+     * Acquire the inputStream of some OrdDicom record according
+     * to record Id.
+     * This method is thread-safe.
+     */
     public InputStream getInputStream(File file) throws Exception{
         
         String fileURI = file.getPath();
@@ -109,15 +121,15 @@ public class QrSCPDBImpl {
             int pk = Integer.parseInt(
                     fileURI.substring(pos + DBConUtil.DBSTORE_MARK.length()).trim());
             
-//            if(con == null) {
-//               con = softRef.get();
-//               if (con == null) {
-//                   configCon();
-//               }
-//            }
-            
-            ps1 = con.prepareStatement("select t.i_image.getContent() from " +
-            		"DICOM_IMAGE t where i_id = ?");
+//            ps1 = con.prepareStatement("select t.i_image.getContent() from " +
+//            		"DICOM_IMAGE t where i_id = ?");
+            ps1 = con.prepareStatement("select t." + 
+  		                               DBConUtil.IMAGE_COL_NAME + 
+		                               ".getContent() from " + 
+		                               DBConUtil.TABLE_NAME +
+		                               " t where " +                             
+		                               DBConUtil.ID_COL_NAME +
+                                       " = ?");
             ps1.setInt(1, pk);
             rs = ps1.executeQuery();
 
@@ -134,22 +146,24 @@ public class QrSCPDBImpl {
             throw new Exception("No valid database store mark");
     }
     
+    /**
+     * Acquire the imageInputStream of some OrdDicom record according
+     * to record Id.
+     * This method is thread-safe.
+     */
     public ImageInputStream getImageInputStream(File file) throws Exception{
         
         ImageInputStream imageInputStream = ImageIO.createImageInputStream(getInputStream(file));
         return imageInputStream;
     }
     
-    /*
-     * Decide which kind of connection to use
-     * If user wants to keep the original database unchanged, then an 
-     * individual oracle database need to be set to store images.
-     * The connection to this individual db can be configured in JBOSS
-     * and acquired through JNDI, or configured and acquired manually.
-     * The decision will be made by user in a property file.  
+    /**
+     * Connection to database can be configured in JBOSS and 
+     * acquired through JNDI, or configured and acquired manually.
+     * This method decides which way to take.
      */
     private boolean useManualCon() {
-        //Some action to acquire information
+    	
         return DBConUtil.MANUAL_CON_FLAG;
     }
     

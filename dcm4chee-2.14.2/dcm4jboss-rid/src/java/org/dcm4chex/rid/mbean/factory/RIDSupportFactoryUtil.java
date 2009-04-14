@@ -51,6 +51,9 @@ public class RIDSupportFactoryUtil {
 	
     private static RIDSupportFactory ridSupportFactory;
 	
+    /**
+     * Acquire a RIDSupportFactory instance.
+     */
 	public static RIDSupportFactory getRIDSupportFactory() {
 		if(ridSupportFactory == null) {
 		   if(org.dcm4chex.archive.dcm.DBConUtil.saveToDB) {

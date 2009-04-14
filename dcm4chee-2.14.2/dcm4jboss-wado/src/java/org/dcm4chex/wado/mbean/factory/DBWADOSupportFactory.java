@@ -53,7 +53,10 @@ import org.dcm4chex.wado.mbean.WADOSupport;
 public class DBWADOSupportFactory implements WADOSupportFactory {
 
 	private DBWADOSupport dbWADOSupport;
-
+    
+	/**
+     * Construct a DBWADOSupport instance.
+     */
 	public WADOSupport getWADOSupport(MBeanServer mbServer) {
 		if(dbWADOSupport == null) {
 			dbWADOSupport = new DBWADOSupport(mbServer);

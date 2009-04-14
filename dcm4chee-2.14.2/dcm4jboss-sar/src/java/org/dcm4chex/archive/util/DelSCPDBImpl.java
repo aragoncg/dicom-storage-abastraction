@@ -53,8 +53,10 @@ import org.dcm4chex.archive.dcm.DBConUtil;
  * @version 1.0
  * @since 01.09.2008
  * 
- * This class is used to delete the content of Diocm image stored
+ * This class is used to delete OrdDicom records stored
  * in Oracle 11g database.
+ * This class is thread-safe since it is accessed sequentially
+ * by one deamon thread.
  */
 public class DelSCPDBImpl {
     
@@ -66,6 +68,9 @@ public class DelSCPDBImpl {
     
     private boolean manualCon = false;
     
+    /**
+     * Constructor of DelSCPDBImpl.
+     */
     public DelSCPDBImpl() {
         try {
             setDBCon();
@@ -74,6 +79,9 @@ public class DelSCPDBImpl {
         }
     }
     
+    /**
+     * Set up a database connection.
+     */
     private void setDBCon() throws Exception {
         if (useManualCon()) {
             configCon();
@@ -83,7 +91,10 @@ public class DelSCPDBImpl {
             lookupCon();
         }
     }
-
+    
+    /**
+     * Manually acquire a database connection.
+     */
     private void configCon() throws ClassNotFoundException, SQLException {
 
         con = DriverManager.getConnection(
@@ -92,23 +103,26 @@ public class DelSCPDBImpl {
         softRef = new SoftReference<Connection>(con);
     }
     
+    /**
+     * Add looking up code if using connection pool.
+     */
     private void lookupCon() {
         // JNDI look up
     }
     
-    /*
-     * Decide which kind of connection to use.
-     * If user wants to keep the original database unchanged, then an 
-     * individual oracle database need to be set to store images.
-     * The connection to this individual db can be configured in JBOSS
-     * and acquired through JNDI, or configured and acquired manually.
-     * The decision will be made by user in a property file.  
+    /**
+     * Connection to database can be configured in JBOSS and 
+     * acquired through JNDI, or configured and acquired manually.
+     * This method decides which way to take.
      */
     private boolean useManualCon() {
-        //Some action to acquire information
+
         return DBConUtil.MANUAL_CON_FLAG;
     }
     
+    /**
+     * Delete OrdDicom record according to record Id in database.
+     */
     public int deleteDBFile(File file) throws Exception{
         
         int number = -1;
@@ -125,7 +139,12 @@ public class DelSCPDBImpl {
                }
             }
             
-            ps1 = con.prepareStatement("delete DICOM_IMAGE where i_id=?");
+//            ps1 = con.prepareStatement("delete DICOM_IMAGE where i_id=?");
+            ps1 = con.prepareStatement("delete " +
+            		                   DBConUtil.TABLE_NAME +
+            		                   " where " +
+            		                   DBConUtil.ID_COL_NAME +
+            		                   "=?");
             ps1.setInt(1, pk);
             number = ps1.executeUpdate();
         }
@@ -133,6 +152,9 @@ public class DelSCPDBImpl {
         return number;
     }
     
+    /**
+     * Release resource.
+     */
     private void releaseResource(boolean manualCon) {
     	
     	if(ps1 != null) {
