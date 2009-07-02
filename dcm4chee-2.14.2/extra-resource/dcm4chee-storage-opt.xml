@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id: dcm4chee-storage-opt.xml 01 2009-03-26 by YangLin $ -->
+<!-- DICOM image storage configuration -->
+
+<options>
+    <!-- Save in database or file system: DB or FILE -->
+    <save-to>DB</save-to>
+
+    <!-- Configure database connection manually: TRUE or FALSE -->
+    <manual-con-flag>TRUE</manual-con-flag>
+    
+    <!-- Connection configuration -->
+    <con-driver>oracle.jdbc.driver.OracleDriver</con-driver>
+    <con-url>jdbc:oracle:thin:@192.168.2.7:1521:ORCL</con-url>
+    <con-user>SYSTEM</con-user>
+    <con-password></con-password>
+    
+    <!-- Mark string indicating storage in database -->
+    <dbstore-mark>@Oracle11g#PK=</dbstore-mark>
+    
+    <!-- Use default table definition: YES or NO -->
+    <use-default-table>YES</use-default-table>
+    
+    <!-- Provide table name and column names if choose not to use default table definition -->
+    <!-- Make sure the column types provided are same as required -->
+    <!-- Customized table name and column names -->
+    <table_name>DICOM_IMAGE</table_name>
+
+    <!-- Required type: Integer -->
+    <id_col_name>I_ID</id_col_name>
+
+    <!-- Required type: Date -->
+    <date_col_ame>I_DATE</date_col_ame>
+
+    <!-- Required type: Orddicom -->
+    <image_col_name>I_IMAGE</image_col_name>
+     
+</options>
+
