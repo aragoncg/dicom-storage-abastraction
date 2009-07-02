@@ -40,7 +40,6 @@ package org.dcm4chex.archive.dcm.storescp;
 
 import java.io.OutputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,9 +58,11 @@ import oracle.sql.BLOB;
  * 
  * This class contains detailed JDBC operation to store 
  * OrdDicom object in Oracle 11g database.
+ * Make sure each DB identifier wrapped with a double quote.
  */
 public class StSCPDBImpl {
-
+	
+	/** Current Id. */
     private static int newId = maxId();
     
     /**
@@ -75,14 +76,17 @@ public class StSCPDBImpl {
         ResultSet rs = null;
         
         try {
-            con = DriverManager.getConnection(DBConUtil.CON_URL,
-                    DBConUtil.CON_USER, DBConUtil.CON_PW);
+            con = DBConUtil.borrowConnection(StSCPDBImpl.class);
             st = con.createStatement();
 //            rs = st.executeQuery("select max(i_id) from DICOM_IMAGE");
             rs = st.executeQuery("select max(" + 
+            		             "\"" +
             		             DBConUtil.ID_COL_NAME + 
+            		             "\"" +
             		             ") from " + 
-            		             DBConUtil.TABLE_NAME);
+            		             "\"" +
+            		             DBConUtil.TABLE_NAME +
+            		             "\"");
             if (rs.next()) {
                 maxNum = rs.getInt(1);
             }
@@ -103,8 +107,10 @@ public class StSCPDBImpl {
                 e.printStackTrace();
             }
             try {
-            	if(con != null)
+            	if(con != null) {
                    con.close();
+                   con = null;
+            	}   
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -135,6 +141,8 @@ public class StSCPDBImpl {
     public OutputStream getOutputStream(int id) {
         
         //Get threadLocal connection
+    	//The reason of using threadLocal connection is that
+    	//we face a situation of distributed transaction
         Connection con = ConnectionDispenser.getConnection();
         OutputStream outStream = null;
         BLOB blob = null;
@@ -148,13 +156,21 @@ public class StSCPDBImpl {
 //                            + "values(?, sysdate, ORDDicom())");
             PreparedStatement pst2 = con
             .prepareStatement("insert into " +
+            		          "\"" +
             		          DBConUtil.TABLE_NAME + 
+            		          "\"" +
             		          "(" + 
-            		          DBConUtil.ID_COL_NAME + 
+            		          "\"" +
+            		          DBConUtil.ID_COL_NAME +
+            		          "\"" +
             		          ", " + 
-            		          DBConUtil.DATE_COL_NAME + 
-            		          ", " + 
+            		          "\"" +
+            		          DBConUtil.DATE_COL_NAME +
+            		          "\"" +
+            		          ", " +
+            		          "\"" +
             		          DBConUtil.IMAGE_COL_NAME + 
+            		          "\"" +
             		          ") " + 
                               "values(?, sysdate, ORDDicom())");
             pst2.setInt(1, id);
@@ -166,11 +182,17 @@ public class StSCPDBImpl {
 //                            + "where i_id=? for update");
             PreparedStatement pst3 = con
             .prepareStatement("select t." + 
-            		          DBConUtil.IMAGE_COL_NAME + 
-            		          ".getContent() from " + 
+            		          "\"" +
+            		          DBConUtil.IMAGE_COL_NAME +
+            		          "\"" +
+            		          ".getContent() from " +
+            		          "\"" +
             		          DBConUtil.TABLE_NAME +
-            		          " t where " +                             
+            		          "\"" +
+            		          " t where " + 
+            		          "\"" +
             		          DBConUtil.ID_COL_NAME +
+            		          "\"" +
                               "=? for update");
             pst3.setInt(1, id);
             ResultSet rs = pst3.executeQuery();
@@ -215,22 +237,34 @@ public class StSCPDBImpl {
 //                .append("select i_image into obj from DICOM_IMAGE where i_id=? for update;");
         multiSql
                 .append("select " +
+                		"\"" +
                 		DBConUtil.IMAGE_COL_NAME + 
+                		"\"" +
                 		" into obj from " +
-                		DBConUtil.TABLE_NAME + 
+                		"\"" +
+                		DBConUtil.TABLE_NAME +
+                		"\"" +
                 		" where " +
+                		"\"" +
                 		DBConUtil.ID_COL_NAME +
+                		"\"" +
                 		"=? for update;");
         
         multiSql.append("obj.setProperties();");
         
 //        multiSql.append("update DICOM_IMAGE set i_image = obj where i_id=?;");
         multiSql.append("update " +
-        		        DBConUtil.TABLE_NAME + 
+        		        "\"" +
+        		        DBConUtil.TABLE_NAME +
+        		        "\"" +
         		        " set " +
+        		        "\"" +
         		        DBConUtil.IMAGE_COL_NAME + 
+        		        "\"" +
         		        " = obj where " +
+        		        "\"" +
         		        DBConUtil.ID_COL_NAME + 
+        		        "\"" +
         		        "=?;");
         
         multiSql.append(" end;");
@@ -247,12 +281,18 @@ public class StSCPDBImpl {
 //                    .prepareStatement("select t.i_image.getContentLength() from DICOM_IMAGE t "
 //                    + "where i_id=?");
             PreparedStatement pst4 = con
-            .prepareStatement("select t." + 
-      	                      DBConUtil.IMAGE_COL_NAME + 
+            .prepareStatement("select t." +
+            		          "\"" +
+      	                      DBConUtil.IMAGE_COL_NAME +
+      	                      "\"" +
     	                      ".getContentLength() from " + 
+    	                      "\"" +
     	                      DBConUtil.TABLE_NAME +
-    	                      " t where " +                             
+    	                      "\"" +
+    	                      " t where " + 
+    	                      "\"" +
     	                      DBConUtil.ID_COL_NAME +
+    	                      "\"" +
                               "=?");
             
             pst4.setInt(1, id);
@@ -273,6 +313,8 @@ public class StSCPDBImpl {
             } catch (SQLException e1) {
                 e1.printStackTrace();
             } 
+            //If SQLException happens, need to manually throw it outside to tell the
+            //doActualStore method that a serious error happens and should stop store
             throw e;
         } finally {
             try {
@@ -281,9 +323,10 @@ public class StSCPDBImpl {
                 e.printStackTrace();
             }
         }
-        //If SQLException happens, need to manually throw it outside to tell the
-        //doActualStore method that a serious error happens and should stop store
-        con = null;
+        
+        //Release the threadlocal connection
+        ConnectionDispenser.releaseConnection(con);
+        
         return imageLength;
     }
     
