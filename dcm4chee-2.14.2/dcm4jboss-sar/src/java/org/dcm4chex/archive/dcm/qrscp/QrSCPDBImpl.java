@@ -41,7 +41,6 @@ package org.dcm4chex.archive.dcm.qrscp;
 import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,6 +49,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 
 import oracle.jdbc.OracleResultSet;
+import oracle.ucp.AbandonedConnectionTimeoutCallback;
+import oracle.ucp.jdbc.ConnectionWithAbandonedTimeout;
 
 import org.dcm4chex.archive.dcm.DBConUtil;
 
@@ -58,50 +59,11 @@ import org.dcm4chex.archive.dcm.DBConUtil;
  * @version 1.0
  * @since 01.04.2009
  * 
- * This class is used to retrieve the data of Diocm image
+ * This class is used to retrieve the data of DICOM image
  * stored in Oracle 11g database.
+ * Make sure each DB identifier wrapped with a double quote.
  */
-public class QrSCPDBImpl {
-    
-    private Connection con = null;
-    
-    /**
-     * Constructor of QrSCPDBImpl.
-     */
-    public QrSCPDBImpl() {
-        try {
-            setDBCon();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Set up a database connection.
-     */
-    private void setDBCon() throws Exception {
-        if (useManualCon()) {
-            configCon();
-        } else {
-            lookupCon();
-        }
-    }
-    
-    /**
-     * Add looking up code if using connection pool.
-     */
-    private void lookupCon() {
-        // JNDI look up
-    }
-    
-    /**
-     * Manually acquire a database connection.
-     */
-    private void configCon() throws ClassNotFoundException, SQLException {
-
-        con = DriverManager.getConnection(
-                DBConUtil.CON_URL, DBConUtil.CON_USER, DBConUtil.CON_PW);
-    }
+public class QrSCPDBImpl { 
     
     /**
      * Acquire the inputStream of some OrdDicom record according
@@ -114,21 +76,34 @@ public class QrSCPDBImpl {
         int pos = fileURI.indexOf(DBConUtil.DBSTORE_MARK);
         if(pos != -1) {           
             InputStream inputStream = null;
+            
+            Connection con = DBConUtil.borrowConnection(this);
             PreparedStatement ps1 = null;
             ResultSet rs = null;
             oracle.sql.BLOB blob = null;
+            
+            AbandonedConnectionTimeoutCallback callback = 
+            	    new CustAbandonedConnectionTimeoutCallback(con);
+            ((ConnectionWithAbandonedTimeout)con).
+                    registerAbandonedConnectionTimeoutCallback(callback);
             
             int pk = Integer.parseInt(
                     fileURI.substring(pos + DBConUtil.DBSTORE_MARK.length()).trim());
             
 //            ps1 = con.prepareStatement("select t.i_image.getContent() from " +
 //            		"DICOM_IMAGE t where i_id = ?");
-            ps1 = con.prepareStatement("select t." + 
+            ps1 = con.prepareStatement("select t." +
+            		                   "\"" +
   		                               DBConUtil.IMAGE_COL_NAME + 
+  		                               "\"" +
 		                               ".getContent() from " + 
+		                               "\"" +
 		                               DBConUtil.TABLE_NAME +
-		                               " t where " +                             
+		                               "\"" +
+		                               " t where " + 
+		                               "\"" +
 		                               DBConUtil.ID_COL_NAME +
+		                               "\"" +
                                        " = ?");
             ps1.setInt(1, pk);
             rs = ps1.executeQuery();
@@ -157,14 +132,35 @@ public class QrSCPDBImpl {
         return imageInputStream;
     }
     
-    /**
-     * Connection to database can be configured in JBOSS and 
-     * acquired through JNDI, or configured and acquired manually.
-     * This method decides which way to take.
-     */
-    private boolean useManualCon() {
-    	
-        return DBConUtil.MANUAL_CON_FLAG;
-    }
-    
 }
+
+/**
+ * Customize handler for abandoned connections. 
+ * This handler will be invoked when a connection 
+ * has been non-active for some time after borrowed. 
+ */
+class CustAbandonedConnectionTimeoutCallback implements AbandonedConnectionTimeoutCallback {
+	
+	private Connection conn = null;
+
+	public CustAbandonedConnectionTimeoutCallback(Connection conn) {
+		this.conn = conn;
+	}
+
+	@Override
+	public boolean handleTimedOutConnection() {
+		
+        try {
+        	((ConnectionWithAbandonedTimeout)conn).
+        	             removeAbandonedConnectionTimeoutCallback();
+			conn.close();
+		} catch (SQLException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+}
+
+

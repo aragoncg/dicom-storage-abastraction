@@ -39,9 +39,7 @@
 package org.dcm4chex.archive.util;
 
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -55,122 +53,60 @@ import org.dcm4chex.archive.dcm.DBConUtil;
  * 
  * This class is used to delete OrdDicom records stored
  * in Oracle 11g database.
- * This class is thread-safe since it is accessed sequentially
- * by one deamon thread.
+ * This class is thread-safe.
+ * Make sure each DB identifier wrapped with a double quote.
  */
 public class DelSCPDBImpl {
-    
-    private Connection con = null;
-    
-    private SoftReference<Connection> softRef = null;
-    
-    private PreparedStatement ps1 = null;
-    
-    private boolean manualCon = false;
-    
-    /**
-     * Constructor of DelSCPDBImpl.
-     */
-    public DelSCPDBImpl() {
-        try {
-            setDBCon();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Set up a database connection.
-     */
-    private void setDBCon() throws Exception {
-        if (useManualCon()) {
-            configCon();
-            con = null;
-            manualCon = true;
-        } else {
-            lookupCon();
-        }
-    }
-    
-    /**
-     * Manually acquire a database connection.
-     */
-    private void configCon() throws ClassNotFoundException, SQLException {
-
-        con = DriverManager.getConnection(
-                DBConUtil.CON_URL, DBConUtil.CON_USER, DBConUtil.CON_PW);
-
-        softRef = new SoftReference<Connection>(con);
-    }
-    
-    /**
-     * Add looking up code if using connection pool.
-     */
-    private void lookupCon() {
-        // JNDI look up
-    }
-    
-    /**
-     * Connection to database can be configured in JBOSS and 
-     * acquired through JNDI, or configured and acquired manually.
-     * This method decides which way to take.
-     */
-    private boolean useManualCon() {
-
-        return DBConUtil.MANUAL_CON_FLAG;
-    }
     
     /**
      * Delete OrdDicom record according to record Id in database.
      */
-    public int deleteDBFile(File file) throws Exception{
-        
+    public static int deleteDBFile(File file) throws Exception{
+           	
         int number = -1;
         String fileURI = file.getPath();
         int pos = fileURI.indexOf(DBConUtil.DBSTORE_MARK);
+        
+        Connection con = null;
+        PreparedStatement ps1 = null;
+        
+        //If the record is found stored in database
         if(pos != -1) {
             int pk = Integer.parseInt(
                     fileURI.substring(pos + DBConUtil.DBSTORE_MARK.length()).trim());
             
-            if(manualCon) {
-               con = (Connection)softRef.get();
-               if (con == null) {
-                   configCon();
-               }
-            }
+            con = DBConUtil.borrowConnection(DelSCPDBImpl.class);
             
 //            ps1 = con.prepareStatement("delete DICOM_IMAGE where i_id=?");
             ps1 = con.prepareStatement("delete " +
+            		                   "\"" +
             		                   DBConUtil.TABLE_NAME +
+            		                   "\"" +
             		                   " where " +
+            		                   "\"" +
             		                   DBConUtil.ID_COL_NAME +
+            		                   "\"" +
             		                   "=?");
             ps1.setInt(1, pk);
             number = ps1.executeUpdate();
         }
-        releaseResource(manualCon);
-        return number;
-    }
-    
-    /**
-     * Release resource.
-     */
-    private void releaseResource(boolean manualCon) {
-    	
-    	if(ps1 != null) {
-           try {
+        
+        //Release resource
+        //Catching the possible SQLExcption but not throwing it for
+        //we don't want the exception caught by caller's try clause 
+        try {
+            if(ps1 != null) {           
                ps1.close();
-           } catch (SQLException e) {
-               e.printStackTrace();
-           }
-    	}
-        
-        if (manualCon) {                    
-             con = null;
-        } else {
-            //release connection to pool
-        }
-        
+            }
+            if(con != null) {
+               con.close();
+               con = null;
+            }     
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }      
+     	       
+        return number;
     }
 
 }

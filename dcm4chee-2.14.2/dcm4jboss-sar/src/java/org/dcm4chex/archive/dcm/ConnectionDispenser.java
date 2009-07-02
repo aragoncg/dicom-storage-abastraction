@@ -39,7 +39,6 @@
 package org.dcm4chex.archive.dcm;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -59,13 +58,14 @@ public class ConnectionDispenser {
         public Connection initialValue() {
             Connection con = null;
             try {
-                //Connection can also come from connection pool
-                con = DriverManager.getConnection(DBConUtil.CON_URL,
-                        DBConUtil.CON_USER, DBConUtil.CON_PW);
+                con = DBConUtil.borrowConnection(this);
+            	
                 StringBuilder multiSql = new StringBuilder();
+                
                 multiSql.append("begin ");
                 multiSql.append("ord_dicom.setdatamodel;");
                 multiSql.append(" end;");
+                
                 Statement st = con.createStatement();
                 st.execute(multiSql.toString());
                 st.close();
@@ -83,6 +83,19 @@ public class ConnectionDispenser {
      */
     public static Connection getConnection() {
         return conn.get();
+    }
+    
+    /**
+     * Release borrowed connection to the pool.
+     */
+    public static void releaseConnection(Connection borrowedCon) {
+    	try {
+			borrowedCon.close();
+			borrowedCon = null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 		
+		conn.remove();
     }
 
 }

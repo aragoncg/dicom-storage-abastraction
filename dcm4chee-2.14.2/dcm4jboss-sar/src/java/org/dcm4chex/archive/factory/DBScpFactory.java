@@ -61,8 +61,6 @@ public class DBScpFactory implements ScpFactory {
 
 	private DBStoreScp dbStoreScp;
 	
-	private DelSCPDBImpl dsi; 
-	
 	/**
      * Construct a DBStoreScp instance.
      */
@@ -82,19 +80,14 @@ public class DBScpFactory implements ScpFactory {
 
 	/**
      * Delete some OrdDicom record according to record Id.
-     * Since deletion is done by some deamon thread, this
-     * method is thread-safe. 
+     * This method is thread-safe. 
      */
 	public boolean getFileDeleted(File file, Logger log, boolean deleteEmptyParents) {
-		
-		if (dsi == null) {
-			dsi = new DelSCPDBImpl();
-		}
 
 		int number = 0;
 
 		try {
-			number = dsi.deleteDBFile(file);
+			number = DelSCPDBImpl.deleteDBFile(file);
 		} catch (Exception e) {
 			log.warn("Failed to delete file: " + file);
 			return false;
