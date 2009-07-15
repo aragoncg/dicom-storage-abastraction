@@ -314,7 +314,7 @@ public class DBConUtil {
         
         try {
         	con = pds.getConnection();       	           
-            pst = con.prepareStatement("select DATA_TYPE from User_Tab_Columns t " +
+            pst = con.prepareStatement("select DATA_TYPE from SYS.USER_TAB_COLUMNS t " +
             		                   "where t.TABLE_NAME = ? and t.COLUMN_NAME = ?");
              
             pst.setString(1, TABLE_NAME);

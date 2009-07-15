@@ -12,8 +12,8 @@
     
     <!-- Connection configuration -->
     <con-driver>oracle.jdbc.driver.OracleDriver</con-driver>
-    <con-url>jdbc:oracle:thin:@192.168.2.7:1521:ORCL</con-url>
-    <con-user>SYSTEM</con-user>
+    <con-url>jdbc:oracle:thin:@***.***.***.***:1521:ORCL</con-url>
+    <con-user></con-user>
     <con-password></con-password>
     
     <!-- Mark string indicating storage in database -->
