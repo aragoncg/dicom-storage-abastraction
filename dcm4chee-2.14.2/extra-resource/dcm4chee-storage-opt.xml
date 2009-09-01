@@ -35,6 +35,9 @@
 
     <!-- Required type: Orddicom -->
     <image_col_name>I_IMAGE</image_col_name>
+    
+    <!-- Provide a valid sequence -->
+    <sequence_name>dicom_seq</sequence_name>
      
 </options>
 

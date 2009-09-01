@@ -1,4 +1,4 @@
-PROMPT Do you want to create the default table for DICOM images?
+PROMPT Do you want to create the default table for DICOM image?
 
 PAUSE Press OK to create default table.
 
@@ -17,7 +17,7 @@ EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
 --
 --  Step 4 will increase the size of the ORDDicom object. Thus it will require more 
 --  space in the database page when it is written back to the table in step 5. Oracle
---  reserves space on every database page to accomodate the growth of data items. The 
+--  reserves space on every database page to accomodate the grow of data items. The 
 --  amount of space is determined by the PCTFREE attribute (default value 10) which 
 --  is specified in the CREATE TABLE statement. 
 --  
@@ -32,7 +32,7 @@ EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
 --  6. compute a value for PCTFREE as 100*(1-X/Y)  where X is the AVG_ROW_LEN 
 --     from step 3 and Y is the AVG_ROW_LEN from step 5
 --   
---    NOTE this discussion assumes that AVG_ROW_LEN < the database block size
+--    NOTE this discussion assume that AVG_ROW_LEN < the database block size
 --         You should ensure the your AVG_ROW_LEN is less than your database block size
 --         so that row chaining does not occur automatically for every row.
 --
@@ -77,7 +77,12 @@ create table dicom_image
       )
 ; 
 
-
+-- Create sequence
+CREATE SEQUENCE dicom_seq
+    MINVALUE 1
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
  
 
 

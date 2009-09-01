@@ -564,8 +564,9 @@ public class DBStoreScp extends StoreScp {
         service.getLog().info("M-WRITE to Database Oracle.11g");
         
         //Acquire OutputStream of the new inserted empty Dicom object in database
-        int id = dbStore.getNewId();
-        OutputStream ops = dbStore.getOutputStream(id);
+        DicomObj emptyDicom = dbStore.getDicomObj();
+        long id = emptyDicom.getId();
+        OutputStream ops = emptyDicom.getContent();
         
         MessageDigest md = null;
         BufferedOutputStream bos = null;

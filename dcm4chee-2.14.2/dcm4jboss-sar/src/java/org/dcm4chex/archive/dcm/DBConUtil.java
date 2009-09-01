@@ -96,6 +96,9 @@ public class DBConUtil {
     /** Default DICOM image column name. */
     public static String IMAGE_COL_NAME = "I_IMAGE";
     
+    /** Default sequence name. */
+    public static String SEQUENCE_NAME = "dicom_seq";
+    
     /** If password is provided in plain text. */
     public static boolean readPlainText = true;
     
@@ -196,6 +199,7 @@ public class DBConUtil {
             		ID_COL_NAME = root.elementText("id_col_name").trim();
             		DATE_COL_NAME = root.elementText("date_col_ame").trim();
             		IMAGE_COL_NAME = root.elementText("image_col_name").trim();
+            		SEQUENCE_NAME = root.elementText("sequence_name").trim();
             		
             		//If fail the type check system will default to save image in file system
             		if(!checkColType()) {
@@ -221,15 +225,14 @@ public class DBConUtil {
     	
        //Prompt for user name and password input
        Console console = System.console();
+       
        if (console == null) {
             System.err.println("Console not available");
             return false;
        }
+       
        String username = console.readLine("Enter Oracle 11g Database username: ");
        String password = new String(console.readPassword("Enter Oracle 11g Database password: "));
-       
-//    	String username = "SYSTEM";
-//    	String password = "000000";
     	
        if(username.equals("")) {
     	   System.out.println("NO username input. Database storage NOT available");
@@ -375,7 +378,7 @@ public class DBConUtil {
     		System.out.println("Available connection number is: " + 
     				           pds.getAvailableConnectionsCount());
     		
-    		//Suppose this method is synchronized(it should be)
+    		//Suppose this method is thread-safe(it should be)
 			con = pds.getConnection();
 			
 			System.out.println("*** " + fromWhom + " borrowed a connection ***");
