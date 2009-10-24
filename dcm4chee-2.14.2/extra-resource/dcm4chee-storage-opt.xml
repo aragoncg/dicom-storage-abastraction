@@ -22,9 +22,9 @@
     <!-- Use default table definition: YES or NO -->
     <use-default-table>YES</use-default-table>
     
-    <!-- Provide table name and column names if choose not to use default table definition -->
+    <!-- Provide table name, column names and sequence name if choose NOT to use default table definition -->
     <!-- Make sure the column types provided are same as required -->
-    <!-- Customized table name and column names -->
+    <!-- Customized table name, column names and sequence name -->
     <table_name>DICOM_IMAGE</table_name>
 
     <!-- Required type: Integer -->
@@ -37,7 +37,7 @@
     <image_col_name>I_IMAGE</image_col_name>
     
     <!-- Provide a valid sequence -->
-    <sequence_name>dicom_seq</sequence_name>
+    <sequence_name>DICOM_SEQ</sequence_name>
      
 </options>
 

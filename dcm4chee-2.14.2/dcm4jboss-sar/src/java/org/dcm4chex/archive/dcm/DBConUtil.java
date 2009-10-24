@@ -97,7 +97,7 @@ public class DBConUtil {
     public static String IMAGE_COL_NAME = "I_IMAGE";
     
     /** Default sequence name. */
-    public static String SEQUENCE_NAME = "dicom_seq";
+    public static String SEQUENCE_NAME = "DICOM_SEQ";
     
     /** If password is provided in plain text. */
     public static boolean readPlainText = true;
@@ -201,8 +201,8 @@ public class DBConUtil {
             		IMAGE_COL_NAME = root.elementText("image_col_name").trim();
             		SEQUENCE_NAME = root.elementText("sequence_name").trim();
             		
-            		//If fail the type check system will default to save image in file system
-            		if(!checkColType()) {
+            		//If fail type check or sequence check then default to save image in file system
+            		if(!checkColType() || !checkSeqName()) {
 //            			System.out.println("Invalid column types user provided!" +
 //            					           "Image storage will be defaulted to file system!");            			
             			return saveToDB;
@@ -233,7 +233,7 @@ public class DBConUtil {
        
        String username = console.readLine("Enter Oracle 11g Database username: ");
        String password = new String(console.readPassword("Enter Oracle 11g Database password: "));
-    	
+       
        if(username.equals("")) {
     	   System.out.println("NO username input. Database storage NOT available");
     	   return false;
@@ -313,8 +313,7 @@ public class DBConUtil {
     	Connection con = null;
         PreparedStatement pst = null;
         ResultSet rs = null;
-        
-        
+               
         try {
         	con = pds.getConnection();       	           
             pst = con.prepareStatement("select DATA_TYPE from SYS.USER_TAB_COLUMNS t " +
@@ -364,6 +363,56 @@ public class DBConUtil {
         }
     	
         return isNameValid;
+    }
+    
+    /**
+     * Check if the sequence retrieved by the name user provided
+     * is valid.
+     */
+    private static boolean checkSeqName() {
+    	
+    	boolean isNameValid = true;
+    	
+    	Connection con = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+               
+        try {
+        	con = pds.getConnection();       	           
+            pst = con.prepareStatement("select SEQUENCE_NAME from USER_SEQUENCES s where s.SEQUENCE_NAME = ?");            
+            pst.setString(1, SEQUENCE_NAME);
+            
+            rs = pst.executeQuery();           
+            if (!rs.next()) {
+                isNameValid = false;
+            }                      
+        } catch (SQLException e) {
+            e.printStackTrace();
+            isNameValid = false;         
+        } finally {
+        	try {
+            	if(rs != null)
+                   rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+            	if(pst != null)
+                   pst.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+            	if(con != null) {
+                   con.close();
+                   con = null;
+            	}
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    	
+    	return isNameValid;
     }
     
     /**

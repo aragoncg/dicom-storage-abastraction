@@ -40,15 +40,12 @@ package org.dcm4chex.archive.dcm.storescp;
 
 import java.io.OutputStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.dcm4chex.archive.dcm.ConnectionDispenser;
 import org.dcm4chex.archive.dcm.DBConUtil;
 
 import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.BLOB;
 
@@ -83,15 +80,12 @@ public class StSCPDBImpl {
             con.setAutoCommit(false);
 
             //Insert a new empty OrdDicom object
-//            PreparedStatement pst2 = con
-//                              .prepareStatement("BEGIN insert into DICOM_IMAGE(i_id, i_date, i_image) "
-//                              + "values(dicom_seq.nextval, sysdate, ORDDicom()) returning i_id into ?; END;");
             OracleCallableStatement ocs = (OracleCallableStatement)con
                  .prepareCall("BEGIN insert into " +
             		          "\"" +
             		          DBConUtil.TABLE_NAME + 
             		          "\"" +
-            		          "(" + 
+            		          " t(" + 
             		          "\"" +
             		          DBConUtil.ID_COL_NAME +
             		          "\"" +
@@ -103,46 +97,32 @@ public class StSCPDBImpl {
             		          "\"" +
             		          DBConUtil.IMAGE_COL_NAME + 
             		          "\"" +
-            		          ") " + 
-                              "values(" + 
+            		          ") values(" + 
+                              "\"" +
                               DBConUtil.SEQUENCE_NAME + 
+                              "\"" +
                               ".nextval, sysdate, ORDDicom()) returning " +
                               "\"" +
             		          DBConUtil.ID_COL_NAME +
             		          "\"" +
-            		          " into ?; END;");           
+            		          ", t." +
+            		          "\"" +
+            		          DBConUtil.IMAGE_COL_NAME + 
+            		          "\"" +
+            		          ".getContent() into ?, ?; END;");
+            
             ocs.registerOutParameter(1, OracleTypes.NUMBER);
+            ocs.registerOutParameter(2, OracleTypes.BLOB);
+            
 			ocs.execute();
+			
+			//Get the id and the BOLB of the new inserted OrdDicom object
 			id = ocs.getLong(1);
-             
-            //Get the BOLB of the new inserted OrdDicom object
-//            PreparedStatement pst3 = con
-//                    .prepareStatement("select t.i_image.getContent() from DICOM_IMAGE t "
-//                            + "where i_id=? for update");
-            PreparedStatement pst3 = con
-            .prepareStatement("select t." + 
-            		          "\"" +
-            		          DBConUtil.IMAGE_COL_NAME +
-            		          "\"" +
-            		          ".getContent() from " +
-            		          "\"" +
-            		          DBConUtil.TABLE_NAME +
-            		          "\"" +
-            		          " t where " + 
-            		          "\"" +
-            		          DBConUtil.ID_COL_NAME +
-            		          "\"" +
-                              "=? for update");
-            pst3.setLong(1, id);
-            ResultSet rs = pst3.executeQuery();
-
-            if (rs.next()) {
-                blob = ((OracleResultSet)rs).getBLOB(1);
-                outStream = blob.setBinaryStream(0);
-            }
-            rs.close();
-            ocs.close();
-            pst3.close();
+            blob = ocs.getBLOB(2);
+            
+            outStream = blob.setBinaryStream(0);
+            
+            ocs.close();            
         } catch (SQLException e) {
             e.printStackTrace();
             try {
@@ -174,8 +154,6 @@ public class StSCPDBImpl {
         multiSql.append("begin ");
 
         //Call setProperties() method and update
-//        multiSql
-//                .append("select i_image into obj from DICOM_IMAGE where i_id=? for update;");
         multiSql
                 .append("select " +
                 		"\"" +
@@ -193,12 +171,11 @@ public class StSCPDBImpl {
         
         multiSql.append("obj.setProperties();");
         
-//        multiSql.append("update DICOM_IMAGE set i_image = obj where i_id=?;");
         multiSql.append("update " +
         		        "\"" +
         		        DBConUtil.TABLE_NAME +
         		        "\"" +
-        		        " set " +
+        		        " t set " +
         		        "\"" +
         		        DBConUtil.IMAGE_COL_NAME + 
         		        "\"" +
@@ -206,47 +183,23 @@ public class StSCPDBImpl {
         		        "\"" +
         		        DBConUtil.ID_COL_NAME + 
         		        "\"" +
-        		        "=?;");
+        		        "=? returning obj.getContentLength() into ?;");
         
         multiSql.append(" end;");
 
         //Execute the PL/SQL block
         try {
-            PreparedStatement multiSqlPst = con.prepareStatement(multiSql
-                    .toString());
-            multiSqlPst.setLong(1, id);
-            multiSqlPst.setLong(2, id);
-            multiSqlPst.execute();
-           
-//            PreparedStatement pst4 = con
-//                    .prepareStatement("select t.i_image.getContentLength() from DICOM_IMAGE t "
-//                    + "where i_id=?");
-            PreparedStatement pst4 = con
-            .prepareStatement("select t." +
-            		          "\"" +
-      	                      DBConUtil.IMAGE_COL_NAME +
-      	                      "\"" +
-    	                      ".getContentLength() from " + 
-    	                      "\"" +
-    	                      DBConUtil.TABLE_NAME +
-    	                      "\"" +
-    	                      " t where " + 
-    	                      "\"" +
-    	                      DBConUtil.ID_COL_NAME +
-    	                      "\"" +
-                              "=?");
+        	OracleCallableStatement multiSqlOcs = (OracleCallableStatement)con
+                                                   .prepareCall(multiSql.toString());
+        	multiSqlOcs.setLong(1, id);
+        	multiSqlOcs.setLong(2, id);
+        	multiSqlOcs.registerOutParameter(3, OracleTypes.NUMBER);
             
-            pst4.setLong(1, id);
-            ResultSet rs = pst4.executeQuery();
-            if (rs.next()) {
-                imageLength = rs.getInt(1);
-            }
+        	multiSqlOcs.execute();
+            imageLength = multiSqlOcs.getLong(3);
             
             con.commit();            
-            rs.close();
-            multiSqlPst.close();
-            pst4.close();  
-            
+            multiSqlOcs.close();            
         } catch (SQLException e) {
             e.printStackTrace();
             try {
