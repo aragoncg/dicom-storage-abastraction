@@ -62,9 +62,13 @@ public class DBDataSource extends FileDataSource{
     
     /**
      * Constructor of DBDataSource.
+     * Each DBDataSource instance is equipped with an QrSCPDBImpl when 
+     * being constructed in case no outside QrSCMImpl instance is gonna
+     * be injected later by the user for DBDataSource.   
      */
     public DBDataSource(File file, Dataset mergeAttrs, byte[] buffer) {
         super(file, mergeAttrs, buffer);
+        qri = new QrSCPDBImpl();
     }
     
     /**
@@ -94,9 +98,13 @@ public class DBDataSource extends FileDataSource{
     }
     
     /**
-     * Set qri field.
+     * Set the qri field.
+     * Once the user's own QrSCPDBImpl is injected into, first make null the qri ref so
+     * the QrSCMDBImpl instance equipped at construction can be gced, then reset the qri
+     * ref to the injected one.   
      */
     public void setQrSCPDBImpl(QrSCPDBImpl qri) {
+    	this.qri = null;
         this.qri = qri;
     }
 

@@ -1380,7 +1380,14 @@ public class QueryRetrieveScpService extends AbstractScpService {
             buf = new byte[bufferSize];
             assoc.putProperty(SEND_BUFFER, buf);
         }
-        FileDataSource ds = new FileDataSource(f, mergeAttrs, buf);
+        
+        //Modified by YangLin@cn-arg.com on 01.26.2010 for DCMQR command with -cmove
+        //I don't think it is a thread safe way to use a cached buffer like above
+        //Acquire DataSource instance according to Dicom image storage way
+//      FileDataSource ds = new FileDataSource(f, mergeAttrs, buf);
+        FileDataSource ds = (FileDataSource)ScpFactoryUtil.getScpFactory().getDataSource(
+                                            f, mergeAttrs, buf.length);
+        
         ds.setWithoutPixeldata(isWithoutPixelData(dest));
         Dimse rq = AssociationFactory.getInstance().newDimse(
                 presCtx.pcid(), storeRqCmd, ds);
